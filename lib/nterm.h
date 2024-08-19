@@ -3,6 +3,18 @@
 #ifndef _NIM_TERMINAL_H
 #define _NIM_TERMINAL_H
 
+extern "C"
+const char*
+nterm_getVersion(void);
+
+namespace nterm
+{
+  // @returns static data
+  const char* getVersion(){return nterm_getVersion();}
+  
+} // namespace nterm
+
+
 #include <cstdint>
 
 #define _NIN(n) typedef int##n##_t NI##n; typedef uint##n##_t NU##n;
@@ -158,8 +170,8 @@ namespace ncolor{
 typedef NI NColor; // nim std/colors.Color; shall be distinct NI,
   // but C++ has not such notion.
 
-_PRE NColor nc_rgb(int r, int g, int b);
-_PRE NColor nc_parseColor(const char* name);
+_PRE NColor ntermC_rgb(int r, int g, int b);
+_PRE NColor ntermC_parseColor(const char* name);
 
 class Base{
     NColor data;
@@ -172,10 +184,10 @@ public:
       data = rgb;
     }
     Base(int r, int g, int b){
-      data = nc_rgb(r, g, b);}
+      data = ntermC_rgb(r, g, b);}
     // @throw `std::invalid_argument`
     Base(const char* name){
-      data = nc_parseColor(name);}
+      data = ntermC_parseColor(name);}
     NI toNInt() const{return data;}
 };
 #define DerivedInits(cls) \

@@ -2,6 +2,11 @@
 import ./terminal
 export terminal
 
+const Version* = "0.0.2"
+let version = cstring Version
+proc nterm_getVersion*(): cstring{.exportc, dynlib.} =
+  version
+
 import std/colors
 type
   CStdException* {.importcpp: "std::exception", header: "<exception>", inheritable.} = object
@@ -21,7 +26,7 @@ func chk255(x: cint): RGB =
     raise initInvArgErr cstring("not in" & $rRGB)
   cast[RGB](x)
 
-{.pragma: exportNC, exportc: "nc_$1", dynlib, raises: [InvArgErr].}
+{.pragma: exportNC, exportc: "ntermC_$1", dynlib, raises: [InvArgErr].}
 proc rgb*(r, g, b: cint): Color{.exportNC.} =
   rgb(chk255 r,
       chk255 g,

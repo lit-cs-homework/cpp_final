@@ -19,15 +19,22 @@ proc terminalSize*(w, h: var int){.exportc, dynlib.} =
 
 type
   InitList[T]{.importcpp: "std::vector", header: "<vector>"} = object
-
 proc `[]`[T](self: InitList[T], i: cint): T{.importcpp: "#[#]".}
 proc size[T](self: InitList[T]): cint{.importcpp.}
 
-proc writeStyled*(s: cstring, ils: InitList[Style]){.exportc, dynlib.} =
-  var styles: set[Style]
+type StyleSet = InitList[Style]
+
+template toSet[T](ils: InitList[T]): set[T] =
+  var s: set[T]
   for i in cint(0)..<ils.size:
-    styles.incl ils[i]
-  writeStyled($s, styles)
+    s.incl ils[i]
+  s
+
+proc setStyle*(f: File, ils: StyleSet){.exportc, dynlib.} =
+  f.setStyle ils.toSet
+
+proc writeStyled*(s: cstring, ils: StyleSet){.exportc, dynlib.} =
+  writeStyled($s, ils.toSet)
 
 when defined(windows) and appType != "gui" and
     not defined(nimDontSetUtf8CodePage) and not defined(nimscript):

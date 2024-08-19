@@ -13,6 +13,8 @@ _NIN(32)
 _NIN(16)
 _NIN(8)
 
+#undef _NIN
+
 //typedef void* POINTER;
 //constexpr int NIM_INTBITS = (8 * sizeof(POINTER));
 //#define NIM_INTBITS (8 * sizeof(POINTER))
@@ -48,17 +50,21 @@ _PRE char getch(void);
 _RI( terminalWidth )
 _RI( terminalHeight )
 
+#undef _RI
 
 #define _VIVI(sym) _PRE void sym(NI&, NI&);
 
 _VIVI( getCursorPos )
 
+#undef _VIVI
 
 #define _FII(sym) _PRE void sym(FILE*, NI, NI);
 #define _NFII(sym) _FII(sym)\
   void sym(NI x, NI y){sym(stdout, x, y);}
 
 _NFII( setCursorPos )
+
+#undef _NFII
 
 #define _FI(sym) _PRE void sym(FILE*, NI);
 #define _NFI(sym) _FI(sym)\
@@ -74,6 +80,7 @@ _NFI( cursorDown )
 _NFI( cursorForward )
 _NFI( cursorBackward )
 
+#undef _NFI
 
 #define _F(sym) _PRE void sym(FILE* _file=stdout);
 
@@ -84,17 +91,24 @@ _F( resetAttributes )
 _F( hideCursor )
 _F( showCursor )
 
+#undef _F
+
 
 #define _VV(sym) _PRE void sym(void);
 
 _VV( enableTrueColors )
 _VV( disableTrueColors )
 
+#undef _VV
+
 #define _BV(sym) _PRE bool sym(void);
 _BV( isTrueColorSupported )
 
 _FI( setBackgroundColorRGB )
 _FI( setForegroundColorRGB )
+
+#undef _FI
+#undef _BV
 
 enum
   ForegroundColor{ // Terminal's foreground colors.
@@ -124,10 +138,13 @@ enum
     bgDefault                 // default terminal background color
   };
 
-#define _FBcB(sym, en) _PRE void sym(FILE* _file, en _color, bool bright=false);
+#define _FBcB(sym, en) _PRE void sym(FILE* _file, en _color, bool bright=false);\
+  void sym(en _color, bool bright=false){sym(stdout, _color, bright);}
+
 _FBcB( setBackgroundColor, BackgroundColor )
 _FBcB( setForegroundColor, ForegroundColor )
 
+#undef _FBcB
 
 enum
  Style{
@@ -137,17 +154,82 @@ enum
   styleUnderscore,          // underscored text
   styleBlink,               // blinking/bold text
   styleBlinkRapid,          // rapid blinking/bold text (not widely supported)
-  styleReverse,             // reverse
+  styleReverse,             // reverse the background and foreground color
   styleHidden,              // hidden text
-  styleStrikethrough        // strikethrough
+  styleStrikethrough        // strikethrough (a delete line)
  };
 
 
 #include <vector>
+typedef std::vector<Style> StyleSet;
+
+_PRE void setStyle(FILE*, StyleSet);
+void setStyle(FILE* f, Style s){setStyle(f, StyleSet{s});}
+
+#define DefStyles {styleBright}
 
 _PRE void writeStyled(
   const char* s,
-  const std::vector<Style>& styles = {styleBright});
+  const StyleSet& styles = DefStyles);
 
+
+#define _genAttr(T, fun) \
+void setConsoleAttr(FILE*f, T c){fun(f, c);}
+
+_genAttr( BackgroundColor, setBackgroundColor )
+_genAttr( ForegroundColor, setForegroundColor )
+_genAttr( StyleSet, setStyle )
+_genAttr( Style, setStyle )
+#undef _genAttr
+
+template <typename T>
+void styledWrite(FILE* f, T st, const char* s) {
+    setConsoleAttr(f, st);
+    fputs(s, f);
+    resetAttributes(f);
+}
+template <typename T>
+void styledWrite(T c, const char* s) {
+  styledWrite(stdout, c, s);}
+
+// XXX: due to C++'s lack of concept before C++23
+// we just cannot implement with the first parameter
+// as `FILE*`
+#define f stdout
+template <typename A, typename B>
+void styledWrite(A fc, B bc, const char* s) {
+    setConsoleAttr(f, bc);
+    setConsoleAttr(f, fc);
+    fputs(s, f); resetAttributes(f);
+}
+
+template <typename A, typename B, typename C>
+void styledWrite(A a, B b, C c, const char* s) {
+    setConsoleAttr(f, a);
+    setConsoleAttr(f, b);
+    setConsoleAttr(f, c);
+    fputs(s, f); resetAttributes(f);
+}
+
+#if __cplusplus < 202000L
+#define styledWriteLine(...) do{styledWrite(__VA_ARGS__); putc('\n', stdout);\
+  }while(0)
+#else
+// use of ‘auto’ in parameter declaration only available with
+// ‘-std=c++20’ or ‘-fconcepts'
+void styledWriteLine(const char* s){
+    fputs(s, f);
+    resetAttributes(f);
+    putc('\n', f);
+}
+void styledWriteLine(auto st, auto...args){
+  setConsoleAttr(f, st);
+  styledWriteLine(args...);
+}
+#endif // c++20
+
+#undef f
+
+#undef _PRE
 
 #endif  // _NIM_TREMINAL_H

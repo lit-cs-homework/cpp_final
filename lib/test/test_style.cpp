@@ -4,11 +4,12 @@
 #include <iostream>
 int main(){
   ntermInit();
-  writeStyled(
-    "this shall be italic",
-    {styleItalic}
+  std::cout << "asdsa\n";
+  styledWrite(bgGreen, fgRed,
+    "this shall be italic with green bg and red fg"
   );
-  writeStyled(
-    " bright\n"
+  styledWriteLine(styleBright,
+    " bright"
   );
+  std::cout << "asdsa\n";
 }

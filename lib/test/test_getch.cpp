@@ -4,6 +4,7 @@
 
 #include <iostream>
 int main(){
+  ntermInit();
   writeStyled(
     "asdasd",
     {styleItalic}

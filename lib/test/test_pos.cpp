@@ -4,6 +4,7 @@
 #include <iostream>
 
 int main(){
+  ntermInit();
   NI x, y;
   getCursorPos(x, y);
   std::cout << x << ' ' << y << std::endl;

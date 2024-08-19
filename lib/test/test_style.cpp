@@ -3,6 +3,7 @@
 
 #include <iostream>
 int main(){
+  ntermInit();
   writeStyled(
     "this shall be italic",
     {styleItalic}

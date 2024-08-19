@@ -4,6 +4,8 @@
 #define _NIM_TERMINAL_H
 
 #include <cstdint>
+void NimMain(void);
+#define ntermInit() NimMain()
 
 typedef void* POINTER;
 constexpr int NIM_INTBITS = (8 * sizeof(POINTER));

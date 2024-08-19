@@ -1,7 +1,37 @@
 
 import ./terminal
-
 export terminal
+
+import std/colors
+type
+  CStdException* {.importcpp: "std::exception", header: "<exception>", inheritable.} = object
+  InvArgErr*{.importcpp:"std::invalid_argument", header: "<stdexcept>",
+  .} = object of CStdException
+proc what*(s: CStdException): cstring {.importcpp: "((char *)#.what())".}
+proc initInvArgErr*(a: cstring): InvArgErr {.importcpp: "std::invalid_argument(@)", constructor.}
+proc initInvArgErr*(a: string): InvArgErr{.noInit  # noInit is required to pass compilation
+  .} = initInvArgErr cstring a
+
+
+const rRGB = cint(0)..cint(255)
+type
+  RGB = range[0..255]
+func chk255(x: cint): RGB =
+  if x not_in rRGB:
+    raise initInvArgErr cstring("not in" & $rRGB)
+  cast[RGB](x)
+
+{.pragma: exportNC, exportc: "nc_$1", dynlib, raises: [InvArgErr].}
+proc rgb*(r, g, b: cint): Color{.exportNC.} =
+  rgb(chk255 r,
+      chk255 g,
+      chk255 b)
+
+proc parseColor*(name: cstring): Color{.exportNC.} =
+  try:
+    result = parseColor $name
+  except ValueError as e:
+    raise initInvArgErr e.msg
 
 template wrapXY(sym, x, y) =
   let res = sym()

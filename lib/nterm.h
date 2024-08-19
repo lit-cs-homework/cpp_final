@@ -4,8 +4,6 @@
 #define _NIM_TERMINAL_H
 
 #include <cstdint>
-void NimMain(void);
-#define ntermInit() NimMain()
 
 #define _NIN(n) typedef int##n##_t NI##n; typedef uint##n##_t NU##n;
 _NIN(64)
@@ -14,12 +12,6 @@ _NIN(16)
 _NIN(8)
 
 #undef _NIN
-
-//typedef void* POINTER;
-//constexpr int NIM_INTBITS = (8 * sizeof(POINTER));
-//#define NIM_INTBITS (8 * sizeof(POINTER))
-//static_assert(NIM_INTBITS==64);
-
 
 //#  if NIM_INTBITS == 64
 #include <cstdint>
@@ -42,6 +34,32 @@ typedef NU8 NU;
 #include <cstdio>
 
 #define _PRE extern "C" 
+
+#define _VV(sym) _PRE void sym(void);
+_VV( enableTrueColors )
+_VV( disableTrueColors )
+#undef _VV
+
+#define _BV(sym) _PRE bool sym(void);
+_BV( isTrueColorSupported )
+#undef _BV
+
+#include <stdexcept>
+#include <cstdlib>
+void NimMain(void);
+// a must before calling any other functions of `nterm`.
+// otherwise a crash may occur.
+void ntermInit(bool enableTrueColor=true){
+  NimMain();
+  if (enableTrueColor) {
+      enableTrueColors();
+      if (!isTrueColorSupported()){
+          throw std::runtime_error("you wanna enable console true color, \n"
+          "but your console doesn't support it, considering disable it");
+      }
+      atexit(disableTrueColors);
+  }
+}
 
 _PRE char getch(void);
 
@@ -80,7 +98,6 @@ _NFI( cursorDown )
 _NFI( cursorForward )
 _NFI( cursorBackward )
 
-#undef _NFI
 
 #define _F(sym) _PRE void sym(FILE* _file=stdout);
 
@@ -94,21 +111,11 @@ _F( showCursor )
 #undef _F
 
 
-#define _VV(sym) _PRE void sym(void);
-
-_VV( enableTrueColors )
-_VV( disableTrueColors )
-
-#undef _VV
-
-#define _BV(sym) _PRE bool sym(void);
-_BV( isTrueColorSupported )
-
-_FI( setBackgroundColorRGB )
-_FI( setForegroundColorRGB )
+_NFI( setBackgroundColorRGB )
+_NFI( setForegroundColorRGB )
 
 #undef _FI
-#undef _BV
+#undef _NFI
 
 enum
   ForegroundColor{ // Terminal's foreground colors.
@@ -146,6 +153,70 @@ _FBcB( setForegroundColor, ForegroundColor )
 
 #undef _FBcB
 
+
+namespace ncolor{
+typedef NI NColor; // nim std/colors.Color; shall be distinct NI,
+  // but C++ has not such notion.
+
+_PRE NColor nc_rgb(int r, int g, int b);
+_PRE NColor nc_parseColor(const char* name);
+
+class Base{
+    NColor data;
+public:
+    // for hex notation.
+    Base(int rgb){
+      if ( rgb<0 || rgb>0xffffff)
+        throw std::invalid_argument(
+          "expect color in range 0..0xffffff");
+      data = rgb;
+    }
+    Base(int r, int g, int b){
+      data = nc_rgb(r, g, b);}
+    // @throw `std::invalid_argument`
+    Base(const char* name){
+      data = nc_parseColor(name);}
+    NI toNInt() const{return data;}
+};
+#define DerivedInits(cls) \
+    public:\
+      cls(int rgb): Base(rgb){};\
+      cls(int r, int g, int b): Base(r, g, b){}\
+      cls(const char* name): Base(name){}\
+
+/* trick: this is shortly-named asumming:
+  this is only used via namespace and within `styledWrite`,
+  e.g.
+```cpp
+styledWrite(ncolor::bg(0x12, 0x23, 0x34), "asd");
+```
+  where the notation is alreadly long enough,
+  so other name like `Backgound` is annoying.
+*/
+class bg: public Base{DerivedInits(bg)};
+class fg: public Base{DerivedInits(fg)};
+/* do not use a macro that declared class, as that'll
+ nullify static-check tools and they will complain there're no
+ `bg`, `fg` in this namespace.
+ */
+
+#undef DerivedInits
+
+} // namespace
+
+#define _genColor(fun) \
+void fun(FILE*f, ncolor::Base c){\
+    fun##RGB(f, c.toNInt() );\
+}\
+void fun(ncolor::Base c){fun(stdout, c);}\
+void fun(int r, int g, int b){\
+    fun(ncolor::Base(r, g, b));\
+}
+//end_define
+
+_genColor( setBackgroundColor )
+_genColor( setForegroundColor )
+
 enum
  Style{
   styleBright = 1,          // bright text
@@ -177,7 +248,9 @@ _PRE void writeStyled(
 void setConsoleAttr(FILE*f, T c){fun(f, c);}
 
 _genAttr( BackgroundColor, setBackgroundColor )
+_genAttr( ncolor::bg, setBackgroundColor )
 _genAttr( ForegroundColor, setForegroundColor )
+_genAttr( ncolor::fg, setForegroundColor )
 _genAttr( StyleSet, setStyle )
 _genAttr( Style, setStyle )
 #undef _genAttr

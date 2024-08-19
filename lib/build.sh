@@ -1,0 +1,1 @@
+nim cpp --app:staticLib --outdir:. src/nterm.nim

@@ -65,7 +65,7 @@ _NFII( setCursorPos )
   void sym(NI n){sym(stdout, n);}
 
 _NFI( setCursorXPos )
-_NFI( setCursorYPos )
+//_NFI( setCursorYPos ) // only support in windows
 
 
 _NFI( cursorUp )
@@ -147,7 +147,7 @@ enum
 
 _PRE void writeStyled(
   const char* s,
-  std::vector<Style> styles = {styleBright});
+  const std::vector<Style>& styles = {styleBright});
 
 
 #endif  // _NIM_TREMINAL_H

@@ -7,37 +7,36 @@
 void NimMain(void);
 #define ntermInit() NimMain()
 
-typedef void* POINTER;
-constexpr int NIM_INTBITS = (8 * sizeof(POINTER));
-//#define NIM_INTBITS (8 * sizeof(POINTER))
-
 #define _NIN(n) typedef int##n##_t NI##n; typedef uint##n##_t NU##n;
 _NIN(64)
 _NIN(32)
 _NIN(16)
 _NIN(8)
 
-static_assert(NIM_INTBITS==64);
-typedef NI64 NI;
-typedef NU64 NU;
+//typedef void* POINTER;
+//constexpr int NIM_INTBITS = (8 * sizeof(POINTER));
+//#define NIM_INTBITS (8 * sizeof(POINTER))
+//static_assert(NIM_INTBITS==64);
 
-/*
-#  if NIM_INTBITS == 64
+
+//#  if NIM_INTBITS == 64
+#include <cstdint>
+#if INTPTR_MAX == 9223372036854775807L
 typedef NI64 NI;
 typedef NU64 NU;
-#  elif NIM_INTBITS == 32
+#elif INTPTR_MAX == 2147483647
 typedef NI32 NI;
 typedef NU32 NU;
-#  elif NIM_INTBITS == 16
+#elif INTPTR_MAX == 32767
 typedef NI16 NI;
 typedef NU16 NU;
-#  elif NIM_INTBITS == 8
+#elif INTPTR_MAX == 127
 typedef NI8 NI;
 typedef NU8 NU;
-#  else
-#    error "invalid bit width for int"
-#  endif
-*/
+#else
+# error "invalid bit width for int"
+#endif
+
 #include <cstdio>
 
 #define _PRE extern "C" 

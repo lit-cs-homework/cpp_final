@@ -29,4 +29,33 @@ proc writeStyled*(s: cstring, ils: InitList[Style]){.exportc, dynlib.} =
     styles.incl ils[i]
   writeStyled($s, styles)
 
+when defined(windows) and appType != "gui" and
+    not defined(nimDontSetUtf8CodePage) and not defined(nimscript):
+  import std/exitprocs
+
+  proc setConsoleOutputCP(codepage: cuint): int32 {.stdcall, dynlib: "kernel32",
+    importc: "SetConsoleOutputCP".}
+  proc setConsoleCP(wCodePageID: cuint): int32 {.stdcall, dynlib: "kernel32",
+    importc: "SetConsoleCP".}
+  proc getConsoleOutputCP(): cuint {.stdcall, dynlib: "kernel32",
+    importc: "GetConsoleOutputCP".}
+  proc getConsoleCP(): cuint {.stdcall, dynlib: "kernel32",
+    importc: "GetConsoleCP".}
+
+  const Utf8codepage = 65001'u32
+
+  let
+    consoleOutputCP = getConsoleOutputCP()
+    consoleCP = getConsoleCP()
+
+  proc restoreConsoleOutputCP() = discard setConsoleOutputCP(consoleOutputCP)
+  proc restoreConsoleCP() = discard setConsoleCP(consoleCP)
+
+  if consoleOutputCP != Utf8codepage:
+    discard setConsoleOutputCP(Utf8codepage)
+    addExitProc(restoreConsoleOutputCP)
+
+  if consoleCP != Utf8codepage:
+    discard setConsoleCP(Utf8codepage)
+    addExitProc(restoreConsoleCP)
 

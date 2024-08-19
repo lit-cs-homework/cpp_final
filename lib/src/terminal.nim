@@ -1,3 +1,7 @@
+# modified from std/terminal
+#  adding exportc pragma for apis
+# on Nim 2.1.9
+
 #
 #
 #            Nim's Runtime Library
@@ -62,6 +66,8 @@ import std/macros
 import std/strformat
 from std/strutils import toLowerAscii, `%`, parseInt
 import std/colors
+{.pragma: exportNimTerm, exportc: "nimTerm$1".}
+
 
 when defined(windows):
   import std/winlean
@@ -173,7 +179,7 @@ when defined(windows):
         return int(csbi.srWindow.bottom - csbi.srWindow.top + 1)
     return 0
 
-  proc terminalWidth*(): int =
+  proc terminalWidth*(): int{.exportc, dynlib.} =
     ## Returns the terminal width in columns.
     var w: int = 0
     w = terminalWidthIoctl([getStdHandle(STD_INPUT_HANDLE),
@@ -182,7 +188,7 @@ when defined(windows):
     if w > 0: return w
     return 80
 
-  proc terminalHeight*(): int =
+  proc terminalHeight*(): int{.exportc, dynlib.} =
     ## Returns the terminal height in rows.
     var h: int = 0
     h = terminalHeightIoctl([getStdHandle(STD_INPUT_HANDLE),
@@ -221,7 +227,7 @@ when defined(windows):
       raiseOSError(osLastError())
     return (int(c.dwCursorPosition.x), int(c.dwCursorPosition.y))
 
-  proc getCursorPos*(): tuple [x, y: int] {.raises: [ValueError, IOError, OSError].} =
+  proc getCursorPos*(): tuple [x, y: int] {.raises: [ValueError, IOError, OSError], exportNimTerm, dynlib.} =
     return getCursorPos(getStdHandle(STD_OUTPUT_HANDLE))
 
   proc setCursorPos(h: Handle, x, y: int) =
@@ -271,7 +277,7 @@ else:
     mode.c_cc[VTIME] = 0.cuchar
     discard fd.tcSetAttr(time, addr mode)
 
-  proc getCursorPos*(): tuple [x, y: int] {.raises: [ValueError, IOError].} =
+  proc getCursorPos*(): tuple [x, y: int]{.exportNimTerm, dynlib.} =
     ## Returns cursor position (x, y)
     ## writes to stdout and expects the terminal to respond via stdin
     var
@@ -333,7 +339,7 @@ else:
 
   var L_ctermid{.importc, header: "<stdio.h>".}: cint
 
-  proc terminalWidth*(): int =
+  proc terminalWidth*(): int{.exportc, dynlib.} =
     ## Returns some reasonable terminal width from either standard file
     ## descriptors, controlling terminal, environment variables or tradition.
 
@@ -363,7 +369,7 @@ else:
     if w > 0: return w
     return 80 # Finally default to venerable value
 
-  proc terminalHeight*(): int =
+  proc terminalHeight*(): int{.exportc, dynlib.} =
     ## Returns some reasonable terminal height from either standard file
     ## descriptors, controlling terminal, environment variables or tradition.
     ## Zero is returned if the height could not be determined.
@@ -397,7 +403,7 @@ else:
     if h > 0: return h
     return 0 # Could not determine height
 
-proc terminalSize*(): tuple[w, h: int] =
+proc terminalSize*(): tuple[w, h: int]{.exportNimTerm, dynlib.} =
   ## Returns the terminal width and height as a tuple. Internally calls
   ## `terminalWidth` and `terminalHeight`, so the same assumptions apply.
   result = (terminalWidth(), terminalHeight())
@@ -412,21 +418,21 @@ when defined(windows):
     if setConsoleCursorInfo(h, addr(ccsi)) == 0:
       raiseOSError(osLastError())
 
-proc hideCursor*(f: File) =
+proc hideCursor*(f: File){.exportc, dynlib.} =
   ## Hides the cursor.
   when defined(windows):
     setCursorVisibility(f, false)
   else:
     f.write("\e[?25l")
 
-proc showCursor*(f: File) =
+proc showCursor*(f: File){.exportc, dynlib.} =
   ## Shows the cursor.
   when defined(windows):
     setCursorVisibility(f, true)
   else:
     f.write("\e[?25h")
 
-proc setCursorPos*(f: File, x, y: int) =
+proc setCursorPos*(f: File, x, y: int){.exportc, dynlib.} =
   ## Sets the terminal's cursor to the (x,y) position.
   ## (0,0) is the upper left of the screen.
   when defined(windows):
@@ -435,7 +441,7 @@ proc setCursorPos*(f: File, x, y: int) =
   else:
     f.write(fmt"{stylePrefix}{y+1};{x+1}f")
 
-proc setCursorXPos*(f: File, x: int) =
+proc setCursorXPos*(f: File, x: int){.exportc, dynlib.} =
   ## Sets the terminal's cursor to the x position.
   ## The y position is not changed.
   when defined(windows):
@@ -467,7 +473,7 @@ when defined(windows):
     else:
       discard
 
-proc cursorUp*(f: File, count = 1) =
+proc cursorUp*(f: File, count = 1){.exportc, dynlib.} =
   ## Moves the cursor up by `count` rows.
   runnableExamples("-r:off"):
     stdout.cursorUp(2)
@@ -480,7 +486,7 @@ proc cursorUp*(f: File, count = 1) =
   else:
     f.write("\e[" & $count & 'A')
 
-proc cursorDown*(f: File, count = 1) =
+proc cursorDown*(f: File, count = 1){.exportc, dynlib.} =
   ## Moves the cursor down by `count` rows.
   runnableExamples("-r:off"):
     stdout.cursorDown(2)
@@ -493,7 +499,7 @@ proc cursorDown*(f: File, count = 1) =
   else:
     f.write(fmt"{stylePrefix}{count}B")
 
-proc cursorForward*(f: File, count = 1) =
+proc cursorForward*(f: File, count = 1){.exportc, dynlib.} =
   ## Moves the cursor forward by `count` columns.
   runnableExamples("-r:off"):
     stdout.cursorForward(2)
@@ -506,7 +512,7 @@ proc cursorForward*(f: File, count = 1) =
   else:
     f.write(fmt"{stylePrefix}{count}C")
 
-proc cursorBackward*(f: File, count = 1) =
+proc cursorBackward*(f: File, count = 1){.exportc, dynlib.} =
   ## Moves the cursor backward by `count` columns.
   runnableExamples("-r:off"):
     stdout.cursorBackward(2)
@@ -550,7 +556,7 @@ else:
     else:
       f.write("\e[1J")
 
-proc eraseLine*(f: File) =
+proc eraseLine*(f: File){.exportc, dynlib.} =
   ## Erases the entire current line.
   runnableExamples("-r:off"):
     write(stdout, "never mind")
@@ -576,7 +582,7 @@ proc eraseLine*(f: File) =
     f.write("\e[2K")
     setCursorXPos(f, 0)
 
-proc eraseScreen*(f: File) =
+proc eraseScreen*(f: File){.exportc, dynlib.} =
   ## Erases the screen with the background colour and moves the cursor to home.
   when defined(windows):
     let h = conHandle(f)
@@ -603,7 +609,7 @@ when not defined(windows):
     gFG {.threadvar.}: int
     gBG {.threadvar.}: int
 
-proc resetAttributes*(f: File) =
+proc resetAttributes*(f: File){.exportc, dynlib.} =
   ## Resets all attributes.
   when defined(windows):
     let term = getTerminal()
@@ -628,7 +634,7 @@ type
     styleHidden,       ## hidden text
     styleStrikethrough ## strikethrough
 
-proc ansiStyleCode*(style: int): string =
+proc ansiStyleCode*(style: int): string{.exportc, dynlib.} =
   result = fmt"{stylePrefix}{style}m"
 
 template ansiStyleCode*(style: Style): string =
@@ -638,7 +644,7 @@ template ansiStyleCode*(style: Style): string =
 template ansiStyleCode*(style: static[Style]): string =
   (static(stylePrefix & $style.int & "m"))
 
-proc setStyle*(f: File, style: set[Style]) =
+proc setStyle*(f: File, style: set[Style]){.exportc, dynlib.} =
   ## Sets the terminal style.
   when defined(windows):
     let h = conHandle(f)
@@ -653,7 +659,7 @@ proc setStyle*(f: File, style: set[Style]) =
     for s in items(style):
       f.write(ansiStyleCode(s))
 
-proc writeStyled*(txt: string, style: set[Style] = {styleBright}) =
+proc writeStyled*(txt: string, style: set[Style] = {styleBright}){.exportNimTerm, dynlib.} =
   ## Writes the text `txt` in a given `style` to stdout.
   when defined(windows):
     let term = getTerminal()
@@ -698,7 +704,7 @@ type
 when defined(windows):
   var defaultForegroundColor, defaultBackgroundColor: int16 = 0xFFFF'i16 # Default to an invalid value 0xFFFF
 
-proc setForegroundColor*(f: File, fg: ForegroundColor, bright = false) =
+proc setForegroundColor*(f: File, fg: ForegroundColor, bright = false){.exportc, dynlib.} =
   ## Sets the terminal's foreground color.
   when defined(windows):
     let h = conHandle(f)
@@ -727,7 +733,7 @@ proc setForegroundColor*(f: File, fg: ForegroundColor, bright = false) =
     if bright: inc(gFG, 60)
     f.write(ansiStyleCode(gFG))
 
-proc setBackgroundColor*(f: File, bg: BackgroundColor, bright = false) =
+proc setBackgroundColor*(f: File, bg: BackgroundColor, bright = false){.exportc, dynlib.} =
   ## Sets the terminal's background color.
   when defined(windows):
     let h = conHandle(f)
@@ -756,7 +762,7 @@ proc setBackgroundColor*(f: File, bg: BackgroundColor, bright = false) =
     if bright: inc(gBG, 60)
     f.write(ansiStyleCode(gBG))
 
-proc ansiForegroundColorCode*(fg: ForegroundColor, bright = false): string =
+proc ansiForegroundColorCode*(fg: ForegroundColor, bright = false): string{.exportc, dynlib.} =
   var style = ord(fg)
   if bright: inc(style, 60)
   return ansiStyleCode(style)
@@ -765,7 +771,7 @@ template ansiForegroundColorCode*(fg: static[ForegroundColor],
                                   bright: static[bool] = false): string =
   ansiStyleCode(fg.int + bright.int * 60)
 
-proc ansiForegroundColorCode*(color: Color): string =
+proc ansiForegroundColorCode*(color: Color): string{.exportc: "nterm$1", dynlib.} =
   let rgb = extractRGB(color)
   result = fmt"{fgPrefix}{rgb.r};{rgb.g};{rgb.b}m"
 
@@ -783,24 +789,24 @@ template ansiBackgroundColorCode*(color: static[Color]): string =
   # no usage of `fmt`, see issue #7632
   (static("$1$2;$3;$4m" % [$bgPrefix, $(rgb.r), $(rgb.g), $(rgb.b)]))
 
-proc setForegroundColor*(f: File, color: Color) =
+proc setForegroundColor*(f: File, color: Color){.exportc: "$1RGB", dynlib.} =
   ## Sets the terminal's foreground true color.
   if getTerminal().trueColorIsEnabled:
     f.write(ansiForegroundColorCode(color))
 
-proc setBackgroundColor*(f: File, color: Color) =
+proc setBackgroundColor*(f: File, color: Color){.exportc: "$1RGB", dynlib.} =
   ## Sets the terminal's background true color.
   if getTerminal().trueColorIsEnabled:
     f.write(ansiBackgroundColorCode(color))
 
-proc setTrueColor(f: File, color: Color) =
+proc setTrueColor(f: File, color: Color){.exportc, dynlib.} =
   let term = getTerminal()
   if term.fgSetColor:
     setForegroundColor(f, color)
   else:
     setBackgroundColor(f, color)
 
-proc isatty*(f: File): bool =
+proc isatty*(f: File): bool {.exportc: "nterm$1", dynlib.} =
   ## Returns true if `f` is associated with a terminal device.
   when defined(posix):
     proc isatty(fildes: FileHandle): cint {.
@@ -875,7 +881,7 @@ template styledEcho*(args: varargs[untyped]) =
   ## Echoes styles arguments to stdout using `styledWriteLine`.
   stdout.styledWriteLine(args)
 
-proc getch*(): char =
+proc getch*(): char{.exportc, dynlib.} =
   ## Reads a single character from the terminal, blocking until it is entered.
   ## The character is not printed to the terminal.
   when defined(windows):
@@ -899,7 +905,7 @@ proc getch*(): char =
 
 when defined(windows):
   proc readPasswordFromStdin*(prompt: string, password: var string):
-                              bool {.tags: [ReadIOEffect, WriteIOEffect].} =
+                              bool {.tags: [ReadIOEffect, WriteIOEffect], exportc: "$1VarString", dynlib.} =
     ## Reads a `password` from stdin without printing it. `password` must not
     ## be `nil`! Returns `false` if the end of the file has been reached,
     ## `true` otherwise.
@@ -925,7 +931,7 @@ else:
   import std/termios
 
   proc readPasswordFromStdin*(prompt: string, password: var string):
-                            bool {.tags: [ReadIOEffect, WriteIOEffect].} =
+                            bool {.tags: [ReadIOEffect, WriteIOEffect], exportc: "$1VarString", dynlib.} =
     password.setLen(0)
     let fd = stdin.getFileHandle()
     var cur, old: Termios
@@ -938,7 +944,7 @@ else:
     stdout.write "\n"
     discard fd.tcSetAttr(TCSADRAIN, old.addr)
 
-proc readPasswordFromStdin*(prompt = "password: "): string =
+proc readPasswordFromStdin*(prompt = "password: "): string{.exportc, dynlib.} =
   ## Reads a password from stdin without printing it.
   result = ""
   discard readPasswordFromStdin(prompt, result)
@@ -973,14 +979,14 @@ proc resetAttributes*() {.noconv.} =
   ## `exitprocs.addExitProc(resetAttributes)`.
   resetAttributes(stdout)
 
-proc isTrueColorSupported*(): bool =
+proc isTrueColorSupported*(): bool{.exportc, dynlib.} =
   ## Returns true if a terminal supports true color.
   return getTerminal().trueColorIsSupported
 
 when defined(windows):
   import std/os
 
-proc enableTrueColors*() =
+proc enableTrueColors*() {.exportc, dynlib.}=
   ## Enables true color.
   var term = getTerminal()
   when defined(windows):
@@ -1013,7 +1019,7 @@ proc enableTrueColors*() =
         "truecolor", "24bit"]
     term.trueColorIsEnabled = term.trueColorIsSupported
 
-proc disableTrueColors*() =
+proc disableTrueColors*(){.exportc, dynlib.} =
   ## Disables true color.
   var term = getTerminal()
   when defined(windows):

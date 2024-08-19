@@ -1,3 +1,4 @@
 #include <iostream>
-class Map(){
+class Map(){ 
 };
+return 0;

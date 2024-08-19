@@ -55,20 +55,24 @@ _VIVI( getCursorPos )
 
 
 #define _FII(sym) _PRE void sym(FILE*, NI, NI);
+#define _NFII(sym) _FII(sym)\
+  void sym(NI x, NI y){sym(stdout, x, y);}
 
-_FII( setCursorPos )
+_NFII( setCursorPos )
 
 #define _FI(sym) _PRE void sym(FILE*, NI);
+#define _NFI(sym) _FI(sym)\
+  void sym(NI n){sym(stdout, n);}
 
-_FI( setCursorXPos )
-_FI( setCursorYPos )
+_NFI( setCursorXPos )
+_NFI( setCursorYPos )
 
 
-_FI( cursorUp )
-_FI( cursorDown )
+_NFI( cursorUp )
+_NFI( cursorDown )
 
-_FI( cursorForward )
-_FI( cursorBackward )
+_NFI( cursorForward )
+_NFI( cursorBackward )
 
 
 #define _F(sym) _PRE void sym(FILE* _file=stdout);

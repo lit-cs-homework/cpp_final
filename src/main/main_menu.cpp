@@ -7,12 +7,12 @@
 using namespace ftxui;
 
 Component QuitTab(std::function<void()> quit) {
-  return Button("Quit", quit, ButtonOption::Animated());
+  return Button("Quit", quit, ButtonOption::Animated(Color::Cyan1));
 }
 
 Element MainMenuDecorator(Element element) {
   return vbox({
-      text("") | bold | center,
+      text("Cpp Game") | bold | center,
       element,
   });
 }
@@ -20,11 +20,11 @@ Element MainMenuDecorator(Element element) {
 // A tab menu, with extra wide items.
 MenuOption CustomMenuOption() {
   auto option = MenuOption::HorizontalAnimated();
-  /*
-  option.entries.transform = [](const EntryState& state) {
-    Element e = text(state.label) | borderEmpty | borderEmpty;
+
+  option.entries_option.transform = [](const EntryState& state) {
+    Element e = text(state.label) | borderEmpty;
     if (state.focused) {
-      e |= inverted;
+      //e |= inverted;
     }
     if (state.active) {
       e |= bold;
@@ -34,7 +34,7 @@ MenuOption CustomMenuOption() {
     }
     return e;
   };
-  */
+
   return option;
 };
 
@@ -84,11 +84,40 @@ Component PlayTab(std::function<void(int)> play) {
   return Make<Impl>(play);
 }
 
+int LifeCost(const GameConfig& config){
+    return config.difficulty;
+}
 Component ShopTab(GameConfig& config) {
-  auto button = Button("TODO", [&] {
+
+  auto button = Button("[TODO] Buy 5 life values", [&] {
+    if (config.coins >= LifeCost(config)) {
+      config.coins -= LifeCost(config);
+      config.life += 5;
+    }
   });
 
-  return button;
+  return button | [&](Element button_element) {
+    auto description = vbox({
+        //text("balls: " + std::to_string(config.balls)),
+        text("coins: " + std::to_string(config.coins)),
+        text("cost 5 life value: " + std::to_string(LifeCost(config)) + " coins"),
+    });
+
+    description |= border;
+
+    if (config.coins < LifeCost(config)) {
+      return vbox({
+          description,
+          text("You don't have enough coins"),
+      });
+    }
+
+    return vbox({
+        description,
+        button_element,
+    });
+  };
+
 }
 
 

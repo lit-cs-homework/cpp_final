@@ -644,7 +644,7 @@ template ansiStyleCode*(style: Style): string =
 template ansiStyleCode*(style: static[Style]): string =
   (static(stylePrefix & $style.int & "m"))
 
-proc setStyle*(f: File, style: set[Style]){.exportc, dynlib.} =
+proc setStyle*(f: File, style: set[Style]){.exportNimTerm, dynlib.} =
   ## Sets the terminal style.
   when defined(windows):
     let h = conHandle(f)

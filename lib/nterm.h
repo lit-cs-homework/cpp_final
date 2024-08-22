@@ -25,22 +25,12 @@ _NIN(8)
 
 #undef _NIN
 
-//#  if NIM_INTBITS == 64
-#include <cstdint>
-#if INTPTR_MAX == 9223372036854775807L
-typedef NI64 NI;
-typedef NU64 NU;
-#elif INTPTR_MAX == 2147483647
-typedef NI32 NI;
-typedef NU32 NU;
-#elif INTPTR_MAX == 32767
-typedef NI16 NI;
-typedef NU16 NU;
-#elif INTPTR_MAX == 127
-typedef NI8 NI;
-typedef NU8 NU;
-#else
-# error "invalid bit width for int"
+#ifndef NI
+#ifndef INTPTR_MAX
+# error "please manually define NI (signed integer that has the same size of (void*) ) as your compiler lacks one"
+#endif
+
+typedef intptr_t NI;
 #endif
 
 #include <cstdio>

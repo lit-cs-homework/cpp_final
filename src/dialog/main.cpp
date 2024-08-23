@@ -24,7 +24,9 @@ OneDialogPage::OneDialogPage(const char* name, const char* text,
     for (const auto& option: options) {
         auto option_text = option.first;
         auto onclick = [func = option.second]() { func(); };
-        btns->Add(Button(option_text, onclick, btns_style));
+        btns->Add(Button(option_text, onclick, btns_style)
+            |flex  // this makes button stretch through the width
+        );
         //|size(HEIGHT, EQUAL, 1)
         // XXX: adopting above to Button seems no use?!
     }

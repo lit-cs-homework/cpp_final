@@ -59,15 +59,17 @@ class DialogPage {
             virtual ~Impl(){}
             virtual Element Render() { return render_(); }
 
-            void addNextBtn(ButtonOption opt){
+            void addNextBtn(ButtonOption opt, bool useFlex){
                 for(auto pi=p->pages.begin(); pi<p->pages.end()-1; // not the last
                         pi++){
                     //p.btns->ChildAt(p.btns->ChildCount()-1)->Detach();
-                    pi->btns->Add(Button(p->nextPageText,
+                    auto btn = Button(p->nextPageText,
                         [this](){
                             this->p->next();
                         }, opt
-                    ));
+                    );
+                    if (useFlex) btn = btn|flex;
+                    pi->btns->Add(btn);
                     //std::cerr << p->btns->ChildCount() << std::endl;
 
                 }
@@ -83,10 +85,9 @@ class DialogPage {
     //
 public:
     DialogPage();
-    DialogPage(const DialogPage&);
-    DialogPage(const DialogPage&&);
+    DialogPage(const DialogPage&) = default;
 
-    DialogPage(const char* const nextPageText, ButtonOption nextButtonOption = ButtonOption::Animated());
+    DialogPage(const char* const nextPageText, bool sameWidthAsOthers=false, ButtonOption nextButtonOption = ButtonOption::Animated());
     ~DialogPage();
     /* manaully call this, especially after `addNext(name, text, ...)` is called!
       NOTE: next page's live span may be longer, does this in destructor leads to Drag-pointer
@@ -123,6 +124,7 @@ private:
 
     const char* nextPageText;
     ButtonOption nextBtnOption;
+    bool sameWidthAsOthers;
     using Pages = std::vector<OneDialogPage>;
     Pages pages;
     Pages::iterator cur;

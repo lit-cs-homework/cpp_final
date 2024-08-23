@@ -33,21 +33,13 @@ OneDialogPage::OneDialogPage(const char* name, const char* text,
 }
 
 DialogPage::DialogPage(const char* const nextPageText,
+        bool sameWidthAsOthers/*=false*/,
         ButtonOption nextButtonOption/*=ButtionOption::Animated()*/):
-    nextPageText(nextPageText), nextBtnOption(nextButtonOption), cur(pages.end()), idx(-1) {}
+    nextPageText(nextPageText), nextBtnOption(nextButtonOption),
+    sameWidthAsOthers(sameWidthAsOthers),
+    cur(pages.end()), idx(-1) {}
+
 DialogPage::DialogPage(): DialogPage("Next") {}
-DialogPage::DialogPage(const DialogPage& o){
-    idx = o.idx;
-    nextPageText = o.nextPageText;
-    cur = o.cur;
-    pages = o.pages;
-}
-DialogPage::DialogPage(const DialogPage&& o){
-    idx = o.idx;
-    nextPageText = o.nextPageText;
-    cur = o.cur;
-    pages = o.pages;
-}
 
 DialogPage::~DialogPage(){
 
@@ -84,7 +76,7 @@ Component DialogPage::asComponent(Element abovePart/*=filler()*/) {
     idx = -1;
     auto res = DialogPage::ComponentWithRC::Renderer(*this);
     res->Add(cur->btns);
-    res->addNextBtn(nextBtnOption);
+    res->addNextBtn(nextBtnOption, sameWidthAsOthers);
     // we add RC to this so that lambdas below won't refer to a dead(deallocated) `this`
     res->setRender([abovePart, res]{
         auto cap_this = res->p;

@@ -48,11 +48,8 @@ DialogPage::DialogPage(const DialogPage&& o){
     pages = o.pages;
 }
 
-#include <fstream>
 DialogPage::~DialogPage(){
-    std::ofstream f("d.txt");
-    f << "D" << std::endl;
-    f.close();
+
 }
 
 //void DialogPage::ReleaseNext(){if(isNew) delete nextPage;}

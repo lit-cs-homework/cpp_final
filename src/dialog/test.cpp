@@ -45,13 +45,13 @@ int main() {
         ).mainloop(screen);
     } else {
         auto p = DialogPage(
-         ).add("Tom", "hi", {
+         ).add("鹅峨峨", "hi, 奥斯丁不 爱鸟哦爬上哦奥法奥法熬", {
             {"1", onOptionOne},
             {"2", onOptionTwo}
-        }).add("me", "hi", {
+        }, OneDialogPage::NextOption("here", false, true)).add("me", "hi", {
                 {"2", onOptionTwo},
                 {"1", onOptionOne},
-                }
+                }, OneDialogPage::NextOption(true)
         ).add("me", "bye", {
                 {"One", onOptionOne},
                 {"Two", onOptionTwo},

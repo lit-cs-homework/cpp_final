@@ -24,10 +24,43 @@ class OneDialogPage {
 public:
     const char *name_, *text_;
     ftxui::Component btns;
-
+    ButtonOption btns_style;
+    static constexpr const char* const DefNext = "Next";
+    struct NextOption{
+        ButtonOption opt;
+        bool optGiven; // trick! (see nextOption)
+        const char* text;
+        bool textRightAlign;
+        bool sameWidthAsOthers;
+        // meaning using `{btns_style}`
+        NextOption(): optGiven(false), textRightAlign(false), sameWidthAsOthers(false), text(DefNext){}
+        NextOption(ButtonOption opt,
+            const char* const text=DefNext,
+            const bool textRightAlign=false,
+            const bool sameWidthAsOthers=false): optGiven(true),
+          opt(opt), text(text), 
+          textRightAlign(textRightAlign), sameWidthAsOthers(sameWidthAsOthers){}
+        NextOption(const char* text,
+            const bool textRightAlign=false,
+            const bool sameWidthAsOthers=false): optGiven(false),
+          text(text),
+          textRightAlign(textRightAlign), sameWidthAsOthers(sameWidthAsOthers){}
+        NextOption(
+            const bool textRightAlign,
+            const bool sameWidthAsOthers=false): optGiven(false),
+          text(DefNext),
+          textRightAlign(textRightAlign), sameWidthAsOthers(sameWidthAsOthers){}
+    } nextOption;
+    static const ButtonOption DefBtnsStyle; // see .cpp
     using Options = const std::vector<std::pair<std::string, std::function<void()>>>&;
-    OneDialogPage(const char* name, const char* text,
-            Options options, ButtonOption btns_styles = ButtonOption::Animated(Color::Blue3));
+    /*nextOptions={btns_styles}
+     hint: the default value for `nextOptions` is in fact the NextButton{btns_styles}
+     this just has to write as sth like this due to C++ limit.
+    */
+    OneDialogPage(const char* name, const char* text, Options options,
+        NextOption nextOption = {},
+        ButtonOption btns_style = DefBtnsStyle
+    );
 
 };
 
@@ -59,17 +92,19 @@ class DialogPage {
             virtual ~Impl(){}
             virtual Element Render() { return render_(); }
 
-            void addNextBtn(ButtonOption opt, bool useFlex){
-                for(auto pi=p->pages.begin(); pi<p->pages.end()-1; // not the last
-                        pi++){
+            void addNextBtn(){
+                for(auto i=0; i<p->pages.size()-1; // not the last
+                        i++){
                     //p.btns->ChildAt(p.btns->ChildCount()-1)->Detach();
-                    auto btn = Button(p->nextPageText,
+                    auto& cur = p->pages[i];
+                    const auto& nOpt = cur.nextOption;
+                    auto btn = Button(nOpt.text,
                         [this](){
                             this->p->next();
-                        }, opt
+                        }, nOpt.opt
                     );
-                    if (useFlex) btn = btn|flex;
-                    pi->btns->Add(btn);
+                    if (nOpt.sameWidthAsOthers) btn = btn|flex;
+                    cur.btns->Add(btn);
                     //std::cerr << p->btns->ChildCount() << std::endl;
 
                 }
@@ -87,7 +122,6 @@ public:
     DialogPage();
     DialogPage(const DialogPage&) = default;
 
-    DialogPage(const char* const nextPageText, bool sameWidthAsOthers=false, ButtonOption nextButtonOption = ButtonOption::Animated());
     ~DialogPage();
     /* manaully call this, especially after `addNext(name, text, ...)` is called!
       NOTE: next page's live span may be longer, does this in destructor leads to Drag-pointer
@@ -95,10 +129,10 @@ public:
     DialogPage& add(OneDialogPage&& n);
     DialogPage& add(OneDialogPage& n);
 
-    template <typename T>
-    DialogPage& add(T name, T text, OneDialogPage::Options options){
+    template <typename T, typename ...A>
+    DialogPage& add(T name, T text, OneDialogPage::Options options, A&&... args){
         return add(
-            OneDialogPage(name, text, options));
+            OneDialogPage(name, text, options, std::forward<A>(args)...));
     }
 
     ftxui::Component asComponent(Element abovePart=filler());
@@ -119,12 +153,9 @@ private:
 
     //void ReleaseNext();
 
-    DialogPage& addNextButton();
     //ftxui::Component old_btns;
 
-    const char* nextPageText;
-    ButtonOption nextBtnOption;
-    bool sameWidthAsOthers;
+    
     using Pages = std::vector<OneDialogPage>;
     Pages pages;
     Pages::iterator cur;
@@ -133,10 +164,10 @@ private:
     bool hasOldBtns(){return idx!=-1;}
     //#define getOldBtns() (this->pages[idx].btns)
     //ftxui::Component& parent; // used to control lifespan
-    template <typename... T>
-    DialogPage& addImpl(DialogPage*t, T&&... n){
+    template <typename T>
+    DialogPage& addImpl(DialogPage*t, T n){
         bool wasEmpty = cur==pages.end();
-        pages.emplace_back(std::forward<T>(n)...);
+        pages.push_back(n);
         if(wasEmpty){ 
             //old_btns = n.btns;
             idx = -1;
@@ -147,6 +178,6 @@ private:
         idx = pages.size() - 2;
         cur = pages.end()-1;
         //assert(old_btns!=nullptr);
-        return addNextButton();
+        return *this;
     }
 };

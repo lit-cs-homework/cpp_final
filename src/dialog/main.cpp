@@ -16,11 +16,18 @@
 
 using namespace ftxui;
 
-OneDialogPage::OneDialogPage(const char* name, const char* text,
-        OneDialogPage::Options options, ButtonOption btns_style/*=ButtinOption::Simple*/)
-        : name_(name), text_(text) {
+const ButtonOption
+OneDialogPage::DefBtnsStyle = ButtonOption::Animated(Color::Blue3);
+
+OneDialogPage::OneDialogPage(const char* name, const char* text, Options options,
+        const NextOption nextOption/*={}*/,
+        ButtonOption btns_style/*= DefBtnsStyle*/
+) : name_(name), text_(text), btns_style(btns_style), nextOption(nextOption) {
     btns = Container::Horizontal({});
     // Options
+    if (!nextOption.optGiven) { // if no nextOption is given
+        this->nextOption.opt = btns_style; // uses {btns_style}
+    }
     for (const auto& option: options) {
         auto option_text = option.first;
         auto onclick = [func = option.second]() { func(); };
@@ -32,33 +39,11 @@ OneDialogPage::OneDialogPage(const char* name, const char* text,
     }
 }
 
-DialogPage::DialogPage(const char* const nextPageText,
-        bool sameWidthAsOthers/*=false*/,
-        ButtonOption nextButtonOption/*=ButtionOption::Animated()*/):
-    nextPageText(nextPageText), nextBtnOption(nextButtonOption),
-    sameWidthAsOthers(sameWidthAsOthers),
-    cur(pages.end()), idx(-1) {}
-
-DialogPage::DialogPage(): DialogPage("Next") {}
+DialogPage::DialogPage(): cur(pages.end()), idx(-1) {}
 
 DialogPage::~DialogPage(){
 
 }
-
-//void DialogPage::ReleaseNext(){if(isNew) delete nextPage;}
-
-DialogPage& DialogPage::addNextButton(){
-    //auto sthis = std::make_shared<DialogPage>(*this);
-    /*
-    getOldBtns()->Add(Button(
-        nextPageText, [this](){
-            next();
-        }
-    ));
-    */
-    return *this;
-}
-
 
 DialogPage& DialogPage::add(OneDialogPage&  n){return addImpl(this, n);}
 DialogPage& DialogPage::add(OneDialogPage&& n){return addImpl(this, n);}
@@ -76,11 +61,12 @@ Component DialogPage::asComponent(Element abovePart/*=filler()*/) {
     idx = -1;
     auto res = DialogPage::ComponentWithRC::Renderer(*this);
     res->Add(cur->btns);
-    res->addNextBtn(nextBtnOption, sameWidthAsOthers);
+    res->addNextBtn();
     // we add RC to this so that lambdas below won't refer to a dead(deallocated) `this`
     res->setRender([abovePart, res]{
         auto cap_this = res->p;
         auto c = cap_this->cur;
+        bool alignMsgRight = c->nextOption.textRightAlign;
         if (cap_this->hasOldBtns()){
             // update the dispatched object
             res->Add(c->btns);
@@ -88,14 +74,15 @@ Component DialogPage::asComponent(Element abovePart/*=filler()*/) {
             //btns->TakeFocus(); // same as above
             cap_this->getOldBtns()->Detach();
         }
-
+        auto msg = paragraph(std::string(c->text_)); // align left by default
+        if (alignMsgRight) msg = msg | align_right;
         return vbox({
             abovePart /*empty elem to fill the space*/,
             vbox({
                 //separator(), // adding this results too large room used
                 vbox(vbox({
                     text(std::string(c->name_) + ":"),
-                    text(std::string(c->text_)) // align left by default
+                    msg  
                 }) | border,
                 (c->btns->Render())),
             })

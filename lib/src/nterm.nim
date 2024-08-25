@@ -1,7 +1,42 @@
 
 import ./terminal
-
 export terminal
+
+const Version* = "0.0.2"
+let version = cstring Version
+proc nterm_getVersion*(): cstring{.exportc, dynlib.} =
+  version
+
+import std/colors
+type
+  CStdException* {.importcpp: "std::exception", header: "<exception>", inheritable.} = object
+  InvArgErr*{.importcpp:"std::invalid_argument", header: "<stdexcept>",
+  .} = object of CStdException
+proc what*(s: CStdException): cstring {.importcpp: "((char *)#.what())".}
+proc initInvArgErr*(a: cstring): InvArgErr {.importcpp: "std::invalid_argument(@)", constructor.}
+proc initInvArgErr*(a: string): InvArgErr{.noInit  # noInit is required to pass compilation
+  .} = initInvArgErr cstring a
+
+
+const rRGB = cint(0)..cint(255)
+type
+  RGB = range[0..255]
+func chk255(x: cint): RGB =
+  if x not_in rRGB:
+    raise initInvArgErr cstring("not in" & $rRGB)
+  cast[RGB](x)
+
+{.pragma: exportNC, exportc: "ntermC_$1", dynlib, raises: [InvArgErr].}
+proc rgb*(r, g, b: cint): Color{.exportNC.} =
+  rgb(chk255 r,
+      chk255 g,
+      chk255 b)
+
+proc parseColor*(name: cstring): Color{.exportNC.} =
+  try:
+    result = parseColor $name
+  except ValueError as e:
+    raise initInvArgErr e.msg
 
 template wrapXY(sym, x, y) =
   let res = sym()
@@ -19,15 +54,22 @@ proc terminalSize*(w, h: var int){.exportc, dynlib.} =
 
 type
   InitList[T]{.importcpp: "std::vector", header: "<vector>"} = object
-
 proc `[]`[T](self: InitList[T], i: cint): T{.importcpp: "#[#]".}
 proc size[T](self: InitList[T]): cint{.importcpp.}
 
-proc writeStyled*(s: cstring, ils: InitList[Style]){.exportc, dynlib.} =
-  var styles: set[Style]
+type StyleSet = InitList[Style]
+
+template toSet[T](ils: InitList[T]): set[T] =
+  var s: set[T]
   for i in cint(0)..<ils.size:
-    styles.incl ils[i]
-  writeStyled($s, styles)
+    s.incl ils[i]
+  s
+
+proc setStyle*(f: File, ils: StyleSet){.exportc, dynlib.} =
+  f.setStyle ils.toSet
+
+proc writeStyled*(s: cstring, ils: StyleSet){.exportc, dynlib.} =
+  writeStyled($s, ils.toSet)
 
 when defined(windows) and appType != "gui" and
     not defined(nimDontSetUtf8CodePage) and not defined(nimscript):

@@ -1,6 +1,6 @@
 
 
-#include "../terminal.h"
+#include "../nterm.h"
 
 #include <iostream>
 int main(){

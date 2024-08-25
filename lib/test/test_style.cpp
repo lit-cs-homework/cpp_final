@@ -1,14 +1,15 @@
 
-#include "../terminal.h"
+#include "../nterm.h"
 
 #include <iostream>
 int main(){
   ntermInit();
-  writeStyled(
-    "this shall be italic",
-    {styleItalic}
+  styledWrite(
+    ncolor::bg("blue"), ncolor::fg(255, 0, 0), styleItalic,
+    "this shall be italic with blue bg and red fg"
   );
-  writeStyled(
-    " bright\n"
+  styledWriteLine(styleBright,
+    " bright"
   );
+  std::cout << "asdsa\n";
 }

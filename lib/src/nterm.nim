@@ -4,19 +4,33 @@ export terminal
 
 const Version* = "0.0.2"
 let version = cstring Version
-proc nterm_getVersion*(): cstring{.exportc, dynlib.} =
+
+{.pragma: expC, exportc, dynlib.}
+proc nterm_getVersion*(): cstring{.expC.} =
   version
 
-import std/colors
 type
   CStdException* {.importcpp: "std::exception", header: "<exception>", inheritable.} = object
-  InvArgErr*{.importcpp:"std::invalid_argument", header: "<stdexcept>",
-  .} = object of CStdException
-proc what*(s: CStdException): cstring {.importcpp: "((char *)#.what())".}
-proc initInvArgErr*(a: cstring): InvArgErr {.importcpp: "std::invalid_argument(@)", constructor.}
-proc initInvArgErr*(a: string): InvArgErr{.noInit  # noInit is required to pass compilation
-  .} = initInvArgErr cstring a
 
+proc what*(s: CStdException): cstring {.importcpp: "((char *)#.what())".}
+
+template impCErr(nname; cname: cstring, initNName){.dirty.} =
+  type nname*{.importcpp:"std::"&cname, header: "<stdexcept>".} = object of CStdException
+  proc initNName*(a: cstring): nname{.importcpp:"std::"&cname&"(@)", constructor.}
+  proc initNName*(a: string): nname{.noInit  # noInit is required to pass compilation
+    .} = initNName cstring a
+
+impCErr RtErr, "runtime_error", initRtErr
+
+# We write expXXX as Nim will exportcpp as `extern "C"`
+# so no overload can be done for C++ via Nim's export system.
+
+
+{.compile: "./nterm.cpp".}
+
+import std/colors
+
+impCErr InvArgErr, "invalid_argument", initInvArgErr
 
 const rRGB = cint(0)..cint(255)
 type
@@ -43,9 +57,9 @@ template wrapXY(sym, x, y) =
   x = res.x
   y = res.y
 
-proc getCursorPos*(x, y: var int){.exportc, dynlib.} =
+proc getCursorPos*(x, y: var int){.expC.} =
    wrapXY(getCursorPos, x, y)
-proc terminalSize*(w, h: var int){.exportc, dynlib.} =
+proc terminalSize*(w, h: var int){.expC.} =
    wrapXY(terminalSize, w, h)
     
 
@@ -65,10 +79,10 @@ template toSet[T](ils: InitList[T]): set[T] =
     s.incl ils[i]
   s
 
-proc setStyle*(f: File, ils: StyleSet){.exportc, dynlib.} =
+proc setStyle*(f: File, ils: StyleSet){.expC.} =
   f.setStyle ils.toSet
 
-proc writeStyled*(s: cstring, ils: StyleSet){.exportc, dynlib.} =
+proc writeStyled*(s: cstring, ils: StyleSet){.expC.} =
   writeStyled($s, ils.toSet)
 
 when defined(windows) and appType != "gui" and

@@ -28,12 +28,12 @@ public:
     static constexpr const char* const DefNext = "Next";
     struct NextOption{
         ButtonOption opt;
-        bool optGiven; // trick! (see nextOption)
-        const char* text;
+        bool optGiven = false; // trick! (see nextOption)
+        const char* text = DefNext;
         bool textRightAlign;
         bool sameWidthAsOthers;
         // meaning using `{btns_style}`
-        NextOption(): optGiven(false), textRightAlign(false), sameWidthAsOthers(false), text(DefNext){}
+        NextOption(): textRightAlign(false), sameWidthAsOthers(false){}
         NextOption(ButtonOption opt,
             const char* const text=DefNext,
             const bool textRightAlign=false,
@@ -42,13 +42,12 @@ public:
           textRightAlign(textRightAlign), sameWidthAsOthers(sameWidthAsOthers){}
         NextOption(const char* text,
             const bool textRightAlign=false,
-            const bool sameWidthAsOthers=false): optGiven(false),
+            const bool sameWidthAsOthers=false):
           text(text),
           textRightAlign(textRightAlign), sameWidthAsOthers(sameWidthAsOthers){}
         NextOption(
             const bool textRightAlign,
-            const bool sameWidthAsOthers=false): optGiven(false),
-          text(DefNext),
+            const bool sameWidthAsOthers=false):
           textRightAlign(textRightAlign), sameWidthAsOthers(sameWidthAsOthers){}
     } nextOption;
     static const ButtonOption DefBtnsStyle; // see .cpp

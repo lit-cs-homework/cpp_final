@@ -6,85 +6,80 @@
 using namespace std;
 
 
-class Enemy{
-public:
-    string getname(){
-        return name;
-    }
-    int gettype(){
-        return type;
-    }
-    int gethealth(){
-        return health;
-    }
-    int getattack(){
-        return attackNum;
-    }
-    int getdefend(){
-        return defendNum;
-    }
-    string getawards(){
-        return awards;
-    }
-private:
-    string name;
-    int type;
-    int health;
-    int attackNum;
-    int defendNum;
-    string awards;
-};
+// class Enemy{
+// public:
+//     string getname(){
+//         return name;
+//     }
+//     int gettype(){
+//         return type;
+//     }
+//     int gethealth(){
+//         return health;
+//     }
+//     int getattack(){
+//         return attackNum;
+//     }
+//     int getdefend(){
+//         return defendNum;
+//     }
+//     string getawards(){
+//         return awards;
+//     }
+// private:
+//     string name;
+//     int type;
+//     int health;
+//     int attackNum;
+//     int defendNum;
+//     string awards;
+// };
 
-class Hero{
-public:
-    string getname(){
-        return name;
-    }
-    char getgender(){
-        return gender;
-    }
-    int gethealth(){
-        return health;
-    }
-    int getmagic(){
-        return magic;
-    }
-    int getattack(){
-        return attack;
-    }
-    int getdefend(){
-        return defend;
-    }
-    int getexp(){
-        return exp;
-    }
-    int getlevel(){
-        return level;
-    }
-    int getmoney(){
-        return money;
-    }
+// class Hero{
+// public:
+//     string getname(){
+//         return name;
+//     }
+//     char getgender(){
+//         return gender;
+//     }
+//     int gethealth(){
+//         return health;
+//     }
+//     int getmagic(){
+//         return magic;
+//     }
+//     int getattack(){
+//         return attack;
+//     }
+//     int getdefend(){
+//         return defend;
+//     }
+//     int getexp(){
+//         return exp;
+//     }
+//     int getlevel(){
+//         return level;
+//     }
+//     int getmoney(){
+//         return money;
+//     }
 
-private:
-    string name;
-    char gender;
-    int health;
-    int magic;
-    int attack;
-    int defend;
-    int exp;
-    int level;
-    int money;
-};
+// private:
+//     string name;
+//     char gender;
+//     int health;
+//     int magic;
+//     int attack;
+//     int defend;
+//     int exp;
+//     int level;
+//     int money;
+// };
 
-class Map{
-public:
-    char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
-    char pos[10][10];
-    Map(int p = 7)
+
+    Map::Map(int p = 7)
     {
-
-        
         position = p;
         
         if (p == 0){
@@ -137,7 +132,7 @@ public:
         }
         pos[dx][dy] = '*';
     }
-    void showMap(){
+    void Map::showMap(){
     cout << "世界地图:" << endl;
 	cout<<"                        __________"<<endl;
 	cout<<"                       |          |"<<endl;
@@ -167,10 +162,10 @@ public:
     }
     
 
-    void showPosition(){
+    void Map::showPosition(){
         cout << "您目前的位置是：" << mapName[position] << endl;
     }
-    void move(){
+    void Map::move(){
         char command;
         cout << "输入wasd以移动" << endl;
         cin >> command;
@@ -253,28 +248,28 @@ public:
         
     }
         
-    Map(){
-	position = 0;
-	dx = 5;
-	dy = 2;
+//     Map(){
+// 	position = 0;
+// 	dx = 5;
+// 	dy = 2;
 
-	for (int i = 0; i < 6; i++)
-	{
-		for (int j = 0; j < 6; j++)
-		{
-			pos[i][j] = ' ';
-		}
-	}
-	pos[dx][dy] = '*';
-}
-    bool isCombat(){
+// 	for (int i = 0; i < 6; i++)
+// 	{
+// 		for (int j = 0; j < 6; j++)
+// 		{
+// 			pos[i][j] = ' ';
+// 		}
+// 	}
+// 	pos[dx][dy] = '*';
+// }
+    bool Map::isCombat(){
         if (position == 0 || position == 1 || position == 2 || position == 3 || position == 9){
             return true;
         }
         else
             return false;
     }
-    bool isChat(){
+    bool Map::isChat(){
         if (position == 4 || position == 6 || position == 8){
             return true;
         }
@@ -282,18 +277,12 @@ public:
             return false;
     }
 
-    int getPostion(){
+    int Map::getPostion(){
         return position;
     }
-    string getName(){
+    string Map::getName(){
         return mapName[position];
     }
 
-
-
-private:
-    int position;
-    int dx, dy;
     
-    
-};
+

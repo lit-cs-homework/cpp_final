@@ -1,19 +1,33 @@
 #include <iostream>
 #include <string>
+#include <ios>
+#include <cstdlib>
 
+class Room{
+public:
+    char posR[10][10];
+    Room(int p = 7);
+    int getPositionR() ;
+    void showRoom();
+    void actionRoom();
+private:
+    int position;
+    int dx, dy;
+    int positionR;
+};
 class Map{
 public:
-   char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
    char pos[10][10];
-   Map(int p = 7) {}
-   void showMap() {}
-   void showPosition() {}
-   void move(){}
-   bool isCombat(){}
-   bool isChat(){}
-   int getPosition(){}
-   string getName(){}
+   Map(int p = 7) ;
+   void showMap() ;
+   void showPosition() ;
+   void action();
+   void showMenu();
+//    bool isCombat();
+//    bool isChat();
+   int getPosition();
+   //string getName();
 private:
-    int postion;
+    int position;
     int dx, dy;
-}
+};

@@ -8,6 +8,10 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <array>
+
+
+
 
 class Hero
 {
@@ -43,7 +47,7 @@ enum EquipTyp{
     tArmhour,
     tShoes,
 };
-static constexpr size_t EquipTypCount = 3;
+static constexpr size_t EquipTypCount = 4;
 
 
 class BaseEquip{
@@ -87,10 +91,7 @@ class Medicine: public BaseEquip
 class Bag;
 class Store{
     public:
-        Store(
-            std::vector<Equip> equipstore = {},//商店初始装备
-            std::vector<Medicine> medicinestore = {}
-        );
+        Store(std::vector<Equip> equipstore = {},std::vector<Medicine> medicinestore = {});
         //void refresh();
         void display() const;
         void sold(Equip& equip, int n,Bag& bag);

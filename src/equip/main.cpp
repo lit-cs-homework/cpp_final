@@ -9,7 +9,12 @@ void Bag::display() const
         if(i.second>=0){
             std::cout <<i.first.name << i.second <<std::endl;
         }
-    } 
+    }
+    for(const auto& i: medicinebag){
+        if(i.second>=0){
+            std::cout <<i.first.name << i.second <<std::endl;
+        }
+    }
 }
 
 void Bag::get(Equip& equip, int n){
@@ -42,12 +47,16 @@ void Bag::changeequip(Equip& equip,Hero& hero)
     //const auto tup = std::make_pair(equip.number,equip);
     equipbag[equip] = equip;
     */
-   auto& old = equipbag[equip.typ()];
-   if(old) {
+
+   Equip& old = equipbag[equip.typ()];
+   if(equipbag[equip.typ()]) {
      old.takeoff(hero);
    }
+   bag[old]++;
+   bag[equip]--;
    equipbag[equip.typ()] = equip;
-   equipbag[equip.typ()].equiped(hero);
+//    equipbag[equip.typ()].equiped(hero);
+    equip.equiped(hero);
 }
 
 bool BaseEquip::operator== (const BaseEquip& other)const
@@ -55,14 +64,16 @@ bool BaseEquip::operator== (const BaseEquip& other)const
     return name==other.name;
 }
 
-Equip::Equip(){}
+#define WithName(cls) cls::cls(){name=__func__;}
+
+WithName(Equip)
 
 Equip::Equip(double hp,double mp,double def,double value):hp(hp),mp(mp),def(def),value(value){
     name = __func__;
 };
 
 Equip::operator bool(){
-    return value == 0;
+    return value != 0;
 }
 
 #define __unImplement {std::cerr<<__func__ <<" unimplemented"<<std::endl; abort();}
@@ -80,7 +91,6 @@ size_t hashBaseEquip::operator()(const BaseEquip& value) const
         return std::hash<std::string>{}(value.name);
     }
 
-#define WithName(cls) cls::cls(){name==__func__;}
 
 WithName(Medicine)
 
@@ -138,14 +148,14 @@ void Store::buy(Equip& equip, int n,Bag& bag)
 {
     if(bag.bag[equip]>=n)
     {
-        bag.bag[equip]+=n;
+        bag.bag[equip]-=n;
     }
 }
 void Store::buy(Medicine& medicine, int n,Bag& bag)
 {
     if(bag.medicinebag[medicine]>=n)
     {
-        bag.medicinebag[medicine]+=n;
+        bag.medicinebag[medicine]-=n;
     }
 }
 
@@ -227,13 +237,22 @@ void Shoes::takeoff(Hero& hero)
 
 void Medicine::used(Hero& hero,int n)
 {
-    if(hero.hp+hp<=hero.hpMax)
+    if(hero.hp+n*hp<=hero.hpMax)
     {
         hero.hp += hp*n;
     }
-    if(hero.mp+mp<=hero.mpMax)
+    else
+    {
+        hero.hp = hero.hpMax;
+    }
+
+    if(hero.mp+n*mp<=hero.mpMax)
     {
         hero.mp += mp*n;
+    }
+    else
+    {
+        hero.mp = hero.mpMax;
     }
     hero.attack += atk*n;
     hero.defend += def*n;

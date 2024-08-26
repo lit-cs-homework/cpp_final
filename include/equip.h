@@ -27,14 +27,14 @@ class Hero
             mp -= 50;
         }
     private:
-        float hp=100;
-        float hpMax=100;
-        float mp=100;
-        float mpMax=100;
-        float attack=10;
-        float defend=10;
-        float skills;
-        float stuffs;
+        double hp=100;
+        double hpMax=100;
+        double mp=100;
+        double mpMax=100;
+        double attack=10;
+        double defend=10;
+        double skills;
+        double stuffs;
 };
 
 enum EquipTyp{
@@ -49,57 +49,49 @@ static constexpr size_t EquipTypCount = 3;
 class BaseEquip{
     public:
         std::string name;
-        bool operator== (const BaseEquip& other)const{return name==other.name;}
+        bool operator== (const BaseEquip& other)const;
 };
 
 
 class Equip: public BaseEquip{
     public:
-        Equip(){};
-        Equip(float hp,float mp,float def,float value):hp(hp),mp(mp),def(def),value(value){
-            name = __func__;
-        };
-        float hp = 0;
-        float mp = 0;
-        float def = 0;
-        float value = 0;
-        operator bool(){
-            return value == 0;
-        }
-        virtual EquipTyp typ(){return tEquip;};
-        virtual void equiped(Hero& hero){std::cout<<"equiped"<<std::endl;};
-        virtual void takeoff(Hero& hero){};
+        Equip();
+        Equip(double hp,double mp,double def,double value);
+        double hp = 0;
+        double mp = 0;
+        double def = 0;
+        double value = 0;
+        operator bool();
+        virtual EquipTyp typ();
+        virtual void equiped(Hero& hero);
+        virtual void takeoff(Hero& hero);
 };
+
 struct hashBaseEquip{
-    size_t operator()(const BaseEquip& value) const
-    {
-        return std::hash<std::string>{}(value.name);
-    }
+    size_t operator()(const BaseEquip& value) const;
 };  
 
 class Medicine: public BaseEquip
 {
     public:
-        Medicine(){
-            name = __func__;
-        };
-
-        float hp;
-        float mp;
-        float atk;
-        float def;
+        Medicine();
+        double hp;
+        double mp;
+        double atk;
+        double def;
         void used(Hero& hero,int n);
-        void display(){};
+        virtual void display();
 };
 
-const std::vector<Equip> equipstore; 
-const std::vector<Medicine> medicinestore;
 
 class Bag;
 class Store{
     public:
-        void initializeCommodities();
-        void refresh();
+        Store(
+            std::vector<Equip> equipstore = {},//商店初始装备
+            std::vector<Medicine> medicinestore = {}
+        );
+        //void refresh();
         void display() const;
         void sold(Equip& equip, int n,Bag& bag);
         void sold(Medicine& medicine, int n,Bag& bag);
@@ -113,9 +105,6 @@ class Store{
 
 class Bag{
     public:
-        Bag(){
-
-        }
         friend class Hero;
         friend class Store;
         friend class Equip;
@@ -133,16 +122,14 @@ class Bag{
 
 
 
-
 class Sword : public Equip
 {
     public:
         friend class Bag;
         friend class Hero;
-        Sword(float hp,float mp,float def,float value,float atk):
-            Equip(hp,mp,def,value),atk(atk){};
-        float atk;
-        EquipTyp typ(){return tSword;}
+        Sword(double hp,double mp,double def,double value,double atk);
+        double atk;
+        EquipTyp typ();
         void equiped(Hero& hero);
         void takeoff(Hero& hero);
 };
@@ -151,37 +138,29 @@ class Stonesword : public Sword
 {
     public:
         friend class Bag;
-        Stonesword(float hp,float mp,float def,float value,float atk): Sword(hp,mp,def,value,atk){
-            name = __func__;
-        };
+        Stonesword(double hp,double mp,double def,double value,double atk);
 };
 
 class Bronzesword : public Sword
 {
     public:
         friend class Bag;
-        Bronzesword(float hp,float mp,float def,float value,float atk): Sword(hp,mp,def,value,atk){
-            name = __func__;
-        };
+        Bronzesword(double hp,double mp,double def,double value,double atk);
 };
 
 class Ironsword : public Sword
 {
     public:
         friend class Bag;
-        Ironsword(float hp,float mp,float def,float value,float atk): Sword(hp,mp,def,value,atk){
-            name = __func__;
-        };
+        Ironsword(double hp,double mp,double def,double value,double atk);
 };
 
 class Armhour :public Equip
 {
     public:
         friend class Bag;
-        Armhour(int hp,int mp,int def,float value):Equip(hp,mp,def,value){
-            name = __func__;
-        };
-        EquipTyp typ(){return tArmhour;}
+        Armhour(int hp,int mp,int def,double value);
+        EquipTyp typ();
         void equiped(Hero& hero);
         void takeoff(Hero& hero);
 };
@@ -192,10 +171,8 @@ class Shoes :public Equip
 {
     public:
         friend class Bag;
-        Shoes(int hp,int mp,int def,float value):Equip(hp,mp,def,value){
-            name = __func__;
-        };
-        EquipTyp typ(){return tShoes;}
+        Shoes(int hp,int mp,int def,double value);
+        EquipTyp typ();
         void equiped(Hero& hero);
         void takeoff(Hero& hero);
 };
@@ -204,31 +181,14 @@ class Shoes :public Equip
 class RedMedicine : public Medicine
 {
     public:
-        RedMedicine(){
-            name = __func__;
-            hp=10;
-            mp=0;
-        }
-        void display()
-        {
-            std::cout << "hp回复" << std::endl;
-        }
-
-     
+        RedMedicine();
+        void display();
 };
 
 class BlueMedicine : public Medicine
 {
     public:
         friend class Hero;
-        BlueMedicine(){
-            name = __func__;
-            hp=0;
-            mp=10;
-        }
-        void display()
-        {
-            std::cout << "mp回复" << std::endl;
-        }
-     
+        BlueMedicine();
+        void display();
 };  

@@ -8,8 +8,8 @@ int main()
     Store store;
     Hero hero;
     Bag bag;
-
-    hero.display();
     hero.fun();
-    hero.display();
+    
+    bag.display();
+    bag.display();
 }

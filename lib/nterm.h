@@ -3,16 +3,15 @@
 #ifndef _NIM_TERMINAL_H
 #define _NIM_TERMINAL_H
 
-extern "C"
+#define _PRE extern "C" 
+
+_PRE
 const char*
 nterm_getVersion(void);
 
-namespace nterm
-{
-  // @returns static data
-  const char* getVersion(){return nterm_getVersion();}
-  
-} // namespace nterm
+namespace nterm{
+  const char* getVersion();
+}
 
 
 #include <cstdint>
@@ -35,7 +34,6 @@ typedef intptr_t NI;
 
 #include <cstdio>
 
-#define _PRE extern "C" 
 
 #define _VV(sym) _PRE void sym(void);
 _VV( enableTrueColors )
@@ -46,22 +44,7 @@ _VV( disableTrueColors )
 _BV( isTrueColorSupported )
 #undef _BV
 
-#include <stdexcept>
-#include <cstdlib>
-void NimMain(void);
-// a must before calling any other functions of `nterm`.
-// otherwise a crash may occur.
-void ntermInit(bool enableTrueColor=true){
-  NimMain();
-  if (enableTrueColor) {
-      enableTrueColors();
-      if (!isTrueColorSupported()){
-          throw std::runtime_error("you wanna enable console true color, \n"
-          "but your console doesn't support it, considering disable it");
-      }
-      atexit(disableTrueColors);
-  }
-}
+void ntermInit(bool enableTrueColor=true);
 
 _PRE char getch(void);
 
@@ -80,7 +63,7 @@ _VIVI( getCursorPos )
 
 #define _FII(sym) _PRE void sym(FILE*, NI, NI);
 #define _NFII(sym) _FII(sym)\
-  void sym(NI x, NI y){sym(stdout, x, y);}
+  void sym(NI x, NI y);
 
 _NFII( setCursorPos )
 
@@ -88,7 +71,7 @@ _NFII( setCursorPos )
 
 #define _FI(sym) _PRE void sym(FILE*, NI);
 #define _NFI(sym) _FI(sym)\
-  void sym(NI n){sym(stdout, n);}
+  void sym(NI n);
 
 _NFI( setCursorXPos )
 //_NFI( setCursorYPos ) // only support in windows
@@ -148,7 +131,7 @@ enum
   };
 
 #define _FBcB(sym, en) _PRE void sym(FILE* _file, en _color, bool bright=false);\
-  void sym(en _color, bool bright=false){sym(stdout, _color, bright);}
+  void sym(en _color, bool bright=false);
 
 _FBcB( setBackgroundColor, BackgroundColor )
 _FBcB( setForegroundColor, ForegroundColor )
@@ -167,24 +150,18 @@ class Base{
     NColor data;
 public:
     // for hex notation.
-    Base(int rgb){
-      if ( rgb<0 || rgb>0xffffff)
-        throw std::invalid_argument(
-          "expect color in range 0..0xffffff");
-      data = rgb;
-    }
-    Base(int r, int g, int b){
-      data = ntermC_rgb(r, g, b);}
+    Base(int rgb);
+    Base(int r, int g, int b);
     // @throw `std::invalid_argument`
-    Base(const char* name){
-      data = ntermC_parseColor(name);}
-    NI toNInt() const{return data;}
+    Base(const char* name);
+    NI toNInt() const;
 };
+
 #define DerivedInits(cls) \
     public:\
-      cls(int rgb): Base(rgb){};\
-      cls(int r, int g, int b): Base(r, g, b){}\
-      cls(const char* name): Base(name){}\
+      cls(int rgb);\
+      cls(int r, int g, int b);\
+      cls(const char* name);
 
 /* trick: this is shortly-named asumming:
   this is only used via namespace and within `styledWrite`,
@@ -207,13 +184,9 @@ class fg: public Base{DerivedInits(fg)};
 } // namespace
 
 #define _genColor(fun) \
-void fun(FILE*f, ncolor::Base c){\
-    fun##RGB(f, c.toNInt() );\
-}\
-void fun(ncolor::Base c){fun(stdout, c);}\
-void fun(int r, int g, int b){\
-    fun(ncolor::Base(r, g, b));\
-}
+void fun(FILE*f, ncolor::Base c);\
+void fun(ncolor::Base c);\
+void fun(int r, int g, int b);
 //end_define
 
 _genColor( setBackgroundColor )
@@ -237,7 +210,7 @@ enum
 typedef std::vector<Style> StyleSet;
 
 _PRE void setStyle(FILE*, StyleSet);
-void setStyle(FILE* f, Style s){setStyle(f, StyleSet{s});}
+//void setStyle(FILE* f, Style s){setStyle(f, StyleSet{s});}
 
 #define DefStyles {styleBright}
 
@@ -247,7 +220,7 @@ _PRE void writeStyled(
 
 
 #define _genAttr(T, fun) \
-void setConsoleAttr(FILE*f, T c){fun(f, c);}
+void setConsoleAttr(FILE*f, T c);
 
 _genAttr( BackgroundColor, setBackgroundColor )
 _genAttr( ncolor::bg, setBackgroundColor )
@@ -292,11 +265,7 @@ void styledWrite(A a, B b, C c, const char* s) {
 #else
 // use of ‘auto’ in parameter declaration only available with
 // ‘-std=c++20’ or ‘-fconcepts'
-void styledWriteLine(const char* s){
-    fputs(s, f);
-    resetAttributes(f);
-    putc('\n', f);
-}
+void styledWriteLine(const char* s);
 void styledWriteLine(auto st, auto...args){
   setConsoleAttr(f, st);
   styledWriteLine(args...);

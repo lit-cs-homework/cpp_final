@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 #include <array>
+#include <memory>
 
 
 
@@ -41,38 +42,48 @@ class Hero
         double stuffs;
 };
 
-enum EquipTyp{
+enum EquipTyp{//装备类型编号 同类型的编号相同
     tEquip,    
     tSword,
     tArmhour,
     tShoes,
 };
-static constexpr size_t EquipTypCount = 4;
+static constexpr size_t EquipTypCount = 4;//武器装备栏长度
 
 
-class BaseEquip{
+class BaseEquip{//物品基类 包括装备和药水
     public:
         std::string name;
-        bool operator== (const BaseEquip& other)const;
+        bool operator== (const BaseEquip& other) const;//用于哈希表
+};
+
+struct eqOnObg
+{
+    bool operator() (std::shared_ptr<BaseEquip> const a,std::shared_ptr<BaseEquip> const b) const
+    {
+        return *a == *b;
+    }
 };
 
 
-class Equip: public BaseEquip{
+
+class Equip: public BaseEquip{//装备基类
     public:
         Equip();
+
         Equip(double hp,double mp,double def,double value);
         double hp = 0;
         double mp = 0;
         double def = 0;
         double value = 0;
-        operator bool();
-        virtual EquipTyp typ();
-        virtual void equiped(Hero& hero);
-        virtual void takeoff(Hero& hero);
+        operator bool();//判断是否为空装备
+        virtual EquipTyp typ();//获取当前装备的编号
+        virtual void equiped(Hero& hero);//角色穿上装备
+        virtual void takeoff(Hero& hero);//角色脱下装备
 };
 
 struct hashBaseEquip{
-    size_t operator()(const BaseEquip& value) const;
+    size_t operator()(const std::shared_ptr<BaseEquip> value) const;
 };  
 
 class Medicine: public BaseEquip
@@ -83,7 +94,7 @@ class Medicine: public BaseEquip
         double mp;
         double atk;
         double def;
-        void used(Hero& hero,int n);
+        void used(Hero& hero,int n);//角色使用药水
         virtual void display();
 };
 
@@ -91,16 +102,16 @@ class Medicine: public BaseEquip
 class Bag;
 class Store{
     public:
-        Store(std::vector<Equip> equipstore = {},std::vector<Medicine> medicinestore = {});
+        Store(std::vector<std::shared_ptr<Equip>> equipstore = {},std::vector<std::shared_ptr<Medicine>> medicinestore = {});
         //void refresh();
         void display() const;
-        void sold(Equip& equip, int n,Bag& bag);
-        void sold(Medicine& medicine, int n,Bag& bag);
-        void buy(Equip& equip, int n,Bag& bag);
-        void buy(Medicine& medicine, int n,Bag& bag);
+        void sold(std::shared_ptr<Equip> equip, int n,Bag& bag);//角色买装备，商店卖装备
+        void sold(std::shared_ptr<Medicine> medicine, int n,Bag& bag);///角色买药水，商店卖药水
+        void buy(std::shared_ptr<Equip> equip, int n,Bag& bag);//角色卖装备，商店买
+        void buy(std::shared_ptr<Medicine> medicine, int n,Bag& bag);//角色卖药水
     private:
-        std::unordered_map<Equip,int, hashBaseEquip> equipcommodities;
-        std::unordered_map<Medicine,int,hashBaseEquip> medicinecommodities;
+        std::unordered_map<std::shared_ptr<Equip>,int, hashBaseEquip,eqOnObg> equipcommodities;//商店的装备
+        std::unordered_map<std::shared_ptr<Medicine>,int,hashBaseEquip,eqOnObg> medicinecommodities;//商店的药水
 };
 
 
@@ -109,16 +120,16 @@ class Bag{
         friend class Hero;
         friend class Store;
         friend class Equip;
-        void get(Equip& equip, int n);
-        void get(Medicine& Medicine, int n);
+        void get(std::shared_ptr<Equip> equip, int n);//角色获得装备
+        void get(std::shared_ptr<Medicine> Medicine, int n);//角色获得药水
         void display() const;
-        void use(Medicine& medicine,int n,Hero& hero);
-        void changeequip(Equip& equip,Hero& hero);
-        private:
-            std::unordered_map<Equip,int,hashBaseEquip> bag;
-            std::unordered_map<Medicine,int,hashBaseEquip> medicinebag;
-            std::array<Equip, EquipTypCount> equipbag;
-            //Equip  equipbag[EquipTypCount] ;
+        void use(std::shared_ptr<Medicine> medicine,int n,Hero& hero);//角色使用药水
+        void changeequip(std::shared_ptr<Equip> equip,Hero& hero);//角色更换装备
+    private:
+        std::unordered_map<std::shared_ptr<Equip>,int, hashBaseEquip,eqOnObg> bag;//未装备的装备
+        std::unordered_map<std::shared_ptr<Medicine>,int, hashBaseEquip,eqOnObg> medicinebag;//药水
+        std::array<std::shared_ptr<Equip>, EquipTypCount> equipbag;//已装备的装备 武器栏
+        //Equip  equipbag[EquipTypCount] ;
 };
 
 
@@ -131,8 +142,8 @@ class Sword : public Equip
         Sword(double hp,double mp,double def,double value,double atk);
         double atk;
         EquipTyp typ();
-        void equiped(Hero& hero);
-        void takeoff(Hero& hero);
+        void equiped(Hero& hero);//角色穿上装备
+        void takeoff(Hero& hero);//角色脱下装备
 };
 
 class Stonesword : public Sword
@@ -162,8 +173,8 @@ class Armhour :public Equip
         friend class Bag;
         Armhour(int hp,int mp,int def,double value);
         EquipTyp typ();
-        void equiped(Hero& hero);
-        void takeoff(Hero& hero);
+        void equiped(Hero& hero);//角色穿上装备
+        void takeoff(Hero& hero);//角色脱下装备
 };
 
 
@@ -183,7 +194,7 @@ class RedMedicine : public Medicine
 {
     public:
         RedMedicine();
-        void display();
+        void display() const;
 };
 
 class BlueMedicine : public Medicine
@@ -191,5 +202,5 @@ class BlueMedicine : public Medicine
     public:
         friend class Hero;
         BlueMedicine();
-        void display();
+        void display() const;
 };  

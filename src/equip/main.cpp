@@ -7,31 +7,31 @@ void Bag::display() const
 {
     for(const auto& i: bag){
         if(i.second>=0){
-            std::cout <<i.first.name << i.second <<std::endl;
+            std::cout <<i.first->name << i.second <<std::endl;
         }
     }
     for(const auto& i: medicinebag){
         if(i.second>=0){
-            std::cout <<i.first.name << i.second <<std::endl;
+            std::cout <<i.first->name << i.second <<std::endl;
         }
     }
 }
 
-void Bag::get(Equip& equip, int n){
+void Bag::get(std::shared_ptr<Equip>equip, int n){
     bag[equip] = bag[equip] + n;
 }
 
-void Bag::get(Medicine& medicine, int n)
+void Bag::get(std::shared_ptr<Medicine> medicine, int n)
 {
     medicinebag[medicine] += n;
 }
 
-void Bag::use(Medicine& medicine, int n,Hero& hero){
+void Bag::use(std::shared_ptr<Medicine> medicine, int n,Hero& hero){
     medicinebag[medicine] = medicinebag[medicine] - n;
-    medicine.used(hero,n);
+    medicine->used(hero,n);
 }
 
-void Bag::changeequip(Equip& equip,Hero& hero)
+void Bag::changeequip(std::shared_ptr<Equip> equip,Hero& hero) 
 {
     /*
     for(const auto& i:equipbag)
@@ -48,20 +48,20 @@ void Bag::changeequip(Equip& equip,Hero& hero)
     equipbag[equip] = equip;
     */
 
-   Equip& old = equipbag[equip.typ()];
-   if(equipbag[equip.typ()]) {
-     old.takeoff(hero);
+   std::shared_ptr<Equip> old = equipbag[equip->typ()];
+   if(equipbag[equip->typ()]) {
+     old->takeoff(hero);
    }
    bag[old]++;
    bag[equip]--;
-   equipbag[equip.typ()] = equip;
+   equipbag[equip->typ()] = equip;
 //    equipbag[equip.typ()].equiped(hero);
-    equip.equiped(hero);
+    equip->equiped(hero);
 }
 
-bool BaseEquip::operator== (const BaseEquip& other)const
+bool BaseEquip::operator== (const BaseEquip& other) const
 {
-    return name==other.name;
+    return name == other.name;
 }
 
 #define WithName(cls) cls::cls(){name=__func__;}
@@ -86,9 +86,9 @@ void Equip::equiped(Hero& hero) __unImplement
 void Equip::takeoff(Hero& hero) __unImplement
 
 
-size_t hashBaseEquip::operator()(const BaseEquip& value) const
+size_t hashBaseEquip::operator() (const std::shared_ptr<BaseEquip> value) const
     {
-        return std::hash<std::string>{}(value.name);
+        return std::hash<std::string>{}(value->name);
     }
 
 
@@ -99,8 +99,8 @@ void Medicine::display() __unImplement
 
 
 Store::Store(
-            std::vector<Equip> equipstore/*={}*/,//商店初始装备
-            std::vector<Medicine> medicinestore/*={}*/
+            std::vector<std::shared_ptr<Equip>> equipstore/*={}*/,//商店初始装备
+            std::vector<std::shared_ptr<Medicine>> medicinestore/*={}*/
         )
 {
     for (const auto& i : equipstore)
@@ -116,15 +116,15 @@ Store::Store(
 
 void Store::display() const{
     for(const auto& i: equipcommodities){
-        std::cout <<i.first.name << i.second <<std::endl;
+        std::cout <<i.first->name << i.second <<std::endl;
     }
     for(const auto& i: medicinecommodities){
-        std::cout <<i.first.name << i.second <<std::endl;
+        std::cout <<i.first->name << i.second <<std::endl;
     }
 
 }
 
-void Store::sold(Equip& equip, int n,Bag& bag){
+void Store::sold(std::shared_ptr<Equip> equip, int n,Bag& bag){
     if(equipcommodities[equip]>=n){
         equipcommodities[equip] = equipcommodities[equip] - n;
         bag.get(equip,n);
@@ -134,7 +134,7 @@ void Store::sold(Equip& equip, int n,Bag& bag){
      }
 }
 
-void Store::sold(Medicine& medicine, int n,Bag& bag){
+void Store::sold(std::shared_ptr<Medicine> medicine, int n,Bag& bag){
     if(medicinecommodities[medicine]>=n){
         medicinecommodities[medicine] = medicinecommodities[medicine] - n;
         bag.get(medicine,n);
@@ -144,14 +144,14 @@ void Store::sold(Medicine& medicine, int n,Bag& bag){
      }
 }
 
-void Store::buy(Equip& equip, int n,Bag& bag)
+void Store::buy(std::shared_ptr<Equip> equip, int n,Bag& bag)
 {
     if(bag.bag[equip]>=n)
     {
         bag.bag[equip]-=n;
     }
 }
-void Store::buy(Medicine& medicine, int n,Bag& bag)
+void Store::buy(std::shared_ptr<Medicine> medicine, int n,Bag& bag)
 {
     if(bag.medicinebag[medicine]>=n)
     {
@@ -263,7 +263,7 @@ RedMedicine::RedMedicine(){
     mp=0;
 }
 
-void RedMedicine::display()
+void RedMedicine::display()const
 {
     std::cout << "hp回复" << std::endl;
 }
@@ -274,7 +274,7 @@ BlueMedicine::BlueMedicine(){
     mp=10;
 }
 
-void BlueMedicine::display()
+void BlueMedicine::display() const
 {
     std::cout << "mp回复" << std::endl;
 }

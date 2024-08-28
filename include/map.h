@@ -7,7 +7,6 @@ class Room{
 public:
     char posR[10][10];
     Room(int p = 7);
-    int getPositionR() ;
     void showRoom();
     void actionRoom();
 private:
@@ -20,13 +19,8 @@ public:
    char pos[10][10];
    Map(int p = 7) ;
    void showMap() ;
-   void showPosition() ;
    void action();
    void showMenu();
-//    bool isCombat();
-//    bool isChat();
-   int getPosition();
-   //string getName();
 private:
     int position;
     int dx, dy;

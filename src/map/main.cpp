@@ -1,90 +1,16 @@
-
 #include "../../include/map.h"
-
-
 
 using namespace std;
 char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
 
-
-// class Enemy{
-// public:
-//     string getname(){
-//         return name;
-//     }
-//     int gettype(){
-//         return type;
-//     }
-//     int gethealth(){
-//         return health;
-//     }
-//     int getattack(){
-//         return attackNum;
-//     }
-//     int getdefend(){
-//         return defendNum;
-//     }
-//     string getawards(){
-//         return awards;
-//     }
-// private:
-//     string name;
-//     int type;
-//     int health;
-//     int attackNum;
-//     int defendNum;
-//     string awards;
-// };
-
-// class Hero{
-// public:
-//     string getname(){
-//         return name;
-//     }
-//     char getgender(){
-//         return gender;
-//     }
-//     int gethealth(){
-//         return health;
-//     }
-//     int getmagic(){
-//         return magic;
-//     }
-//     int getattack(){
-//         return attack;
-//     }
-//     int getdefend(){
-//         return defend;
-//     }
-//     int getexp(){
-//         return exp;
-//     }
-//     int getlevel(){
-//         return level;
-//     }
-//     int getmoney(){
-//         return money;
-//     }
-
-// private:
-//     string name;
-//     char gender;
-//     int health;
-//     int magic;
-//     int attack;
-//     int defend;
-//     int exp;
-//     int level;
-//     int money;
-// };
-
-    Room::Room(int p/*=7*/){
+    Room::Room(int p){
         position = p;
         dx = 1;
         dy = 1;
         positionR = 4;
 
-        for (int i = 0; i < 3;i++){
+        for (int i = 0; i < 3;i++)
+        {
             for (int j = 0; j < 3; j++)
             {
                 posR[i][j] = ' ';
@@ -93,60 +19,78 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
         posR[1][1] = '*';
         posR[2][2] = '&';
     }
-    int Room::getPositionR(){
-        return positionR;
-    }
-
+   
     void Room::showRoom(){
-        if (position == 4 || position == 6 || position == 7 || position == 8){
+        
+        if (position == 4 || position == 6 || position == 7 || position == 8)
+        {
             posR[0][0] = '#';
         }
-        if (position == 1 || position == 3 || position == 2 || position == 9){
+        if (position == 1 || position == 3 || position == 2 || position == 9)
+        {
             int enemyNum = 0;
-            while(!enemyNum){
+            while(!enemyNum)
+            {
                 enemyNum = rand() % 4;
             }
-            for (int i = 0; i < enemyNum;i++){
+            for (int i = 0; i < enemyNum;i++)
+            {
                 int randomNum = rand() % 7;
-                if (randomNum == 0 || posR[0][0] != '#'){
+                if (randomNum == 0 && posR[0][0] != '#')
+                {
                     posR[0][0] = '#';
+                    break;
                 }
-                if (randomNum == 0 && posR[0][0] =='#'){
+                if (randomNum == 0 && posR[0][0] =='#')
+                {
                     randomNum++;
                 }
 
-                if (randomNum == 1 || posR[0][1] != '#'){
-                    posR[0][0] = '#';
+                if (randomNum == 1 && posR[0][1] != '#')
+                {
+                    posR[0][1] = '#';
+                    break;
                 }
-                if (randomNum == 1 && posR[0][1] =='#'){
+                if (randomNum == 1 && posR[0][1] =='#')
+                {
                     randomNum++;
                 }
-                if (randomNum == 2 || posR[0][2] != '#'){
-                    posR[0][0] = '#';
+                if (randomNum == 2 && posR[0][2] != '#')
+                {
+                    posR[0][2] = '#';
+                    break;
                 }
-                if (randomNum == 2 && posR[0][2] =='#'){
+                if (randomNum == 2 && posR[0][2] =='#')
+                {
                     randomNum++;
                 }
-                if (randomNum == 3 || posR[1][0] != '#'){
-                    posR[0][0] = '#';
+                if (randomNum == 3 && posR[1][0] != '#')
+                {
+                    posR[1][0] = '#';
+                    break;
                 }
-                if (randomNum == 3 && posR[1][0] =='#'){
+                if (randomNum == 3 && posR[1][0] =='#')
+                {
                     randomNum++;
                 }
-                if (randomNum == 4 || posR[1][2] != '#'){
-                    posR[0][0] = '#';
+                if (randomNum == 4 && posR[1][2] != '#')
+                {
+                    posR[1][2] = '#';
+                    break;
                 }
                 if (randomNum == 4 && posR[1][2] =='#'){
                     randomNum++;
                 }
-                if (randomNum == 5 || posR[2][0] != '#'){
-                    posR[0][0] = '#';
+                if (randomNum == 5 && posR[2][0] != '#'){
+                    posR[2][0] = '#';
+                    break;
                 }
                 if (randomNum == 5 && posR[2][0] =='#'){
                     randomNum++;
                 }
-                if (randomNum == 6 || posR[2][1] != '#'){
-                    posR[0][0] = '#';
+                if (randomNum == 6 && posR[2][1] != '#'){
+                    posR[2][1] = '#';
+                    break;
                 }
                 if (randomNum == 6 && posR[2][1] =='#'){
                     randomNum++;
@@ -165,7 +109,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
         cout << "      |                    |" << endl;
         cout << "      |  "<<posR[1][0]<<"     "<<posR[1][1]<<"     "<<posR[1][2]<<"     |" << endl;
         cout << "      |                    |" << endl;
-        cout << "      |                    |" << endl;
+        // cout << "      |                    |" << endl;
         cout << "      |  "<<posR[2][0]<<"     "<<posR[2][1]<<"     "<<posR[2][2]<<"     |" << endl;
         cout << "      |____________________|" << endl;
         
@@ -266,6 +210,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
             default:
                 break;
         }
+
         for (int i = 0; i < 3;i++){
             for (int j = 0; j < 3;j++){
                 if ((posR[i][j]) != '#' && (posR[i][j]) != '&'){
@@ -273,11 +218,13 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
                 }
             }
         }
+
         if (posR[dx][dy] == '&'){
             order = 'n';
             cout << "已回到主地图" << endl;
             return;
         }
+
         posR[dx][dy] = '*';
         Room::showRoom();
         if ((position == 4 || position == 6 || position == 7 || position == 8) && positionR == 0)
@@ -287,9 +234,9 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
         if ((posR[dx][dy] == '#') && (position == 1 || position == 3 || position == 2 || position == 9))
         {
             cout << "这里发生战斗" << endl;
+            posR[dx][dy] = ' ';
         }
-        
-        }
+                }
     }
     
     
@@ -376,30 +323,28 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
 	cout<<"                      |__________|"<<endl;
     }
     
-
     void Map::action(){    
         pos[dx][dy] = ' ';
-        switch (getchar()){
+        char command = ' ';
+        cin >> command;
+        switch (command)
+        {
         case 'w':{
             if (position == 0 || position == 2 || position == 3 || position == 5){
                 cout << "移动失败" << endl;
-                break;
             }
-            if (position == 1 || position == 10)
+            else if (position == 1 || position == 10)
             {
                 dy--;
                 position -= 1;
-                break;
             }
-            if (position == 4 || position == 6 || position == 7 || position == 8){
+            else if (position == 4 || position == 6 || position == 7 || position == 8){
                 dy--;
                 position -= 3;
-                break;
             }
-            if (position == 9){
+            else if (position == 9){
                 dy--;
                 position -= 2;
-                break;
             }
             break;
         }
@@ -453,6 +398,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
             Room myRoom = Room(position);
             myRoom.showRoom();
             myRoom.actionRoom();
+            break;
         }
 
         default:
@@ -460,7 +406,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
                 cout << "不合理的输入" << endl;
                 break;
             }
-        }
+            }
         pos[dx][dy] = '*';
         
     }
@@ -471,40 +417,6 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
         
     }
 
-//     Map(){
-// 	position = 0;
-// 	dx = 5;
-// 	dy = 2;
 
-// 	for (int i = 0; i < 6; i++)
-// 	{
-// 		for (int j = 0; j < 6; j++)
-// 		{
-// 			pos[i][j] = ' ';
-// 		}
-// 	}
-// 	pos[dx][dy] = '*';
-// }
-    // bool Map::isCombat(){
-    //     if (position == 0 || position == 1 || position == 2 || position == 3 || position == 9){
-    //         return true;
-    //     }
-    //     else
-    //         return false;
-    // }
-    // bool Map::isChat(){
-    //     if (position == 4 || position == 6 || position == 8){
-    //         return true;
-    //     }
-    //     else
-    //         return false;
-    // }
-
-    int Map::getPosition(){
-        return position;
-    }
-    // string Map::getName(){
-    //     return mapName[position];
-    // }
 
 

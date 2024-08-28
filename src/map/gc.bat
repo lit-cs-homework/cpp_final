@@ -1,1 +1,1 @@
-c++ test.cpp main.cpp
+c++ test.cpp main.cpp -g ..\..\lib\nterm.lib

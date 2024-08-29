@@ -36,27 +36,32 @@ void Bag::changeequip(std::shared_ptr<Equip> equip,Hero& hero)
     /*
     for(const auto& i:equipbag)
     {
-        if(i.second == equip)
+        if(i == equip)
         {
-            i.second.takeoff(hero);
-            equip.equiped(hero);
-            bag[i.second]++;
+            i->takeoff(hero);
+            equip->equiped(hero);
+            bag[i]++;
             bag[equip]--;
         }
     }
     //const auto tup = std::make_pair(equip.number,equip);
-    equipbag[equip] = equip;
+    equipbag[equip->typ()] = equip;
     */
-
-   std::shared_ptr<Equip> old = equipbag[equip->typ()];
-   if(equipbag[equip->typ()]) {
-     old->takeoff(hero);
-   }
-   bag[old]++;
-   bag[equip]--;
-   equipbag[equip->typ()] = equip;
-//    equipbag[equip.typ()].equiped(hero);
-    equip->equiped(hero);
+    
+    if(equipbag[equip->typ()]==nullptr) {
+        equip->equiped(hero);
+        equipbag[equip->typ()] = equip;
+    }  else {
+        std::shared_ptr<Equip> old = equipbag[equip->typ()];
+        if(equipbag[equip->typ()]) {
+            old->takeoff(hero);
+        }
+        bag[old]++;
+        bag[equip]--;
+        equipbag[equip->typ()] = equip;
+    //    equipbag[equip.typ()].equiped(hero);
+        equip->equiped(hero);
+    }
 }
 
 bool BaseEquip::operator== (const BaseEquip& other) const

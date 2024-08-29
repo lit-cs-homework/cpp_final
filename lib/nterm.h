@@ -1,3 +1,12 @@
+/**
+
+A C++ port from Nim 2.1.9's std/terminal
+
+(doc: https://nim-lang.org/docs/terminal.html)
+
+see ./LICENSE for License.
+*/
+
 
 
 #ifndef _NIM_TERMINAL_H

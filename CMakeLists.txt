@@ -59,6 +59,10 @@ target_link_libraries(${PROJ_NAME}Lib
 	PUBLIC ftxui::component
 )
 cppfinal_addsrc_or_test(dialog)
+cppfinal_addsrc_or_test(equip)
+cppfinal_addsrc_or_test(combat)
+cppfinal_addsrc_or_test(map)
+
 
 foreach(elem ${tests})
 	target_link_libraries(${elem} ${PROJ_NAME}Lib)

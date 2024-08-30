@@ -5,19 +5,24 @@
 
 void Bag::display() const
 {
-    for(const auto& i: bag){
-        if(i.second>=0){
-            std::cout <<i.first->name << i.second <<std::endl;
+    std::cout << "装备背包:" << std::endl;
+    for(const auto& i: equipBag){
+        if(i.second >= 0){
+            std::cout << i.first->name << i.second << std::endl;
         }
     }
-    for(const auto& i: medicinebag){
+
+    std::cout << "药水背包:" << std::endl;
+    for(const auto& i: medicineBag){
         if(i.second>=0){
-            std::cout <<i.first->name << i.second <<std::endl;
+            std::cout << i.first->name << i.second << std::endl;
         }
     }
-    for(const auto& i: equipbag){
+
+    std::cout << "装备栏:" << std::endl;
+    for(const auto& i: equipColumn){
         if(i != nullptr){
-            std::cout << i->name  << std::endl;
+            std::cout << i->name << std::endl;
         } else {
             std::cout << "(none)" << std::endl;
         }
@@ -25,28 +30,25 @@ void Bag::display() const
 }
 
 void Bag::get(std::shared_ptr<Equip> equip, int n){
-    bag[equip] = bag[equip] + n;
+    equipBag[equip] += n;
 }
 
-void Bag::get(std::shared_ptr<Medicine> medicine, int n)
-{
-    medicinebag[medicine] += n;
+void Bag::get(std::shared_ptr<Medicine> medicine, int n){
+    medicineBag[medicine] += n;
 }
 
-void Bag::use(std::shared_ptr<Medicine> medicine, int n,Hero& hero){
-    if(hero.hp<hero.hpMax)
-    {
-        medicinebag[medicine] = medicinebag[medicine] - n;
-        medicine->used(hero,n);
+void Bag::use(std::shared_ptr<Medicine> medicine, int n, Hero& hero){
+    if(hero.hp < hero.hpMax){
+        medicineBag[medicine] = medicineBag[medicine] - n;
+        medicine->used(hero, n);
     }
-    else
-    {
-        std::cout << "英雄已经满血" << std::endl;
+    else{
+        std::cout << hero.name <<"已经满血" << std::endl;
     }
 
 }
 
-void Bag::changeequip(std::shared_ptr<Equip> equip,Hero& hero) 
+void Bag::changeequip(std::shared_ptr<Equip> equip, Hero& hero) 
 {
     /*
     for(const auto& i:equipbag)
@@ -59,36 +61,37 @@ void Bag::changeequip(std::shared_ptr<Equip> equip,Hero& hero)
             bag[equip]--;
         }
     }
-    //const auto tup = std::make_pair(equip.number,equip);
+    //const auto tup = std::make_pair(equip.number, equip);
     equipbag[equip->typ()] = equip;
     */
     
-    if(equipbag[equip->typ()]==nullptr) {
+    if(equipColumn[equip->typ()] == nullptr) {
         equip->equiped(hero);
-        equipbag[equip->typ()] = equip;
-    }  else {
-        std::shared_ptr<Equip> old = equipbag[equip->typ()];
-        if(equipbag[equip->typ()]) {
+        equipColumn[equip->typ()] = equip;
+    }
+    else
+    {
+        std::shared_ptr<Equip> old = equipColumn[equip->typ()];
+        if(equipColumn[equip->typ()]) {
             old->takeoff(hero);
         }
-        bag[old]++;
-        bag[equip]--;
-        equipbag[equip->typ()] = equip;
-    //    equipbag[equip.typ()].equiped(hero);
+        equipBag[old]++;
+        equipBag[equip]--;
+        equipColumn[equip->typ()] = equip;
+    //  equipbag[equip.typ()].equiped(hero);
         equip->equiped(hero);
     }
 }
 
-bool BaseEquip::operator== (const BaseEquip& other) const
-{
+bool BaseEquip::operator== (const BaseEquip& other) const{
     return name == other.name;
 }
 
-#define WithName(cls) cls::cls(){name=__func__;}
+#define WithName(cls) cls::cls(){name = __func__;}
 
 WithName(Equip)
 
-Equip::Equip(double hp,double mp,double def,double value):hp(hp),mp(mp),def(def),value(value){
+Equip::Equip(double hp, double mp, double def, double value):hp(hp), mp(mp), def(def), value(value){
     name = __func__;
 };
 
@@ -96,7 +99,7 @@ Equip::operator bool(){
     return value != 0;
 }
 
-#define __unImplement {std::cerr<<__func__ <<" unimplemented"<<std::endl; abort();}
+#define __unImplement {std::cerr << __func__ << " unimplemented" << std::endl; abort();}
 
 EquipTyp
 Equip::typ()__unImplement
@@ -106,10 +109,9 @@ void Equip::equiped(Hero& hero) __unImplement
 void Equip::takeoff(Hero& hero) __unImplement
 
 
-size_t hashBaseEquip::operator() (const std::shared_ptr<BaseEquip> value) const
-    {
-        return std::hash<std::string>{}(value->name);
-    }
+size_t hashBaseEquip::operator() (const std::shared_ptr<BaseEquip> value) const{
+    return std::hash<std::string>{}(value->name);
+}
 
 
 WithName(Medicine)
@@ -123,84 +125,85 @@ Store::Store(
             std::vector<std::shared_ptr<Medicine>> medicinestore/*={}*/
         )
 {
-    for (const auto& i : equipstore)
-    {
-        equipcommodities.insert(std::make_pair(i, 1));   
+    for (const auto& i : equipstore){
+        equipCommodities.insert(std::make_pair(i, 1));   
     }
-    for (const auto& i : medicinestore)
-    {
-        medicinecommodities.insert(std::make_pair(i, 999));   
+    for (const auto& i : medicinestore){
+        medicineCommodities.insert(std::make_pair(i, 999));   
     }
 }
 
 
-void Store::display() const{
-    for(const auto& i: equipcommodities){
-        std::cout <<i.first->name << i.second <<std::endl;
+void Store::display() const {
+    std::cout << "装备:" << std::endl;
+    for(const auto& i: equipCommodities){
+        std::cout << i.first->name << i.second << std::endl;
     }
-    for(const auto& i: medicinecommodities){
-        std::cout <<i.first->name << i.second <<std::endl;
+    std::cout << "药水:" << std::endl;
+    for(const auto& i: medicineCommodities){
+        std::cout << i.first->name << i.second << std::endl;
     }
 
 }
 
 void Store::sold(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero){
-    if(equipcommodities[equip]>=n){
-        equipcommodities[equip] = equipcommodities[equip] - n;
-        bag.get(equip,n);
-        hero.adjustGold(-(n*equip->value));
+    if(equipCommodities[equip] >= n){
+        equipCommodities[equip] = equipCommodities[equip] - n;
+        bag.get(equip, n);
+        hero.adjustGold(-(n * equip->value));
     }
     else{
         std::cout << "超出数量" << std::endl;
      }
 }
 
-void Store::sold(std::shared_ptr<Medicine> medicine, int n,Bag& bag, Hero& hero){
-    if(medicinecommodities[medicine]>=n){
-        medicinecommodities[medicine] = medicinecommodities[medicine] - n;
-        bag.get(medicine,n);
-        hero.adjustGold(-(n*medicine->value));
+void Store::sold(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero){
+    if(medicineCommodities[medicine] >= n){
+        medicineCommodities[medicine] = medicineCommodities[medicine] - n;
+        bag.get(medicine, n);
+        hero.adjustGold(-(n * medicine->value));
     }
     else{
         std::cout << "超出数量" << std::endl;
      }
 }
 
-void Store::buy(std::shared_ptr<Equip> equip, int n,Bag& bag, Hero& hero)
-{
-    if(bag.bag[equip]>=n)
-    {
-        bag.bag[equip]-=n;
-        hero.adjustGold(n*equip->value);
+void Store::buy(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero){
+    if(bag.equipBag[equip] >= n){
+        bag.equipBag[equip] -= n;
+        hero.adjustGold(n * equip->value);
+    }
+    else{
+        std::cout << "超出数量" << std::endl;
     }
 }
-void Store::buy(std::shared_ptr<Medicine> medicine, int n,Bag& bag, Hero& hero)
-{
-    if(bag.medicinebag[medicine]>=n)
-    {
-        bag.medicinebag[medicine]-=n;
+void Store::buy(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero){
+    if(bag.medicineBag[medicine] >= n){
+        bag.medicineBag[medicine] -= n;
         hero.adjustGold(n * medicine->value);
     }
+    else{
+        std::cout << "超出数量" << std::endl;
+    }
 }
 
 
-Sword::Sword(double hp,double mp,double def,double value,double atk):
-    Equip(hp,mp,def,value),atk(atk){};
+Sword::Sword(double hp, double mp, double def, double value, double atk):
+    Equip(hp, mp, def, value), atk(atk){};
 
 #define RetType(cls) EquipTyp cls::typ(){return t##cls;}
 
 RetType(Sword)
 
 
-void Sword::equiped(Hero& hero)
-{
+void Sword::equiped(Hero& hero){
     hero.hpMax += hp;
     hero.mpMax += mp;
     hero.defend += def;
     hero.attack += atk;
 }
-void Sword::takeoff(Hero& hero)
-{
+
+void Sword::takeoff(Hero& hero){
     hero.hpMax -= hp;
     hero.mpMax -= mp;
     hero.defend -= def;
@@ -209,7 +212,7 @@ void Sword::takeoff(Hero& hero)
 
 
 #define ImplSword(cls) \
-cls::cls(double hp,double mp,double def,double value,double atk): Sword(hp,mp,def,value,atk){\
+cls::cls(double hp, double mp, double def, double value, double atk): Sword(hp, mp, def, value, atk){\
     name = __func__;\
 }\
 
@@ -221,7 +224,7 @@ ImplSword(IronSword)
 RetType(Armhour)
 
 #define ArmOrShoe(cls) \
-cls::cls(int hp,int mp,int def,double value):Equip(hp,mp,def,value){\
+cls::cls(int hp, int mp, int def, double value):Equip(hp, mp, def, value){\
     name = __func__;\
 }
 
@@ -230,14 +233,13 @@ ArmOrShoe(Shoes)
 
 
 
-void Armhour::equiped(Hero& hero)
-{
+void Armhour::equiped(Hero& hero){
     hero.hpMax += hp;
     hero.mpMax += mp;
     hero.defend += def;
 }
-void Armhour::takeoff(Hero& hero)
-{
+
+void Armhour::takeoff(Hero& hero){
     hero.hpMax -= hp;
     hero.mpMax -= mp;
     hero.defend -= def;
@@ -246,40 +248,32 @@ void Armhour::takeoff(Hero& hero)
 
 RetType(Shoes)
 
-void Shoes::equiped(Hero& hero)
-{
+void Shoes::equiped(Hero& hero){
     hero.hpMax += hp;
     hero.mpMax += mp;
     hero.defend += def;
 }
-void Shoes::takeoff(Hero& hero)
-{
+
+void Shoes::takeoff(Hero& hero){
     hero.hpMax -= hp;
     hero.mpMax -= mp;
     hero.defend -= def;
 }
 
-void Medicine::used(Hero& hero,int n)
-{
-    if(hero.hp+n*hp<=hero.hpMax)
-    {
-        hero.hp += hp*n;
-    }
-    else
-    {
+void Medicine::used(Hero& hero, int n){
+    if(hero.hp + n * hp <= hero.hpMax){
+        hero.hp += n * hp;
+    }else{
         hero.hp = hero.hpMax;
     }
 
-    if(hero.mp+n*mp<=hero.mpMax)
-    {
-        hero.mp += mp*n;
-    }
-    else
-    {
+    if(hero.mp + n * mp <= hero.mpMax){
+        hero.mp += n * mp;
+    }else{
         hero.mp = hero.mpMax;
     }
-    hero.attack += atk*n;
-    hero.defend += def*n;
+    hero.attack += atk * n;
+    hero.defend += def * n;
 }
 RedMedicine::RedMedicine(){
     name = __func__;
@@ -288,8 +282,7 @@ RedMedicine::RedMedicine(){
     value = 10;
 }
 
-void RedMedicine::display()const
-{
+void RedMedicine::display() const{
     std::cout << "hp回复" << std::endl;
 }
 
@@ -300,7 +293,6 @@ BlueMedicine::BlueMedicine(){
     value = 10;
 }
 
-void BlueMedicine::display() const
-{
+void BlueMedicine::display() const{
     std::cout << "mp回复" << std::endl;
 }

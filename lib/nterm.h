@@ -53,7 +53,7 @@ _VV( disableTrueColors )
 _BV( isTrueColorSupported )
 #undef _BV
 
-void ntermInit(bool enableTrueColor=true);
+void ntermInit(bool enableTrueColor=false);
 
 _PRE char getch(void);
 

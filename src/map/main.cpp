@@ -1,23 +1,34 @@
 #include "../../include/map.h"
+#include "../../include/combat.h"
+#include "../../include/equip.h"
+#include "../../lib/nterm.h"
 
-using namespace std;
+using std::cin;
+using std::cout;
+using std::endl;
 char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
 
-    Room::Room(int p){
-        position = p;
-        dx = 1;
-        dy = 1;
-        positionR = 4;
 
-        for (int i = 0; i < 3;i++)
+static void CannotMove(){
+    cout << "无法移动" << endl;
+}
+
+Room::Room(int p)
+{
+    position = p;
+    dx = 1;
+    dy = 1;
+    positionR = 4;
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
         {
-            for (int j = 0; j < 3; j++)
-            {
-                posR[i][j] = ' ';
-            }
+            posR[i][j] = ' ';
         }
-        posR[1][1] = '*';
-        posR[2][2] = '&';
+    }
+    posR[1][1] = '*';
+    posR[2][2] = '&';
     }
    
     void Room::showRoom(){
@@ -101,54 +112,55 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
                 
 
         }
-        //system("cls");
-        cout << "             " << mapName[position] << endl;
-        cout << "       ____________________" << endl;
-        cout << "      |                    |" << endl;
-        cout << "      |  "<<posR[0][0]<<"     "<<posR[0][1]<<"     "<<posR[0][2]<<"     |" << endl;
-        cout << "      |                    |" << endl;
-        cout << "      |  "<<posR[1][0]<<"     "<<posR[1][1]<<"     "<<posR[1][2]<<"     |" << endl;
-        cout << "      |                    |" << endl;
-        // cout << "      |                    |" << endl;
-        cout << "      |  "<<posR[2][0]<<"     "<<posR[2][1]<<"     "<<posR[2][2]<<"     |" << endl;
-        cout << "      |____________________|" << endl;
+        eraseScreen();
+        setCursorPos(0, 0);
+        cout << "             " << mapName[position] << '\n';
+        cout << "       ____________________" << '\n';
+        cout << "      |                    |" << '\n';
+        cout << "      |  "<<posR[0][0]<<"     "<<posR[0][1]<<"     "<<posR[0][2]<<"     |" << '\n';
+        cout << "      |                    |" << '\n';
+        cout << "      |  "<<posR[1][0]<<"     "<<posR[1][1]<<"     "<<posR[1][2]<<"     |" << '\n';
+        cout << "      |                    |" << '\n';
+        // cout << "      |                    |" << '\n';
+        cout << "      |  "<<posR[2][0]<<"     "<<posR[2][1]<<"     "<<posR[2][2]<<"     |" << '\n';
+        cout << "      |____________________|" << '\n';
         
         
-        
-        cout << "'&':移动至此可退出地图" << endl;
+        cout << "输入wasd在房间移动" << endl;
+        cout << "'&':移动至此可退出地图" << '\n';
         switch (position)
         {
         case 4:
         {
-            cout << " '#':移动至此可学习技能" << endl;
+            cout << " '#':移动至此可学习技能" << '\n';
             break;
         }
         case 6:
-            {cout << "'#':移动至此可打造你的装备" << endl;
+            {cout << "'#':移动至此可打造你的装备" << '\n';
                 break;
             }
         case 7:
-            {cout << "'#':移动至此可购买物品" << endl;
+            {cout << "'#':移动至此可购买物品" << '\n';
                 break;
             }
         case 8:
-            {cout << "'#':移动至此可治疗和制造药品" << endl;
+            {cout << "'#':移动至此可治疗和制造药品" << '\n';
                 break;
             }
         case 1:
-            {cout << "'#'处可与怪物战斗" << endl;
+            {cout << "'#'处可与怪物战斗" << '\n';
                 break;
             }
         case 2:
-            {cout << "'#':移动至此可与怪物战斗" << endl;
+            {cout << "'#':移动至此可与怪物战斗" << '\n';
                 break;
             }
         case 3:
-           { cout << "'#':移动至此可与怪物战斗" << endl;
+           { cout << "'#':移动至此可与怪物战斗" << '\n';
                break;
            }
         case 9:
-            {cout << "'#':移动至此可与怪物战斗" << endl;
+            {cout << "'#':移动至此可与怪物战斗" << '\n';
                 break;
             }
 
@@ -159,19 +171,18 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
 
     void Room::actionRoom(){
         char order = ' ';
+        
         while (order != 'n')
         {
-            cout << "输入wasd在房间移动" << endl;
-            cin >> order;
             
+            order = getch();
+
             switch (order)
             {
             case 'w':{
                 if (positionR == 0 || positionR == 1 || positionR == 2){
-                    cout << "无法移动" << endl;
-                    
-                }
-                else {
+                    CannotMove();
+                }else {
                     positionR -= 3;
                     dx--;
                     }
@@ -179,7 +190,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
             }
             case 'a':{
                 if (positionR == 0 || positionR == 3 || positionR == 6){
-                    cout << "无法移动"<<endl;
+                    CannotMove();
                 }
                 else{
                     positionR--;
@@ -189,7 +200,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
             }
             case 'd':{
                 if (positionR == 2 || positionR == 5 || positionR == 8){
-                    cout << "无法移动" << endl;
+                    CannotMove();
                 }
                 else{
                     positionR++;
@@ -199,7 +210,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
             }
             case 's':{
                 if (positionR == 6 || positionR == 7 || positionR == 8){
-                    cout << "无法移动" << endl;
+                    CannotMove();
                 }
                 else{
                     dx++;
@@ -225,17 +236,30 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
             return;
         }
 
-        posR[dx][dy] = '*';
+        
         Room::showRoom();
         if ((position == 4 || position == 6 || position == 7 || position == 8) && positionR == 0)
         {
+            posR[dx][dy] = '*';
             cout << "这里有对话" << endl;
+            posR[dx][dy] = '#';
         }
         if ((posR[dx][dy] == '#') && (position == 1 || position == 3 || position == 2 || position == 9))
         {
             cout << "这里发生战斗" << endl;
-            posR[dx][dy] = ' ';
-        }
+            posR[dx][dy] = '*';
+            Hero h;
+            Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+            Skill S[1] = { s1 };
+            Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
+            Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
+            r.setSkill(S, 1);
+            h.setSkill(s2);
+            std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
+            h.getBag().get(redMedicine,10);
+            Battle b(&h, r);
+            Room::showRoom();
+                }
                 }
     }
     
@@ -295,38 +319,42 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
         pos[dx][dy] = '*';
     }
     void Map::showMap(){
-    cout << "世界地图:" << endl;
-	cout<<"                        __________"<<endl;
-	cout<<"                       |          |"<<endl;
-	cout<<"                       |   卧龙山 |"<<endl;
-    cout << "                       |   " << pos[2][0] << "      |" << endl;
-    cout<<"                       |__________|"<<endl;
-	cout<<"                       |          |"<<endl;
-	cout<<"                       |   祸窟   |"<<endl;
-    cout << "                       |     " << pos[2][1] << "    |" << endl;
-    cout<<"_______________________|__________|__________"<<endl;
-	cout<<"|          |          |           |          |"<<endl;
-	cout<<"|   地宫   |   北阳山 |   藏经阁  |   郊外   |"<<endl;
-    cout << "|    " << pos[0][2] << "     |     " << pos[1][2] << "    |     "<< pos[2][2] << "     |    " << pos[3][2] << "     |" << endl;
-    cout<<"|__________|__________|___________|__________|"<<endl;
-    cout << "           |          |          |          |" << endl;
-    cout<<"           |   锻造屋 | 中央主城 |   药铺   |"<<endl;
-    cout << "           |     " << pos[1][3] << "    |      " << pos[2][3] << "   |    " << pos[3][3] << "     |" << endl;
-    cout<<"           |__________|__________|__________|"<<endl;
-	cout<<"                      |          |"<<endl;
-	cout<<"                      |   道远村 |"<<endl;
-    cout<<"                      |    "<< pos[2][4] <<"     |"<<endl;
-	cout<<"                      |__________|"<<endl;
-	cout<<"                      |          |"<<endl;
-	cout<<"                      |    郊外  |"<<endl;
-    cout<<"                      |    "<< pos[2][5] <<"     |"<<endl;
-	cout<<"                      |__________|"<<endl;
+        eraseScreen();
+        setCursorPos(0, 0);
+        cout << "世界地图:" << '\n';
+        cout << "                        __________" << '\n';
+        cout << "                       |          |" << '\n';
+        cout << "                       |   卧龙山 |" << '\n';
+        cout << "                       |   " << pos[2][0] << "      |" << '\n';
+        cout << "                       |__________|" << '\n';
+        cout << "                       |          |" << '\n';
+        cout << "                       |   祸窟   |" << '\n';
+        cout << "                       |     " << pos[2][1] << "    |" << '\n';
+        cout << "_______________________|__________|__________" << '\n';
+        cout << "|          |          |           |          |" << '\n';
+        cout << "|   地宫   |   北阳山 |   藏经阁  |   郊外   |" << '\n';
+        cout << "|    " << pos[0][2] << "     |     " << pos[1][2] << "    |     " << pos[2][2] << "     |    " << pos[3][2] << "     |" << '\n';
+        cout << "|__________|__________|___________|__________|" << '\n';
+        cout << "           |          |          |          |" << '\n';
+        cout << "           |   锻造屋 | 中央主城 |   药铺   |" << '\n';
+        cout << "           |     " << pos[1][3] << "    |      " << pos[2][3] << "   |    " << pos[3][3] << "     |" << '\n';
+        cout << "           |__________|__________|__________|" << '\n';
+        cout << "                      |          |" << '\n';
+        cout << "                      |   道远村 |" << '\n';
+        cout << "                      |    " << pos[2][4] << "     |" << '\n';
+        cout << "                      |__________|" << '\n';
+        cout << "                      |          |" << '\n';
+        cout << "                      |    郊外  |" << '\n';
+        cout << "                      |    " << pos[2][5] << "     |" << '\n';
+        cout << "                      |__________|" << '\n';
+        cout.flush();
     }
-    
+
     void Map::action(){    
         pos[dx][dy] = ' ';
         char command = ' ';
-        cin >> command;
+        command = getch();
+        // cin >> command;
         switch (command)
         {
         case 'w':{
@@ -351,7 +379,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
         case 'a':{
             if (position == 2 || position == 0 || position == 1 || position == 6 || position == 9 || position == 10)
                 {
-                    cout << "移动失败" << endl;
+                    cout << "移动失败" << '\n';
                     break;
                 }
                 if (position == 3 || position == 4 || position == 5 || position == 7 || position == 8){
@@ -363,7 +391,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
         case 'd':{
             if (position == 1 || position == 5 || position == 8 || position == 9 || position == 10 || position == 0)
             {
-                cout << "无法移动" << endl;
+                CannotMove();
             }
             if (position == 2 || position == 3 || position == 4 || position == 6 || position == 7){
                 dx++;
@@ -373,7 +401,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
         }
         case 's':{
             if (position == 2 || position == 6 || position == 10 || position == 8){
-                cout << "无法移动" << endl;
+                CannotMove();
                 break;
             }
             if (position == 3 || position == 4 || position == 5 || position == 1){
@@ -412,7 +440,7 @@ char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁
     }
     void Map::showMenu(){
         cout << "您目前的位置是：" << mapName[position] << endl;
-        cout << "1.输入m进入区域。"<<endl;
+        cout << "1.输入m进入区域。" << endl;
         cout << "2.输入wasd以移动" << endl;
         
     }

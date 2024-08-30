@@ -15,9 +15,16 @@ void Bag::display() const
             std::cout <<i.first->name << i.second <<std::endl;
         }
     }
+    for(const auto& i: equipbag){
+        if(i != nullptr){
+            std::cout << i->name  << std::endl;
+        } else {
+            std::cout << "(none)" << std::endl;
+        }
+    }
 }
 
-void Bag::get(std::shared_ptr<Equip>equip, int n){
+void Bag::get(std::shared_ptr<Equip> equip, int n){
     bag[equip] = bag[equip] + n;
 }
 
@@ -27,8 +34,16 @@ void Bag::get(std::shared_ptr<Medicine> medicine, int n)
 }
 
 void Bag::use(std::shared_ptr<Medicine> medicine, int n,Hero& hero){
-    medicinebag[medicine] = medicinebag[medicine] - n;
-    medicine->used(hero,n);
+    if(hero.hp<hero.hpMax)
+    {
+        medicinebag[medicine] = medicinebag[medicine] - n;
+        medicine->used(hero,n);
+    }
+    else
+    {
+        std::cout << "英雄已经满血" << std::endl;
+    }
+
 }
 
 void Bag::changeequip(std::shared_ptr<Equip> equip,Hero& hero) 
@@ -129,38 +144,42 @@ void Store::display() const{
 
 }
 
-void Store::sold(std::shared_ptr<Equip> equip, int n,Bag& bag){
+void Store::sold(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero){
     if(equipcommodities[equip]>=n){
         equipcommodities[equip] = equipcommodities[equip] - n;
         bag.get(equip,n);
+        hero.adjustGold(-(n*equip->value));
     }
     else{
         std::cout << "超出数量" << std::endl;
      }
 }
 
-void Store::sold(std::shared_ptr<Medicine> medicine, int n,Bag& bag){
+void Store::sold(std::shared_ptr<Medicine> medicine, int n,Bag& bag, Hero& hero){
     if(medicinecommodities[medicine]>=n){
         medicinecommodities[medicine] = medicinecommodities[medicine] - n;
         bag.get(medicine,n);
+        hero.adjustGold(-(n*medicine->value));
     }
     else{
         std::cout << "超出数量" << std::endl;
      }
 }
 
-void Store::buy(std::shared_ptr<Equip> equip, int n,Bag& bag)
+void Store::buy(std::shared_ptr<Equip> equip, int n,Bag& bag, Hero& hero)
 {
     if(bag.bag[equip]>=n)
     {
         bag.bag[equip]-=n;
+        hero.adjustGold(n*equip->value);
     }
 }
-void Store::buy(std::shared_ptr<Medicine> medicine, int n,Bag& bag)
+void Store::buy(std::shared_ptr<Medicine> medicine, int n,Bag& bag, Hero& hero)
 {
     if(bag.medicinebag[medicine]>=n)
     {
         bag.medicinebag[medicine]-=n;
+        hero.adjustGold(n * medicine->value);
     }
 }
 
@@ -194,9 +213,9 @@ cls::cls(double hp,double mp,double def,double value,double atk): Sword(hp,mp,de
     name = __func__;\
 }\
 
-ImplSword(Stonesword)
-ImplSword(Bronzesword)
-ImplSword(Ironsword)
+ImplSword(StoneSword)
+ImplSword(BronzeSword)
+ImplSword(IronSword)
 
 
 RetType(Armhour)
@@ -264,8 +283,9 @@ void Medicine::used(Hero& hero,int n)
 }
 RedMedicine::RedMedicine(){
     name = __func__;
-    hp=10;
-    mp=0;
+    hp = 10;
+    mp = 0;
+    value = 10;
 }
 
 void RedMedicine::display()const
@@ -275,8 +295,9 @@ void RedMedicine::display()const
 
 BlueMedicine::BlueMedicine(){
     name = __func__;
-    hp=0;
-    mp=10;
+    hp = 0;
+    mp = 10;
+    value = 10;
 }
 
 void BlueMedicine::display() const

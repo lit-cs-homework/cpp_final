@@ -10,6 +10,7 @@
 
 #include "cfg.h"
 #include "game.h"
+#include "map.h"
 
 
 using namespace ftxui;
@@ -43,12 +44,13 @@ void ExecuteBoard(GameConfig config,
     exit();
   };
 
-  Page page(config, on_win, on_lose);
+  // Page page(config, on_win, on_lose);
 
-  auto dialog = GameScreen(page, screen, on_lose, on_quit);
-  auto component = dialog.asComponent(filler()) | center;
-  screen.Loop(component);
-  return;
+  // auto dialog = GameScreen(page, screen, on_lose, on_quit);
+  // auto component = dialog.asComponent(filler()) | center;
+
+  // screen.Loop(component);
+  // return;
 
   Loop loop(&screen, component);
 
@@ -57,7 +59,7 @@ void ExecuteBoard(GameConfig config,
     using namespace std::chrono_literals;
     const auto refresh_time = 1.0s / 60.0;
     std::this_thread::sleep_for(refresh_time);
-    screen.PostEvent(Event::Custom);
+    //screen.PostEvent(Event::Custom);
   }
 }
 
@@ -98,7 +100,7 @@ void ExecuteIntro(bool* enable_audio) {
 
 
 // The component responsible for renderering the game board.
-DialogPage GameScreen(Page& page,
+ftxui::Component GameScreen(Page& page,
                             ScreenInteractive& screen,
                             std::function<void()> lose,
                             std::function<void()> quit) {
@@ -110,8 +112,17 @@ DialogPage GameScreen(Page& page,
       button_quit,
   });
 
-  auto component = page.Render(screen, button_back, button_quit);
+  //auto component = page.Render(screen, button_back, button_quit);
+
+  auto layout = Container::Vertical({
+      button_back,
+      button_quit,
+  });
+
   /*
+  auto component = Renderer(layout, [&, button_back, button_quit] {
+    return board.Draw(button_back->Render(), button_quit->Render());
+  });
   component |= CatchEvent([&](Event event) {  // NOLINT
     if (event == Event::Custom) {
       page.Step();
@@ -119,8 +130,9 @@ DialogPage GameScreen(Page& page,
     }
 
     return page.OnEvent(event);
-  });
-  */
+  });*/
+  auto component = layout->;
+
   return component;
 }
 

@@ -1,1 +1,1 @@
-c++ test.cpp main.cpp -g ..\..\lib\nterm.lib
+c++ test.cpp main.cpp  ../combat/main.cpp ../equip/main.cpp  -g ..\..\lib\nterm.lib

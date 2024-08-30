@@ -1,1 +1,1 @@
-c++ test.cpp main.cpp
+g++ test.cpp main.cpp ../equip/main.cpp

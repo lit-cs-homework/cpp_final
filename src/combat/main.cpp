@@ -163,7 +163,7 @@ Bag& Hero::getBag()
 }
 std::unordered_map<std::shared_ptr<Medicine>,int, hashBaseEquip,eqOnObj>& Hero::getMedicine()
 {
-	return bag.medicinebag;
+	return bag.medicineBag;
 }
 void Hero::setSkill(Skill skill)
 {

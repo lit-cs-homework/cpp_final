@@ -1,84 +1,26 @@
 #pragma once
-#include<iostream>
-#include<algorithm>
-#include<cstring>
-#include<ctime>
-#include<cstdlib>
-#include<vector>
-//#include"../../include/equip.h"
-using namespace std;
-class Skill
-{
-public:
-	Skill();
-	Skill(string name, string introduce, int harm, int magicLose);
-	~Skill();
-	void showSkill();
-	string getName();
-	string getIntroduce();
-	int getHarm();
-	int getMagicLose();
-private:
-	string name;//名称
-	string introduce;//介绍
-	int harm;//伤害
-	int magicLose;//耗蓝
-};
 
-
-class Hero
-{
-public:
-	Hero();
-	~Hero();
-	void setName();
-	void showHero();
-	void addHp(int num);//增加生命上限
-	void adjustHp(int num);//增加或减少生命值
-	void addMp(int num);//增加魔法上限
-	void adjustMp(int num);//增加或减少魔法值
-	void adjustAttack(int num);//增加或减少攻击
-	void adjustDefend(int num);//增加或减少防御
-	void addExp(int num);//增加或减少经验
-	void adjustGold(int num);//增加或减少金币
-	int getHp();
-	int getMp();
-	int getAttack();
-	int getDefend();
-	int getExp();
-	int getGold();
-	int getLevel();
-	//Bag& getBag();
-	void setSkill(Skill skill);
-	vector<Skill> getskills();
-private:
-	string name;
-	int hp;//血量
-	int hpMax;
-	int mp;//蓝量
-	int mpMax;
-	int attack;
-	int defend;
-	int exp;
-	int expMax[10] = { 10,50,150,500,1000,2000,4000,8000,15000,30000 };
-	int level;
-	int gold;
-	vector<Skill> skills;
-	int skillNumber;//技能最大数目；
-};
+#include <algorithm>
+#include <string>
+#include <ctime>
+#include <cstdlib>
+#include <vector>
+#include <memory>
+#include "./equip.h"
+//#include "equip.h"
 
 class Enemy
 {
 public:
 	Enemy();
-	Enemy(string name, string introduce, int hp, int hpMax, int mp, int mpMax, int attack, int defend, int threaten, int exp, int gold);
+	Enemy(std::string name, std::string introduce, int hp, int hpMax, int mp, int mpMax, int attack, int defend, int threaten, int exp, int gold);
 	~Enemy();
 	void showEnemy();
 	void adjustHp(int num);//增加或减少生命值
 	void adjustMp(int num);//增加或减少魔法值
 	void adjustAttack(int num);//增加或减少攻击
 	void adjustDefend(int num);//增加或减少防御
-	string getName();
+	std::string getName();
 	int getHp();
 	int getMp();
 	int getAttack();
@@ -90,18 +32,18 @@ public:
 	Skill getSkill(int pos);
 	void setSkill(Skill skill[], int num);//设置技能
 private:
-	string name;
-	string introduce;
+	std::string name;
+	std::string introduce;
 	int hp;//血量
 	int hpMax;
 	int mp;//蓝量
 	int mpMax;
 	int attack;
 	int defend;
-	vector<Skill> skills;
+	std::vector<Skill> skills;
 	int exp;//死亡掉落经验
 	int gold;//死亡掉落金钱
-	//vector<Stuff> stuffs;//死亡掉落物品
+	//std::vector<Stuff> stuffs;//死亡掉落物品
 	int threaten;//威胁指数，影响逃跑概率
 };
 

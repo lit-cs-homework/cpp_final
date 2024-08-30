@@ -23,9 +23,9 @@ class BaseEquip{//物品基类 包括装备和药水
 class Equip;
 
 
-struct eqOnObg
+struct eqOnObj
 {
-    bool operator() (std::shared_ptr<BaseEquip> const a,std::shared_ptr<BaseEquip> const b) const
+    bool operator() (std::shared_ptr<BaseEquip> const a, std::shared_ptr<BaseEquip> const b) const
     {
         return *a == *b;
     }
@@ -52,8 +52,7 @@ class Hero;
 class Equip: public BaseEquip{//装备基类
     public:
         Equip();
-
-        Equip(double hp,double mp,double def,double value);
+        Equip(double hp, double mp, double def, double value);
         double hp = 0;
         double mp = 0;
         double def = 0;
@@ -73,7 +72,8 @@ class Medicine: public BaseEquip
         double mp;
         double atk;
         double def;
-        void used(Hero& hero,int n);//角色使用药水
+        double value;
+        void used(Hero& hero, int n);//角色使用药水
         virtual void display();
 };
 
@@ -81,16 +81,16 @@ class Medicine: public BaseEquip
 class Bag;
 class Store{
     public:
-        Store(std::vector<std::shared_ptr<Equip>> equipstore = {},std::vector<std::shared_ptr<Medicine>> medicinestore = {});
+        Store(std::vector<std::shared_ptr<Equip>> equipstore = {}, std::vector<std::shared_ptr<Medicine>> medicinestore = {});
         //void refresh();
         void display() const;
-        void sold(std::shared_ptr<Equip> equip, int n,Bag& bag);//角色买装备，商店卖装备
-        void sold(std::shared_ptr<Medicine> medicine, int n,Bag& bag);///角色买药水，商店卖药水
-        void buy(std::shared_ptr<Equip> equip, int n,Bag& bag);//角色卖装备，商店买
-        void buy(std::shared_ptr<Medicine> medicine, int n,Bag& bag);//角色卖药水
+        void sold(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色买装备，商店卖装备
+        void sold(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);///角色买药水，商店卖药水
+        void buy(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色卖装备，商店买
+        void buy(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);//角色卖药水
     private:
-        std::unordered_map<std::shared_ptr<Equip>,int, hashBaseEquip, eqOnObg> equipcommodities;//商店的装备
-        std::unordered_map<std::shared_ptr<Medicine>,int,hashBaseEquip, eqOnObg> medicinecommodities;//商店的药水
+        std::unordered_map<std::shared_ptr<Equip>, int, hashBaseEquip, eqOnObj> equipCommodities;//商店的装备
+        std::unordered_map<std::shared_ptr<Medicine>, int, hashBaseEquip, eqOnObj> medicineCommodities;//商店的药水
 };
 
 
@@ -103,39 +103,39 @@ class Sword : public Equip
     public:
         friend class Bag;
         friend class Hero;
-        Sword(double hp,double mp,double def,double value,double atk);
+        Sword(double hp, double mp, double def, double value, double atk);
         double atk;
         EquipTyp typ();
         void equiped(Hero& hero);//角色穿上装备
         void takeoff(Hero& hero);//角色脱下装备
 };
 
-class Stonesword : public Sword
+class StoneSword : public Sword
 {
     public:
         friend class Bag;
-        Stonesword(double hp,double mp,double def,double value,double atk);
+        StoneSword(double hp, double mp, double def, double value, double atk);
 };
 
-class Bronzesword : public Sword
+class BronzeSword : public Sword
 {
     public:
         friend class Bag;
-        Bronzesword(double hp,double mp,double def,double value,double atk);
+        BronzeSword(double hp, double mp, double def, double value, double atk);
 };
 
-class Ironsword : public Sword
+class IronSword : public Sword
 {
     public:
         friend class Bag;
-        Ironsword(double hp,double mp,double def,double value,double atk);
+        IronSword(double hp, double mp, double def, double value, double atk);
 };
 
 class Armhour :public Equip
 {
     public:
         friend class Bag;
-        Armhour(int hp,int mp,int def,double value);
+        Armhour(int hp, int mp, int def, double value);
         EquipTyp typ();
         void equiped(Hero& hero);//角色穿上装备
         void takeoff(Hero& hero);//角色脱下装备
@@ -147,7 +147,7 @@ class Shoes :public Equip
 {
     public:
         friend class Bag;
-        Shoes(int hp,int mp,int def,double value);
+        Shoes(int hp, int mp, int def, double value);
         EquipTyp typ();
         void equiped(Hero& hero);
         void takeoff(Hero& hero);
@@ -179,12 +179,12 @@ class Bag{
         void get(std::shared_ptr<Equip> equip, int n);//角色获得装备
         void get(std::shared_ptr<Medicine> Medicine, int n);//角色获得药水
         void display() const;
-        void use(std::shared_ptr<Medicine> medicine,int n,Hero& hero);//角色使用药水
-        void changeequip(std::shared_ptr<Equip> equip,Hero& hero);//角色更换装备
+        void use(std::shared_ptr<Medicine> medicine, int n, Hero& hero);//角色使用药水
+        void changeequip(std::shared_ptr<Equip> equip, Hero& hero);//角色更换装备
     private:
-        std::unordered_map<std::shared_ptr<Equip>,int, hashBaseEquip, eqOnObg> bag;//未装备的装备
-        std::unordered_map<std::shared_ptr<Medicine>,int, hashBaseEquip, eqOnObg> medicinebag;//药水
-        std::array<std::shared_ptr<Equip>, EquipTypCount> equipbag;//已装备的装备 武器栏
+        std::unordered_map<std::shared_ptr<Equip>, int, hashBaseEquip, eqOnObj> equipBag;//未装备的装备
+        std::unordered_map<std::shared_ptr<Medicine>, int, hashBaseEquip, eqOnObj> medicineBag;//药水
+        std::array<std::shared_ptr<Equip>, EquipTypCount> equipColumn;//已装备的装备 武器栏
         //Equip  equipbag[EquipTypCount] ;
 };
 
@@ -236,10 +236,10 @@ public:
 	int getExp();
 	int getGold();
 	int getLevel();
-	Bag getBag();
-	std::unordered_map<std::shared_ptr<Medicine>,int, hashBaseEquip, eqOnObg> getMedicine();
+	Bag& getBag();
+	std::unordered_map<std::shared_ptr<Medicine>, int, hashBaseEquip, eqOnObj>& getMedicine();
 	void setSkill(Skill skill);
-	std::vector<Skill> getskills();
+	std::vector<Skill>& getskills();
 	void use(std::shared_ptr<Medicine> medicine, int n);
     //void changeequip(std::shared_ptr<Equip> equip);
 private:
@@ -251,7 +251,7 @@ private:
 	int attack;
 	int defend;
 	int exp;
-	int expMax[10] = { 10,50,150,500,1000,2000,4000,8000,15000,30000 };
+	int expMax[10] = { 10, 50, 150, 500, 1000, 2000, 4000, 8000, 15000, 30000 };
 	int level;
 	int gold;
 	std::vector<Skill> skills;

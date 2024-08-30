@@ -23,21 +23,15 @@ int main()
 {
     std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
     std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
-    std::shared_ptr<Stonesword> a = std::make_shared<Stonesword> (0,0,0,10,10);
-    std::shared_ptr<Ironsword> b = std::make_shared<Ironsword> (0,0,0,30,30);
-    std::shared_ptr<Bronzesword> c= std::make_shared<Bronzesword> (0,0,0,20,20);
+    std::shared_ptr<StoneSword> a = std::make_shared<StoneSword> (0,0,0,10,10);
+    std::shared_ptr<IronSword> b = std::make_shared<IronSword> (0,0,0,30,30);
+    std::shared_ptr<BronzeSword> c= std::make_shared<BronzeSword> (0,0,0,20,20);
     std::shared_ptr<Shoes> d = std::make_shared<Shoes> (5,5,5,10);
     std::shared_ptr<Armhour> e = std::make_shared<Armhour> (10,10,20,30);
     std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
     std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
     Store store(equipstore,medicinestore);
     Hero hero;
-    Bag bag;
-    hero.display();
-    a->equiped(hero);
-    hero.display();
-    bag.changeequip(c,hero);
-    hero.display();
-    bag.changeequip(d,hero);
-    hero.display();
+    hero.getBag().get(redMedicine,10);
+    hero.getBag().display();
 }

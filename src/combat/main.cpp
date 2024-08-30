@@ -157,11 +157,11 @@ int Hero::getLevel()
 {
 	return level;
 }
-Bag Hero::getBag()
+Bag& Hero::getBag()
 {
 	return bag;
 }
-std::unordered_map<std::shared_ptr<Medicine>,int, hashBaseEquip,eqOnObg> Hero::getMedicine()
+std::unordered_map<std::shared_ptr<Medicine>,int, hashBaseEquip,eqOnObj>& Hero::getMedicine()
 {
 	return bag.medicinebag;
 }
@@ -169,7 +169,7 @@ void Hero::setSkill(Skill skill)
 {
 	skills.push_back(skill);
 }
-std::vector<Skill> Hero::getskills()
+std::vector<Skill>& Hero::getskills()
 {
 	return skills;
 }
@@ -334,6 +334,11 @@ int Battle::playerRound()
 			}
 			std::cin >> input;
 			pos = input[0] - 49;
+			if (input[0] - 48 == (*player).getskills().size() + 1)//返回
+			{
+				playerRound();
+				return -1;
+			}
 		}
 		if (input[0] - 48 == (*player).getskills().size() + 1)//返回
 		{
@@ -390,6 +395,7 @@ int Battle::playerRound()
         }
         player->use(i->first,1);
         std::cout << "使用" << i->first->name << "成功！" << std::endl;
+		player->showHero();
         playerRound();
 		return -1;
 	}

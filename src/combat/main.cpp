@@ -1,6 +1,6 @@
 
 #include "../../include/combat.h"
-
+#include "../../lib/nterm.h"
 
 #ifdef _WIN32
 # include<windows.h>
@@ -283,15 +283,17 @@ void Battle::showRound()//回合演示
 
 int Battle::playerRound()
 {
+	//while(int c = getchar()!=EOF)  {}
 	std::cout << "请选择：" << "1.攻击  2.使用技能  3.使用物品   4.尝试逃跑" << std::endl;
-	std::string input;
-	std::cin >> input;
-	while (input.size() > 1 || input[0] - 48 < 1 || input[0] - 48 > 4)//输入错误
+	//std::string input;
+	//std::cin >> input;
+	char inp = getch();
+	while (inp - 48 < 1 || inp - 48 > 4)//输入错误
 	{
-		std::cout << "输入错误，请重新选择：";
-		std::cin >> input;
+		//std::cout << "输入错误，请重新选择：";
+		inp = getch();
 	}
-	switch (input[0])
+	switch (inp)
 	{
 	case '1'://攻击
 	{
@@ -375,7 +377,7 @@ int Battle::playerRound()
         std::cin >> input;
         while (input.size() > 1 || input[0] - 48 < 1 || input[0] - 48 > num01)//输入错误
         {
-        	std::cout << "输入错误，请重新选择:";
+        	std::cout << "输入错误，请重新选择:" << std::endl;
         	std::cin >> input;
         }
         if (input[0] - 48 == num01)//返回

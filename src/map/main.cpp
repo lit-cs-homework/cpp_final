@@ -40,10 +40,12 @@ Room::Room(Hero& hm,int p):h(hm)
             int enemyNum = 0;
             while(!enemyNum)
             {
+                srand(time(NULL));
                 enemyNum = rand() % 4;
             }
             for (int i = 0; i < enemyNum;i++)
             {
+                srand(time(NULL));
                 int randomNum = rand() % 7;
                 if (randomNum == 0 && posR[0][0] != '#')
                 {
@@ -189,14 +191,8 @@ Room::Room(Hero& hm,int p):h(hm)
                     cout << "这里有对话" << endl;
                 }
                 else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '#'){
-                    Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
-                    Skill S[1] = {s1};
-                    Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
-                    r.setSkill(S, 1);
-
-                    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
-                    h.getBag().get(redMedicine, 10);
-                    Battle b(&h, r);
+                    eraseScreen();
+                    Fight(&h);
                     positionR -= 3;
                     dx--;
                     
@@ -219,13 +215,8 @@ Room::Room(Hero& hm,int p):h(hm)
                     cout << "这里有对话" << endl;
                 }
                 else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '#'){
-                    Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
-                    Skill S[1] = {s1};
-                    Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
-                    r.setSkill(S, 1);
-                    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
-                    h.getBag().get(redMedicine, 10);
-                    Battle b(&h, r);
+                    eraseScreen();
+                    Fight(&h);
                     positionR--;
                     dy--;
                 }
@@ -243,14 +234,8 @@ Room::Room(Hero& hm,int p):h(hm)
                     CannotMove();
                 }
                 else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '#'){
-                    Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
-                    Skill S[1] = {s1};
-                    Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
-                    r.setSkill(S, 1);
-
-                    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
-                    h.getBag().get(redMedicine, 10);
-                    Battle b(&h, r);
+                    eraseScreen();
+                    Fight(&h);
                     positionR++;
                     dy++;
                     }
@@ -268,16 +253,18 @@ Room::Room(Hero& hm,int p):h(hm)
                     CannotMove();
                 }
                 else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '#'){
-                    
-                    Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
-                    Skill S[1] = {s1};
-                    Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
-                    Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
-                    r.setSkill(S, 1);
-                    h.setSkill(s2);
-                    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
-                    h.getBag().get(redMedicine, 10);
-                    Battle b(&h, r);
+                    eraseScreen();
+                    Fight(&h);
+
+                    // Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+                    // Skill S[1] = {s1};
+                    // Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
+                    // Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
+                    // r.setSkill(S, 1);
+                    // h.setSkill(s2);
+                    // std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
+                    // h.getBag().get(redMedicine, 10);
+                    // Battle b(&h, r);
                     dx++;
                     positionR += 3;
                     
@@ -311,30 +298,6 @@ Room::Room(Hero& hm,int p):h(hm)
         posR[dx][dy] = '*';
 
         Room::showRoom();
-        
-        // if ((position == 4 || position == 6 || position == 7 || position == 8) && positionR == 0)
-        // {
-        //     posR[dx][dy] = '*';
-        //     cout << "这里有对话" << endl;
-        //     posR[dx][dy] = '#';
-        // }
-        // if ((posR[dx][dy] == '#') && (position == 1 || position == 3 || position == 2 || position == 9))
-        // {
-        //     cout << "这里发生战斗" << endl;
-        //     posR[dx][dy] = '*';
-        //     Hero h;
-
-            // Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
-            // Skill S[1] = { s1 };
-            // Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
-            // Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
-            // r.setSkill(S, 1);
-            // h.setSkill(s2);
-            // std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
-            // h.getBag().get(redMedicine,10);
-            // Battle b(&h, r);
-            // Room::showRoom();
-        //         }
         }
     }
     

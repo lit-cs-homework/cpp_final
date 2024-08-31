@@ -1,4 +1,4 @@
-#include "../../lib/nterm.h"
+
 #include "../../include/map.h"
 #include "../../include/combat.h"
 #include "../../include/equip.h"
@@ -9,6 +9,12 @@
 #endif
 
 int main(){
+    // {
+    //     Map myMap = Map(7);
+    //     auto s = hps::to_string(myMap);
+    //     Map nMap = hps::from_string<Map>(s);
+
+    // }
     ntermInit();
     /*
     #ifdef _WIN32
@@ -16,10 +22,14 @@ int main(){
     SetConsoleOutputCP(CP_UTF8);
     #endif
     */
-    Map myMap = Map(7);      
+    Map myMap = Map(7);
+    myMap.showMap();
+    myMap.showMenu('a');
     while(1){
         myMap.showMap();
-        myMap.showMenu();
-        myMap.action();
+        char command = ' ';
+        command = getch();
+        myMap.showMenu(command);
+        myMap.action(command);
     }
 }

@@ -20,9 +20,10 @@ int main()
     Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 50, 50, 20, 20, 15, 5, 1, 5, 4);
     r.setSkill(S, 1);
     Hero h;
+    h.setName();
     h.setSkill(s2);
     std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
     h.getBag().get(redMedicine,10);
-    Battle b(&h, r);
+    Fight(&h);
     return 0;
 }

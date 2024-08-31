@@ -47,7 +47,6 @@ private:
 	int threaten;//威胁指数，影响逃跑概率
 };
 
-
 class Battle
 {
 public:
@@ -69,3 +68,5 @@ private:
 	Enemy enemy;
 	int round;//回合
 };
+
+void Fight(Hero* hero);

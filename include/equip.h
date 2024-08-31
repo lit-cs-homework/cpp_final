@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <functional>
 #include "../lib/nterm.h"
+#include "../lib/hps/hps.h"
 
 #include <string>
 #include <utility>
@@ -14,11 +15,12 @@
 
 
 
-
 class BaseEquip{//物品基类 包括装备和药水
     public:
         std::string name;
         bool operator== (const BaseEquip& other) const;//用于哈希表
+        
+
 };
 
 class Equip;
@@ -62,6 +64,8 @@ class Equip: public BaseEquip{//装备基类
         virtual EquipTyp typ();//获取当前装备的编号
         virtual void equiped(Hero& hero);//角色穿上装备
         virtual void takeoff(Hero& hero);//角色脱下装备
+    protected:
+        void setValue(double value);
 };
 
 
@@ -69,6 +73,7 @@ class Medicine: public BaseEquip
 {
     public:
         Medicine();
+        // delta:
         double hp;
         double mp;
         double atk;
@@ -107,7 +112,7 @@ class Sword : public Equip
     public:
         friend class Bag;
         friend class Hero;
-        Sword(double hp, double mp, double def, double value, double atk);
+        Sword(double value, double atk);
         double atk;
         EquipTyp typ();
         void equiped(Hero& hero);//角色穿上装备
@@ -118,28 +123,29 @@ class StoneSword : public Sword
 {
     public:
         friend class Bag;
-        StoneSword(double hp, double mp, double def, double value, double atk);
+        StoneSword();
 };
 
 class BronzeSword : public Sword
 {
     public:
         friend class Bag;
-        BronzeSword(double hp, double mp, double def, double value, double atk);
+        BronzeSword();
 };
 
 class IronSword : public Sword
 {
     public:
         friend class Bag;
-        IronSword(double hp, double mp, double def, double value, double atk);
+        IronSword();
 };
 
 class Armhour :public Equip
 {
     public:
         friend class Bag;
-        Armhour(int hp, int mp, int def, double value);
+        Armhour();
+        Armhour(double value, double hp, double mp, double def);
         EquipTyp typ();
         void equiped(Hero& hero);//角色穿上装备
         void takeoff(Hero& hero);//角色脱下装备
@@ -151,7 +157,8 @@ class Shoes :public Equip
 {
     public:
         friend class Bag;
-        Shoes(int hp, int mp, int def, double value);
+        Shoes();
+        Shoes(double value, double hp, double mp, double def);
         EquipTyp typ();
         void equiped(Hero& hero);
         void takeoff(Hero& hero);
@@ -173,7 +180,8 @@ class BlueMedicine : public Medicine
         void display() const;
 }; 
 
-
+std::shared_ptr<Equip> parseEquip(std::string name);
+std::shared_ptr<Medicine> parseMedicine(std::string name);
 
 class Bag{
     public:
@@ -185,6 +193,15 @@ class Bag{
         void display() const;
         void use(std::shared_ptr<Medicine> medicine, int n, Hero& hero);//角色使用药水
         void changeequip(std::shared_ptr<Equip> equip, Hero& hero);//角色更换装备
+        template <class B>
+        void serialize(B& buf) const {
+            //buf << n_elecs << orbs_from << orbs_to;
+        }
+
+        template <class B>
+        void parse(B& buf) {
+            //buf >> n_elecs >> orbs_from >> orbs_to;
+        }
     private:
         std::unordered_map<std::shared_ptr<Equip>, int, hashBaseEquip, eqOnObj> equipBag;//未装备的装备
         std::unordered_map<std::shared_ptr<Medicine>, int, hashBaseEquip, eqOnObj> medicineBag;//药水

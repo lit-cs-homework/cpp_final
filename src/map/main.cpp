@@ -13,8 +13,9 @@ static void CannotMove(){
     cout << "无法移动" << endl;
 }
 
-Room::Room(int p)
+Room::Room(Hero& hm,int p):h(hm)
 {
+
     position = p;
     dx = 1;
     dy = 1;
@@ -29,15 +30,12 @@ Room::Room(int p)
     }
     posR[1][1] = '*';
     posR[2][2] = '&';
-    }
-   
-    void Room::showRoom(){
-        
-        if (position == 4 || position == 6 || position == 7 || position == 8)
+    if (position == 4 || position == 6 || position == 7 || position == 8)
         {
             posR[0][0] = '#';
         }
-        if (position == 1 || position == 3 || position == 2 || position == 9)
+
+    if (position == 1 || position == 3 || position == 2 || position == 9)
         {
             int enemyNum = 0;
             while(!enemyNum)
@@ -106,12 +104,14 @@ Room::Room(int p)
                 if (randomNum == 6 && posR[2][1] =='#'){
                     randomNum++;
                 }
-                
-
             }
                 
 
-        }
+            }
+}
+   
+    void Room::showRoom(){
+         
         eraseScreen();
         setCursorPos(0, 0);
         cout << "             " << mapName[position] << '\n';
@@ -176,21 +176,58 @@ Room::Room(int p)
         {
             
             order = getch();
-
             switch (order)
             {
             case 'w':{
-                if (positionR == 0 || positionR == 1 || positionR == 2){
+                int temp = dx;
+                temp--;
+                if (positionR == 0 || positionR == 1 || positionR == 2)
+                {
                     CannotMove();
-                }else {
+                }
+                else if ((positionR == 3)&&(position == 4 || position == 6 || position == 7 || position == 8)){
+                    cout << "这里有对话" << endl;
+                }
+                else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '#'){
+                    Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+                    Skill S[1] = {s1};
+                    Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
+                    r.setSkill(S, 1);
+
+                    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
+                    h.getBag().get(redMedicine, 10);
+                    Battle b(&h, r);
                     positionR -= 3;
                     dx--;
+                    
+                }
+                else
+                    {
+                        positionR -= 3;
+                        dx--;
                     }
                 break;
             }
             case 'a':{
-                if (positionR == 0 || positionR == 3 || positionR == 6){
+                int temp = dy;
+                temp--;
+                if (positionR == 0 || positionR == 3 || positionR == 6)
+                {
                     CannotMove();
+                }
+                else if ((positionR == 1)&&(position == 4 || position == 6 || position == 7 || position == 8)){
+                    cout << "这里有对话" << endl;
+                }
+                else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '#'){
+                    Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+                    Skill S[1] = {s1};
+                    Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
+                    r.setSkill(S, 1);
+                    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
+                    h.getBag().get(redMedicine, 10);
+                    Battle b(&h, r);
+                    positionR--;
+                    dy--;
                 }
                 else{
                     positionR--;
@@ -199,9 +236,24 @@ Room::Room(int p)
                 break;
             }
             case 'd':{
-                if (positionR == 2 || positionR == 5 || positionR == 8){
+                int temp = dy;
+                temp++;
+                if (positionR == 2 || positionR == 5 || positionR == 8)
+                {
                     CannotMove();
                 }
+                else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '#'){
+                    Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+                    Skill S[1] = {s1};
+                    Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
+                    r.setSkill(S, 1);
+
+                    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
+                    h.getBag().get(redMedicine, 10);
+                    Battle b(&h, r);
+                    positionR++;
+                    dy++;
+                    }
                 else{
                     positionR++;
                     dy++;
@@ -209,8 +261,26 @@ Room::Room(int p)
                 break;
             }
             case 's':{
-                if (positionR == 6 || positionR == 7 || positionR == 8){
+                int temp = dx;
+                temp++;
+                if (positionR == 6 || positionR == 7 || positionR == 8)
+                {
                     CannotMove();
+                }
+                else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '#'){
+                    
+                    Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+                    Skill S[1] = {s1};
+                    Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
+                    Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
+                    r.setSkill(S, 1);
+                    h.setSkill(s2);
+                    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
+                    h.getBag().get(redMedicine, 10);
+                    Battle b(&h, r);
+                    dx++;
+                    positionR += 3;
+                    
                 }
                 else{
                     dx++;
@@ -224,11 +294,13 @@ Room::Room(int p)
 
         for (int i = 0; i < 3;i++){
             for (int j = 0; j < 3;j++){
-                if ((posR[i][j]) != '#' && (posR[i][j]) != '&'){
+                if ((posR[i][j]) != '#' && (posR[i][j]) != '&' )
+                {
                     posR[i][j] = ' ';
                 }
             }
         }
+        
 
         if (posR[dx][dy] == '&'){
             order = 'n';
@@ -236,36 +308,42 @@ Room::Room(int p)
             return;
         }
 
-        
+        posR[dx][dy] = '*';
+
         Room::showRoom();
-        if ((position == 4 || position == 6 || position == 7 || position == 8) && positionR == 0)
-        {
-            posR[dx][dy] = '*';
-            cout << "这里有对话" << endl;
-            posR[dx][dy] = '#';
+        
+        // if ((position == 4 || position == 6 || position == 7 || position == 8) && positionR == 0)
+        // {
+        //     posR[dx][dy] = '*';
+        //     cout << "这里有对话" << endl;
+        //     posR[dx][dy] = '#';
+        // }
+        // if ((posR[dx][dy] == '#') && (position == 1 || position == 3 || position == 2 || position == 9))
+        // {
+        //     cout << "这里发生战斗" << endl;
+        //     posR[dx][dy] = '*';
+        //     Hero h;
+
+            // Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+            // Skill S[1] = { s1 };
+            // Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
+            // Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
+            // r.setSkill(S, 1);
+            // h.setSkill(s2);
+            // std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
+            // h.getBag().get(redMedicine,10);
+            // Battle b(&h, r);
+            // Room::showRoom();
+        //         }
         }
-        if ((posR[dx][dy] == '#') && (position == 1 || position == 3 || position == 2 || position == 9))
-        {
-            cout << "这里发生战斗" << endl;
-            posR[dx][dy] = '*';
-            Hero h;
-            Skill s1("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
-            Skill S[1] = { s1 };
-            Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
-            Enemy r("大凶兔", "本来只爱吃胡萝卜的兔子不知为何变得凶巴巴的，小心！它会攻击你的！", 100, 50, 20, 20, 15, 5, 1, 5, 4);
-            r.setSkill(S, 1);
-            h.setSkill(s2);
-            std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>();
-            h.getBag().get(redMedicine,10);
-            Battle b(&h, r);
-            Room::showRoom();
-                }
-                }
     }
     
     
     Map::Map(int p/*=7*/)
     {
+        Hero h;
+        Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
+        h.setSkill(s2);
         position = p;
         
         if (p == 0){
@@ -423,7 +501,7 @@ Room::Room(int p)
         }
         case 'm':{
             
-            Room myRoom = Room(position);
+            Room myRoom = Room(h,position);
             myRoom.showRoom();
             myRoom.actionRoom();
             break;

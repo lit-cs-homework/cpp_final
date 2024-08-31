@@ -1,15 +1,10 @@
 
 #include "../../include/equip.h"
 
-
-using PBEquip = std::shared_ptr<BaseEquip>;
-
-
 std::unordered_map<
     std::string,
     std::function<void(PBEquip)>
 > bagmap;
-
 
 #define show(cls,str,suffix)\
 {\

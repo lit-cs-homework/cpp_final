@@ -4,7 +4,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
-//#include"../../include/combat.h"
+#include "../lib/nterm.h"
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -84,6 +85,9 @@ class Store{
         Store(std::vector<std::shared_ptr<Equip>> equipstore = {}, std::vector<std::shared_ptr<Medicine>> medicinestore = {});
         //void refresh();
         void display() const;
+        // void showEquipCommodities() const;
+        // void showMedicineCommodities() const;
+        void trade(Bag& bag,Hero& hero);
         void sold(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色买装备，商店卖装备
         void sold(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);///角色买药水，商店卖药水
         void buy(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色卖装备，商店买

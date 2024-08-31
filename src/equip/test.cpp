@@ -21,6 +21,7 @@
 
 int main()
 {
+    ntermInit();
     std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
     std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
     std::shared_ptr<StoneSword> a = std::make_shared<StoneSword> (0,0,0,10,10);
@@ -32,6 +33,7 @@ int main()
     std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
     Store store(equipstore,medicinestore);
     Hero hero;
-    hero.getBag().get(redMedicine,10);
+    hero.getBag().get(a,1);
+    store.trade(hero.getBag(),hero);
     hero.getBag().display();
 }

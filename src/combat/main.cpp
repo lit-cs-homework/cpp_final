@@ -18,7 +18,7 @@ void ms_sleep(int ms)
 		ms / 1000,    // second
 		ms % 1000000  // ns
 	};
-	nanosleep(tp, NULL);
+	nanosleep(&tp, NULL);
 #endif
 }
 
@@ -72,7 +72,7 @@ void Hero::setName()
 	std::string tmpName;
 	std::cin >> tmpName;
 	name = tmpName;
-	system("cls");
+	eraseScreen();
 }
 void Hero::showHero()
 {
@@ -448,11 +448,7 @@ void Battle::enemyRound()//对手攻击或使用技能
 	}
 	ms_sleep(1000);
 
-#ifdef _WIN32
-	system("cls");
-#else
-	system("clear");
-#endif
+	eraseScreen();
 
 }
 bool Battle::ifEnd()//战斗是否结束

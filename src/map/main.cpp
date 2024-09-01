@@ -572,7 +572,6 @@ bool Map::action()
     }
     case 3: // ctrl-c
     {
-        eraseScreen();
         return false;
     }
     case 0:

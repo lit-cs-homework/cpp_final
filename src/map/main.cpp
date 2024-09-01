@@ -2,6 +2,27 @@
 #include "../../include/combat.h"
 #include "../../include/equip.h"
 #include <cstdlib>
+#include <string>
+
+#ifdef _WIN32
+# include<windows.h>
+#else
+//#include <unistd.h>
+#endif
+
+static
+void ms_sleep(int ms)
+{
+#ifdef _WIN32
+	Sleep(ms);
+#else
+	struct timespec tp = {
+		ms / 1000,    // second
+		ms % 1000000  // ns
+	};
+	nanosleep(&tp, NULL);
+#endif
+}
 
 using std::cin;
 using std::cout;
@@ -401,7 +422,7 @@ Map::Map(int p /*=7*/)
 }
 void Map::showMap()
 {
-    // eraseScreen();
+    eraseScreen();
     setCursorPos(0, 0);
     cout << "世界地图:" << '\n';
     cout << "                        __________" << '\n';
@@ -432,7 +453,14 @@ void Map::showMap()
     cout.flush();
 }
 
-void Map::action()
+// if not sleep, message will be erased.
+static
+void displayBelowMap(const char* const stringm){
+    cout << stringm << endl;
+    ms_sleep(700);
+}
+
+bool Map::action()
 {
     pos[dx][dy] = ' ';
     char command = ' ';
@@ -527,7 +555,7 @@ void Map::action()
         break;
     }
 
-    case 'm':
+    case 13:  // Enter
     {
         Room myRoom = Room(h,store, position);
         myRoom.showRoom();
@@ -536,28 +564,39 @@ void Map::action()
     }
     case 'v':
     {
-        cout << "游戏进度已保存。" << endl;
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        std::sleep(5);
+        displayBelowMap("游戏进度已保存。");
+
         auto save = hps::to_string(*this);
         
         break;
     }
-    
+    case 3: // ctrl-c
+    {
+        eraseScreen();
+        return false;
+    }
+    case 0:
+    {
+        displayBelowMap("你按下了ctrl /↑/↓/←/→");
 
+        break;
+        
+    }
         default:
     {
-        cout << "不合理的输入" << endl;
+        displayBelowMap("不合理的输入");
         break;
     }
     }
     pos[dx][dy] = '*';
+    return true;
 }
 void Map::showMenu()
 {
     cout << "您目前的位置是：" << mapName[position] << endl;
-    cout << "1.输入'm'进入区域。" << '\n';
+    cout << "1.按回车进入区域。" << '\n';
     cout << "2.输入'v'保存游戏进度。" <<'\n';
-    cout << "3.输入'wasd'以移动。" << endl;
-    
+    cout << "3.输入'wasd'以移动。" << '\n';
+    cout << "4.ctrl-c 退出。" << '\n';
+    cout << endl;
 }

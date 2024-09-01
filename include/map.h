@@ -37,7 +37,7 @@ public:
    char pos[10][10];
    Map(int p = 7) ;
    void showMap() ;
-   void action();
+   bool action();
    void showMenu();
     template <class B>
     void serialize(B& buf) const {

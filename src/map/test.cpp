@@ -23,13 +23,9 @@ int main(){
     #endif
     */
     Map myMap = Map(7);
-    myMap.showMap();
-    myMap.showMenu('a');
-    while(1){
+    do{
         myMap.showMap();
-        char command = ' ';
-        command = getch();
-        myMap.showMenu(command);
-        myMap.action(command);
-    }
+        myMap.showMenu();
+
+    } while (myMap.action());
 }

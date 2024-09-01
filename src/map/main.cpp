@@ -27,7 +27,52 @@ void ms_sleep(int ms)
 using std::cin;
 using std::cout;
 using std::endl;
-char mapName[11][50] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
+//const char* mapName[11] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
+std::string mapName[11] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
+std::string mapName2[11] = {"  卧龙山  ", "   祸窟   ", "   地宫   ", "  北阳山  ", "  藏经阁  ", "   郊外   ", "  锻造屋  ", " 中央主城 ", "   药铺   ", "  道远村  ", "   郊外   "};
+
+
+
+// void arrangeMapName(std::string mapName[]){
+//     for (int i = 0; i < 11; i++) {
+//         std::string tempname = mapName[i];
+//         int length = tempname.length();
+//             tempname += std::string(4 - length, ' ');
+//             tempname.insert(length / 2, ' ');
+//         mapName[i] = tempname.c_str();
+//     }
+// }
+const char* const mapsName[][6][4] =
+{
+{
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""} 
+},
+
+{
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""} 
+},
+
+{
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""}, 
+  {"",      "",      "",      ""} 
+}
+}
+;
+
 
 static void CannotMove()
 {
@@ -59,80 +104,60 @@ Room::Room(Hero &hm,Store& storem, int p):h(hm),store(storem)
     if (position == 1 || position == 3 || position == 2 || position == 9)
     {
         int enemyNum = 0;
+        int randomNum1 = 97;
+        int randomNum2 = 98;
+        int randomNum3 = 99;
         while (!enemyNum)
         {
             srand(time(NULL));
             enemyNum = rand() % 4;
         }
-        for (int i = 0; i < enemyNum; i++)
-        {
-            srand(time(NULL));
-            int randomNum = rand() % 7;
-            if (randomNum == 0 && posR[0][0] != '#')
-            {
+        switch (enemyNum){
+            case 1:{
+                randomNum1 = rand() % 7;
+                break;
+            }
+            case 2:{
+                randomNum1 = rand() % 7;
+                randomNum2 = rand() % 7;
+                break;
+            }
+            case 3:{
+                randomNum1 = rand() % 7;
+                randomNum2 = rand() % 7;
+                randomNum3 = rand() % 7;
+            }
+               
+            
+        }   
+            while(randomNum1==randomNum2){
+                randomNum1 = rand() % 7;
+            }
+            while (randomNum2 == randomNum3){
+                randomNum2 == rand() % 7;
+            }
+            if (randomNum1 == 0 || randomNum2 == 0 || randomNum3 == 0){
                 posR[0][0] = '#';
-                break;
             }
-            if (randomNum == 0 && posR[0][0] == '#')
-            {
-                randomNum++;
-            }
-
-            if (randomNum == 1 && posR[0][1] != '#')
-            {
+            if (randomNum1 == 1 || randomNum2 == 1 || randomNum3 == 1){
                 posR[0][1] = '#';
-                break;
             }
-            if (randomNum == 1 && posR[0][1] == '#')
-            {
-                randomNum++;
-            }
-            if (randomNum == 2 && posR[0][2] != '#')
-            {
+            if (randomNum1 == 2 || randomNum2 == 2 || randomNum3 == 2){
                 posR[0][2] = '#';
-                break;
             }
-            if (randomNum == 2 && posR[0][2] == '#')
-            {
-                randomNum++;
-            }
-            if (randomNum == 3 && posR[1][0] != '#')
-            {
+            if (randomNum1 == 3 || randomNum2 == 3 || randomNum3 == 3){
                 posR[1][0] = '#';
-                break;
             }
-            if (randomNum == 3 && posR[1][0] == '#')
-            {
-                randomNum++;
-            }
-            if (randomNum == 4 && posR[1][2] != '#')
-            {
+            if (randomNum1 == 4 || randomNum2 == 4 || randomNum3 == 4){
                 posR[1][2] = '#';
-                break;
             }
-            if (randomNum == 4 && posR[1][2] == '#')
-            {
-                randomNum++;
+            if (randomNum1 == 5 || randomNum2 == 5 || randomNum3 == 5){
+                posR[0][0] = '#';
             }
-            if (randomNum == 5 && posR[2][0] != '#')
-            {
-                posR[2][0] = '#';
-                break;
-            }
-            if (randomNum == 5 && posR[2][0] == '#')
-            {
-                randomNum++;
-            }
-            if (randomNum == 6 && posR[2][1] != '#')
-            {
+            if (randomNum1 == 6 || randomNum2 == 6 || randomNum3 == 6){
                 posR[2][1] = '#';
-                break;
             }
-            if (randomNum == 6 && posR[2][1] == '#')
-            {
-                randomNum++;
-            }
-        }
+        
     }
 }
 
@@ -420,34 +445,35 @@ Map::Map(int p /*=7*/)
     }
     pos[dx][dy] = '*';
 }
+
 void Map::showMap()
 {
     eraseScreen();
     setCursorPos(0, 0);
     cout << "世界地图:" << '\n';
-    cout << "                        __________" << '\n';
-    cout << "                       |          |" << '\n';
-    cout << "                       |   卧龙山 |" << '\n';
-    cout << "                       |   " << pos[2][0] << "      |" << '\n';
-    cout << "                       |__________|" << '\n';
-    cout << "                       |          |" << '\n';
-    cout << "                       |   祸窟   |" << '\n';
-    cout << "                       |     " << pos[2][1] << "    |" << '\n';
-    cout << "_______________________|__________|__________" << '\n';
-    cout << "|          |          |           |          |" << '\n';
-    cout << "|   地宫   |   北阳山 |   藏经阁  |   郊外   |" << '\n';
-    cout << "|    " << pos[0][2] << "     |     " << pos[1][2] << "    |     " << pos[2][2] << "     |    " << pos[3][2] << "     |" << '\n';
-    cout << "|__________|__________|___________|__________|" << '\n';
+    cout << "                       __________" << '\n';
+    cout << "                      |          |" << '\n';
+    cout << "                      |"<<mapName2[0]<<"|" << '\n';
+    cout << "                      |    " << pos[2][0] << "     |" << '\n';
+    cout << "                      |__________|" << '\n';
+    cout << "                      |          |" << '\n';
+    cout << "                      |"<<mapName2[1]<<"|" << '\n';
+    cout << "                      |    " << pos[2][1] << "     |" << '\n';
+    cout << "______________________|__________|___________" << '\n';
+    cout << "|          |          |          |          |" << '\n';
+    cout << "|"<<mapName2[2]<<"|"<<mapName2[3]<<"|"<<mapName2[4]<<"|"<<mapName2[5]<<"|" << '\n';
+    cout << "|    " << pos[0][2] << "     |    " << pos[1][2] << "     |    " << pos[2][2] << "     |    " << pos[3][2] << "     |" << '\n';
+    cout << "|__________|__________|__________|__________|" << '\n';
     cout << "           |          |          |          |" << '\n';
-    cout << "           |   锻造屋 | 中央主城 |   药铺   |" << '\n';
-    cout << "           |     " << pos[1][3] << "    |      " << pos[2][3] << "   |    " << pos[3][3] << "     |" << '\n';
+    cout << "           |"<<mapName2[6]<<"|"<<mapName2[7]<<"|"<<mapName2[8]<<"|" << '\n';
+    cout << "           |    " << pos[1][3] << "     |    " << pos[2][3] << "     |    " << pos[3][3] << "     |" << '\n';
     cout << "           |__________|__________|__________|" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |   道远村 |" << '\n';
+    cout << "                      |"<<mapName2[9]<<"|" << '\n';
     cout << "                      |    " << pos[2][4] << "     |" << '\n';
     cout << "                      |__________|" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |    郊外  |" << '\n';
+    cout << "                      |"<<mapName2[10]<<"|" << '\n';
     cout << "                      |    " << pos[2][5] << "     |" << '\n';
     cout << "                      |__________|" << '\n';
     cout.flush();

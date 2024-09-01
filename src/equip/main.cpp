@@ -3,6 +3,30 @@
 
 
 
+
+
+std::unordered_map<
+    std::string,
+    std::function<void(std::shared_ptr<Equip>&)>
+> equipbagmap;
+
+std::unordered_map<
+    std::string,
+    std::function<void(std::shared_ptr<Medicine>&)>
+> medicinebagmap;
+
+std::unordered_map<
+    std::string,
+    std::function<void(std::shared_ptr<Equip>&)>
+> equipcolumnmap;
+
+
+
+
+
+
+
+
 #define show(cls,str,suffix)\
 {\
     std::cout << #str << ":" << std::endl;\
@@ -86,6 +110,7 @@ void Bag::changeequip(std::shared_ptr<Equip> equip, Hero& hero)
     
     if(equipColumn[equip->typ()] == nullptr) {
         equip->equiped(hero);
+        equipBag[equip]--;
         equipColumn[equip->typ()] = equip;
     }
     else
@@ -106,13 +131,27 @@ bool BaseEquip::operator== (const BaseEquip& other) const{
     return name == other.name;
 }
 
-#define WithName(cls) cls::cls(){name = __func__;}
+#define withName1(cls)\
+    name = __func__;\
+    equipbagmap[name] = [](std::shared_ptr<Equip>& p){ p = std::make_shared<cls>(); };\
+    equipcolumnmap[name] = [](std::shared_ptr<Equip>& p){ p = std::make_shared<cls>(); };\
 
-WithName(Equip)
+#define withName2(cls) \
+    name = __func__;\
+    medicinebagmap[name] = [](std::shared_ptr<Medicine>& p){ p = std::make_shared<cls>(); };\
 
+#define DeclWithName2(cls) cls::cls(){ withName2(cls);}
+
+
+
+Equip::Equip(){name = __func__;}
 Equip::Equip(double hp, double mp, double def, double value):hp(hp), mp(mp), def(def), value(value){
     name = __func__;
 };
+
+void Equip::setValue(double value){
+    this->value = value;
+}
 
 Equip::operator bool(){
     return value != 0;
@@ -133,7 +172,7 @@ size_t hashBaseEquip::operator() (const std::shared_ptr<BaseEquip> value) const{
 }
 
 
-WithName(Medicine)
+DeclWithName2(Medicine)
 
 
 void Medicine::display() __unImplement
@@ -151,7 +190,6 @@ Store::Store(
         medicineCommodities.insert(std::make_pair(i, 999));   
     }
 }
-
 
 void Store::display() const {
     // showEquipCommodities();
@@ -302,8 +340,9 @@ void Store::buy(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero)
 }
 
 
-Sword::Sword(double hp, double mp, double def, double value, double atk):
-    Equip(hp, mp, def, value), atk(atk){};
+Sword::Sword(double value, double atk): atk(atk){
+    setValue(value);
+};
 
 #define RetType(cls) EquipTyp cls::typ(){return t##cls;}
 
@@ -325,27 +364,30 @@ void Sword::takeoff(Hero& hero){
 }
 
 
-#define ImplSword(cls) \
-cls::cls(double hp, double mp, double def, double value, double atk): Sword(hp, mp, def, value, atk){\
-    name = __func__;\
+#define ImplSword(cls,...) \
+cls::cls(): Sword(__VA_ARGS__){\
+    withName1(cls);\
 }\
 
-ImplSword(StoneSword)
-ImplSword(BronzeSword)
-ImplSword(IronSword)
+ImplSword(StoneSword , 10, 5)
+ImplSword(BronzeSword, 20, 10)
+ImplSword(IronSword  , 30, 15)
 
 
 RetType(Armhour)
 
-#define ArmOrShoe(cls) \
-cls::cls(int hp, int mp, int def, double value):Equip(hp, mp, def, value){\
-    name = __func__;\
-}
-
-ArmOrShoe(Armhour)
-ArmOrShoe(Shoes)
+#define def4(cls) \
+cls::cls(double value, double hp, double mp, double def): Equip(value, hp, mp, def){withName1(cls);}
 
 
+#define ArmOrShoe(cls,...) def4(cls);\
+cls::cls(): cls(__VA_ARGS__){}
+
+ArmOrShoe(Armhour,10, 10, 10, 10)
+ArmOrShoe(Shoes  ,10, 10, 10, 10)
+
+#undef def4
+#undef ArmOrShoe
 
 void Armhour::equiped(Hero& hero){
     hero.hpMax += hp;
@@ -390,7 +432,7 @@ void Medicine::used(Hero& hero, int n){
     hero.defend += def * n;
 }
 RedMedicine::RedMedicine(){
-    name = __func__;
+    withName2(RedMedicine);
     hp = 10;
     mp = 0;
     value = 10;
@@ -401,7 +443,7 @@ void RedMedicine::display() const{
 }
 
 BlueMedicine::BlueMedicine(){
-    name = __func__;
+    withName2(BlueMedicine);
     hp = 0;
     mp = 10;
     value = 10;

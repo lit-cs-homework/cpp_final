@@ -2,30 +2,56 @@
 #include <string>
 #include <ios>
 #include <cstdlib>
+#include "../lib/nterm.h"
+#include "../lib/hps/hps.h"
 #include "../include/combat.h"
 #include "../include/equip.h"
 
 class Room{
 public:
     char posR[10][10];
-    Room(Hero& h,int p = 7);
+    Room(Hero& h,Store& store,int p = 7);
     void showRoom();
     void actionRoom();
+    
+    template <class B>
+    void serialize(B& buf) const {
+        buf << position << dx << dy;
+
+    }
+
+    template <class B>
+    void parse(B& buf) {
+        buf >> position >> dx >> dy;
+    }
 private:
     int position;
     int dx, dy;
     int positionR;
-    Hero h;
+    Store& store;
+    Hero& h;
 };
+  
 class Map{
 public:
    char pos[10][10];
    Map(int p = 7) ;
    void showMap() ;
-   void action();
+   bool action();
    void showMenu();
+    template <class B>
+    void serialize(B& buf) const {
+        buf << position << dx << dy;
+    }
+
+    template <class B>
+    void parse(B& buf) {
+        buf >> position >> dx >> dy;
+    }
 private:
     int position;
     int dx, dy;
+    Store store;
     Hero h;
+
 };

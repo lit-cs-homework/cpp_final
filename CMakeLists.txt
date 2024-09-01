@@ -1,75 +1,108 @@
 
 cmake_minimum_required(VERSION 3.12)
 
-set(PROJ_NAME demonslayer)
-project(${PROJ_NAME}
-	LANGUAGES CXX
-	VERSION 0.0.1
-)
+project(cpp_final)
 
-option(remote_tui_repo "set on if fetching ftxui from github" OFF)
+set(mainTargetName "demonslayer")  #
 
-if (remote_tui_repo)
-	include(FetchContent)
-	FetchContent_Declare(ftxui
-		URL https://github.com/ArthurSonzogni/ftxui
-		GIT_TAG v5.0.0
-	)
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
-	FetchContent_GetProperties(ftxui)
-	if(NOT ftxui_POPULATED)
-		FetchContent_Populate(ftxui)
-		add_subdirectory(${ftxui_SOURCE_DIR} ${ftxui_BINARY_DIR} EXCLUDE_FROM_ALL)
-		FetchContent_MakeAvailable(ftxui)
-endif()
 
+# 1. call nim to build static lib
+
+set(NLIB_PATH ${CMAKE_BINARY_DIR}/lib/libnterm.a)
+
+set(NIMC_CMD nim cpp --noMain --app:staticLib --out:${NLIB_PATH} src/nterm.nim)
+
+if(WIN32)
+  set(NIMC_SH ${NIMC_CMD})
 else()
-	add_subdirectory(lib/ftxui EXCLUDE_FROM_ALL)
+  set(NIMC_SH bash -c "\"${NIMC_CMD}\"")
 endif()
 
-set(tests "")  # a list
-
-macro(cppfinal_addsrc_or_test ARG_SOURCE)
-  #cmake_parse_arguments(ARG "WIN32" "SOURCE" "" ${ARGN})
-	set(targ test_${ARG_SOURCE})
-	set(srcDir src/${ARG_SOURCE})
-	set(testSrc "${srcDir}/test.cpp")
-  add_executable("${targ}" EXCLUDE_FROM_ALL "${testSrc}")
-	#add_test( NAME "${ARG_SOURCE}" COMMAND "${ARG_SOURCE}")
-	list(APPEND tests "${targ}")
-	file(GLOB cppSrc "${srcDir}/*.cpp" LIST_DIRECTORIES false)
-	file(REAL_PATH "${testSrc}" realTestSrc)
-	list(REMOVE_ITEM cppSrc "${realTestSrc}")
-  target_sources(${PROJ_NAME}Lib PUBLIC ${cppSrc})
-endmacro()
-
-	file(GLOB mains "src/main/*.cpp" LIST_DIRECTORIES false)
-	list(REMOVE_ITEM mains "${testSrc}")
-
-add_executable(${PROJ_NAME}
-	#src/main/main.cpp
-	${mains}
-	#src/dialog/test.cpp
+# execute_process(
+#     COMMAND ${NIMC_SH} "nim cpp --noMain --app:staticLib --out:${NLIB_PATH} src/nterm.nim"
+#     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
+# )
+add_custom_command(
+    COMMAND ${NIMC_SH}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
+    OUTPUT  ${NLIB_PATH}
+    DEPENDS ${CMAKE_SOURCE_DIR}/lib/src/*
 )
+add_custom_target(ntermLibBuild ALL DEPENDS ${NLIB_PATH})
 
-add_library(${PROJ_NAME}Lib)
-target_link_libraries(${PROJ_NAME}Lib
-	PUBLIC ftxui::dom
-	PUBLIC ftxui::screen
-	PUBLIC ftxui::component
-)
-cppfinal_addsrc_or_test(dialog)
-cppfinal_addsrc_or_test(equip)
-cppfinal_addsrc_or_test(combat)
-cppfinal_addsrc_or_test(map)
+# append built static lib to CMake system
+add_library(nterm STATIC IMPORTED)
+add_dependencies(nterm ntermLibBuild)
+set_property(TARGET nterm PROPERTY IMPORTED_LOCATION ${NLIB_PATH})
 
 
-foreach(elem ${tests})
-	target_link_libraries(${elem} ${PROJ_NAME}Lib)
+# 2. add ftxui
+add_subdirectory(lib/ftxui EXCLUDE_FROM_ALL)
+
+
+# 3. reate target for each dir in src/
+file(GLOB SUBDIRS RELATIVE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/*)
+
+foreach(DIR ${SUBDIRS})
+    if(NOT IS_DIRECTORY ${CMAKE_SOURCE_DIR}/src/${DIR})
+      list(REMOVE_ITEM DIR ${CMAKE_SOURCE_DIR}/src/${DIR})
+    endif()
 endforeach()
 
-include_directories(include)
+foreach(DIR ${SUBDIRS})
+    string(COMPARE EQUAL "${DIR}" "main" isMain)
+    if( ${isMain} )
+      set(CUR_DST ${mainTargetName})
+      set(REQ_LIB_DST ${CUR_DST})
+    else()
+      set(CUR_DST test_${DIR})
+      set(REQ_LIB_DST ${DIR})
+    endif()
 
-target_link_libraries(${PROJ_NAME} PRIVATE ${PROJ_NAME}Lib)
+    file(GLOB_RECURSE SRCS ${CMAKE_SOURCE_DIR}/src/${DIR}/*.cpp)
+    list(REMOVE_ITEM SRCS ${CMAKE_SOURCE_DIR}/src/${DIR}/test.cpp)
 
-#target_include_directories(${PROJ_NAME}Lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    if( ${isMain} )
+      add_executable(${CUR_DST} ${SRCS})
+    else()
+      add_library(${DIR} STATIC ${SRCS})
+      set(TEST_MAIN ${CMAKE_SOURCE_DIR}/src/${DIR}/test.cpp)
+      # create target named test_${DIR}
+      add_executable(${CUR_DST} EXCLUDE_FROM_ALL ${TEST_MAIN})
+      target_link_libraries(${CUR_DST} PUBLIC ${DIR})
+    endif()
+
+    # hint: ftxui's add_library is also used to expor headers
+
+    # link ftxui and nterm lib
+    target_link_libraries(${REQ_LIB_DST}
+        PUBLIC ftxui::dom
+        PUBLIC ftxui::screen
+        PUBLIC ftxui::component
+        PUBLIC nterm
+    )
+endforeach()
+
+# set dependencies relationship
+target_link_libraries(test_equip PRIVATE combat)
+target_link_libraries(test_combat PRIVATE equip)
+# almost a cycle !
+
+target_link_libraries(map PRIVATE combat equip)
+
+
+# 4. link all ${DIR} target for default target
+
+foreach(DIR ${SUBDIRS})
+    #target_sources(${mainTargetName} PUBLIC ${CMAKE_SOURCE_DIR}/src/${DIR}/main.cpp)
+    if("${DIR}" STREQUAL "main")
+    else()
+      target_link_libraries(${mainTargetName} PUBLIC ${DIR})
+    endif()
+endforeach()
+
+
+# set default target
+#set(DEFAULT_TARGET ${mainTargetName})

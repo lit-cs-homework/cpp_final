@@ -14,13 +14,21 @@ if(NOT WIN32)
   set(NIMC_SH bash -c)
 endif()
 
-execute_process(
+# execute_process(
+#     COMMAND ${NIMC_SH} "nim cpp --noMain --app:staticLib --out:${NLIB_PATH} src/nterm.nim"
+#     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
+# )
+add_custom_command(
     COMMAND ${NIMC_SH} "nim cpp --noMain --app:staticLib --out:${NLIB_PATH} src/nterm.nim"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
+    OUTPUT  ${NLIB_PATH}
+    DEPENDS ${CMAKE_SOURCE_DIR}/lib/src/*
 )
+add_custom_target(ntermLibBuild ALL DEPENDS ${NLIB_PATH})
 
 # append built static lib to CMake system
 add_library(nterm STATIC IMPORTED)
+add_dependencies(nterm ntermLibBuild)
 set_property(TARGET nterm PROPERTY IMPORTED_LOCATION ${NLIB_PATH})
 
 

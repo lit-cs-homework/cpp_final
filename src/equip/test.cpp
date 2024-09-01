@@ -94,7 +94,10 @@ int main()
     bag.get(c,1);
     bag.get(bluemedicine,10);
     bag.get(redMedicine,10);
+    bag.changeequip(d,hero);
+    bag.changeequip(e,hero);
     bag.changeequip(a,hero);
+    bag.changeequip(c,hero);
   //  for(const auto& p: equipbagmap) {
   //      std::cout << p.first << std::endl;
 

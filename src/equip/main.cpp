@@ -110,6 +110,7 @@ void Bag::changeequip(std::shared_ptr<Equip> equip, Hero& hero)
     
     if(equipColumn[equip->typ()] == nullptr) {
         equip->equiped(hero);
+        equipBag[equip]--;
         equipColumn[equip->typ()] = equip;
     }
     else

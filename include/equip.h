@@ -23,10 +23,6 @@ class BaseEquip{//物品基类 包括装备和药水
 };
 
 
-
-
-
-
 struct eqOnObj
 {
     bool operator() (std::shared_ptr<BaseEquip> const a, std::shared_ptr<BaseEquip> const b) const
@@ -198,34 +194,45 @@ class Bag{
         void serialize(B& buf) const {
             std::unordered_map<std::string, int> equipmap;
             std::unordered_map<std::string, int> medicinemap;
+            std::unordered_map<std::string, int> equipcolumn;
             equipmap.reserve(equipBag.size());
             medicinemap.reserve(medicineBag.size());
+            equipcolumn.reserve(equipColumn.size());
             for(const auto& p: equipBag) {
                 equipmap[p.first->name] = p.second;
             }
             for(const auto& p: medicineBag) {
                 medicinemap[p.first->name] = p.second;
             }
-            buf << equipmap << medicinemap;
+            for(const auto& p: equipColumn){
+                if(p != nullptr)
+                equipcolumn[p->name] = p->typ();
+            }
+            buf << equipmap << medicinemap << equipcolumn;
             //buf << n_elecs << orbs_from << orbs_to;
         }
 
         template <class B>
         void parse(B& buf) { //TODO mv string->func to cpp
-            extern 
-                std::unordered_map<
-                    std::string,
-                    std::function<void(std::shared_ptr<Equip>)>
-                > equipbagmap;
-
-                std::unordered_map<
+            extern
+            std::unordered_map<
                 std::string,
-                std::function<void(std::shared_ptr<Medicine>)>
-                > medicinebagmap;
-
+                std::function<void(std::shared_ptr<Equip>&)>
+            > equipbagmap;
+            extern
+            std::unordered_map<
+            std::string,
+            std::function<void(std::shared_ptr<Medicine>&)>
+            > medicinebagmap;
+            extern
+            std::unordered_map<
+            std::string,
+            std::function<void(std::shared_ptr<Equip>&)>
+            > equipcolumnmap;
             std::unordered_map<std::string, int> equipmap;
             std::unordered_map<std::string, int> medicinemap;
-            buf >> equipmap >> medicinemap;
+            std::unordered_map<std::string, int> equipcolumn;
+            buf >> equipmap >> medicinemap >> equipcolumn;
             // auto hasEnding = [](std::string const &fullString, std::string const &ending) {
             //     if (fullString.length() >= ending.length()) {
             //         return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
@@ -234,16 +241,20 @@ class Bag{
             //     }
             // };
             for(const auto& p: equipmap) {
-                std::shared_ptr<Equip> pp;
+                std::shared_ptr<Equip> pp ;//= std::make_shared<Equip>();
                 equipbagmap[p.first](pp);
                 equipBag[pp] = p.second;
             }
             for(const auto& p: medicinemap) {
-                std::shared_ptr<Medicine> pp; 
+                std::shared_ptr<Medicine> pp ;//= std::make_shared<Medicine>(); 
                 medicinebagmap[p.first](pp);
                 medicineBag[pp] = p.second;
             }
-            
+            for(const auto& p: equipcolumn) {
+                std::shared_ptr<Equip> pp ;//= std::make_shared<Equip>();
+                equipcolumnmap[p.first](pp);
+                equipColumn[p.second] = pp;
+            }
             //buf >> n_elecs >> orbs_from >> orbs_to;
         }
     private:

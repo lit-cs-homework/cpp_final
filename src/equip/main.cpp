@@ -7,13 +7,20 @@
 
 std::unordered_map<
     std::string,
-    std::function<void(std::shared_ptr<Equip>)>
+    std::function<void(std::shared_ptr<Equip>&)>
 > equipbagmap;
 
 std::unordered_map<
     std::string,
-    std::function<void(std::shared_ptr<Medicine>)>
+    std::function<void(std::shared_ptr<Medicine>&)>
 > medicinebagmap;
+
+std::unordered_map<
+    std::string,
+    std::function<void(std::shared_ptr<Equip>&)>
+> equipcolumnmap;
+
+
 
 
 
@@ -125,11 +132,12 @@ bool BaseEquip::operator== (const BaseEquip& other) const{
 
 #define withName1(cls)\
     name = __func__;\
-    equipbagmap[name] = [](std::shared_ptr<Equip> p){ p = std::make_shared<cls>(); };\
+    equipbagmap[name] = [](std::shared_ptr<Equip>& p){ p = std::make_shared<cls>(); };\
+    equipcolumnmap[name] = [](std::shared_ptr<Equip>& p){ p = std::make_shared<cls>(); };\
 
 #define withName2(cls) \
     name = __func__;\
-    medicinebagmap[name] = [](std::shared_ptr<Medicine> p){ p = std::make_shared<cls>(); };\
+    medicinebagmap[name] = [](std::shared_ptr<Medicine>& p){ p = std::make_shared<cls>(); };\
 
 #define DeclWithName2(cls) cls::cls(){ withName2(cls);}
 

@@ -50,13 +50,18 @@
 extern
   std::unordered_map<
       std::string,
-      std::function<void(std::shared_ptr<Equip>)>
+      std::function<void(std::shared_ptr<Equip>&)>
   > equipbagmap;
 extern
   std::unordered_map<
       std::string,
-      std::function<void(std::shared_ptr<Medicine>)>
+      std::function<void(std::shared_ptr<Medicine>&)>
   > medicinebagmap;
+extern
+    std::unordered_map<
+    std::string,
+    std::function<void(std::shared_ptr<Equip>&)>
+    > equipcolumnmap;
 
 int main()
 {
@@ -84,16 +89,27 @@ int main()
 
     Hero hero;
     auto& bag = hero.getBag();
-   for(const auto& p: equipbagmap) {
-       std::cout << p.first << std::endl;
+    bag.get(a,1);
+    bag.get(b,1);
+    bag.get(c,1);
+    bag.get(bluemedicine,10);
+    bag.get(redMedicine,10);
+    bag.changeequip(a,hero);
+  //  for(const auto& p: equipbagmap) {
+  //      std::cout << p.first << std::endl;
 
-   }
-   for(const auto& p: medicinebagmap) {
-       std::cout << p.first << std::endl;
+  //  }
+  //  for(const auto& p: medicinebagmap) {
+  //      std::cout << p.first << std::endl;
 
-   }
+  //  }
    auto str = hps::to_string(bag);
    auto nbag = hps::from_string<Bag>(str);
+   bag.display();
+   std::cout << std::endl;
+   nbag.display();
+
+
 
    return 0;
 

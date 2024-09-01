@@ -12,8 +12,12 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 set(NLIB_PATH ${CMAKE_BINARY_DIR}/lib/libnterm.a)
 
-if(NOT WIN32)
-  set(NIMC_SH bash -c)
+set(NIMC_CMD nim cpp --noMain --app:staticLib --out:${NLIB_PATH} src/nterm.nim)
+
+if(WIN32)
+  set(NIMC_SH ${NIMC_CMD})
+else()
+  set(NIMC_SH bash -c "\"${NIMC_CMD}\"")
 endif()
 
 # execute_process(
@@ -21,7 +25,7 @@ endif()
 #     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
 # )
 add_custom_command(
-    COMMAND ${NIMC_SH} "nim cpp --noMain --app:staticLib --out:${NLIB_PATH} src/nterm.nim"
+    COMMAND ${NIMC_SH}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
     OUTPUT  ${NLIB_PATH}
     DEPENDS ${CMAKE_SOURCE_DIR}/lib/src/*

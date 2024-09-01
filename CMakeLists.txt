@@ -91,7 +91,10 @@ target_link_libraries(map PRIVATE combat equip)
 
 foreach(DIR ${SUBDIRS})
     #target_sources(DefaultTarget PUBLIC ${CMAKE_SOURCE_DIR}/src/${DIR}/main.cpp)
-    target_link_libraries(DefaultTarget PUBLIC ${DIR})
+    if("${DIR}" STREQUAL "main")
+    else()
+      target_link_libraries(DefaultTarget PUBLIC ${DIR})
+    endif()
 endforeach()
 
 

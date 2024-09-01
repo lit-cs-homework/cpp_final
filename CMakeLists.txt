@@ -64,7 +64,7 @@ foreach(DIR ${SUBDIRS})
       add_library(${DIR} STATIC ${SRCS})
       set(TEST_MAIN ${CMAKE_SOURCE_DIR}/src/${DIR}/test.cpp)
       # create target named test_${DIR}
-      add_executable(${CUR_DST} ${TEST_MAIN})
+      add_executable(${CUR_DST} EXCLUDE_FROM_ALL ${TEST_MAIN})
       target_link_libraries(${CUR_DST} PUBLIC ${DIR})
     endif()
 

@@ -1,7 +1,8 @@
 # modified from std/terminal
 #  adding exportc pragma for apis
+#  and fix some compile warning
 # on Nim 2.1.9
-
+ 
 #
 #
 #            Nim's Runtime Library
@@ -273,8 +274,8 @@ else:
     mode.c_oflag = mode.c_oflag and not Cflag(OPOST)
     mode.c_cflag = (mode.c_cflag and not Cflag(CSIZE or PARENB)) or CS8
     mode.c_lflag = mode.c_lflag and not Cflag(ECHO or ICANON or IEXTEN or ISIG)
-    mode.c_cc[VMIN] = 1.cuchar
-    mode.c_cc[VTIME] = 0.cuchar
+    mode.c_cc[VMIN] = 1.char
+    mode.c_cc[VTIME] = 0.char
     discard fd.tcSetAttr(time, addr mode)
 
   proc getCursorPos*(): tuple [x, y: int]{.exportNimTerm, dynlib.} =
@@ -928,8 +929,6 @@ when defined(windows):
     stdout.write "\n"
 
 else:
-  import std/termios
-
   proc readPasswordFromStdin*(prompt: string, password: var string):
                             bool {.tags: [ReadIOEffect, WriteIOEffect], exportc: "$1VarString", dynlib.} =
     password.setLen(0)

@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.12)
 
 project(cpp_final)
 
+set(mainTargetName "demonslayer")  #
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 
@@ -48,7 +50,7 @@ endforeach()
 foreach(DIR ${SUBDIRS})
     string(COMPARE EQUAL "${DIR}" "main" isMain)
     if( ${isMain} )
-      set(CUR_DST DefaultTarget)
+      set(CUR_DST ${mainTargetName})
       set(REQ_LIB_DST ${CUR_DST})
     else()
       set(CUR_DST test_${DIR})
@@ -90,13 +92,13 @@ target_link_libraries(map PRIVATE combat equip)
 # 4. link all ${DIR} target for default target
 
 foreach(DIR ${SUBDIRS})
-    #target_sources(DefaultTarget PUBLIC ${CMAKE_SOURCE_DIR}/src/${DIR}/main.cpp)
+    #target_sources(${mainTargetName} PUBLIC ${CMAKE_SOURCE_DIR}/src/${DIR}/main.cpp)
     if("${DIR}" STREQUAL "main")
     else()
-      target_link_libraries(DefaultTarget PUBLIC ${DIR})
+      target_link_libraries(${mainTargetName} PUBLIC ${DIR})
     endif()
 endforeach()
 
 
 # set default target
-set(DEFAULT_TARGET DefaultTarget)
+#set(DEFAULT_TARGET ${mainTargetName})

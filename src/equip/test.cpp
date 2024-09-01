@@ -47,6 +47,16 @@
 //   }
 // };
 
+extern
+  std::unordered_map<
+      std::string,
+      std::function<void(std::shared_ptr<Equip>)>
+  > equipbagmap;
+extern
+  std::unordered_map<
+      std::string,
+      std::function<void(std::shared_ptr<Medicine>)>
+  > medicinebagmap;
 
 int main()
 {
@@ -59,6 +69,7 @@ int main()
     assert (ls==par);
     return 0;
   */
+
     ntermInit();
     std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
     std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
@@ -70,7 +81,22 @@ int main()
     std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
     std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
     Store store(equipstore,medicinestore);
+
     Hero hero;
+    auto& bag = hero.getBag();
+   for(const auto& p: equipbagmap) {
+       std::cout << p.first << std::endl;
+
+   }
+   for(const auto& p: medicinebagmap) {
+       std::cout << p.first << std::endl;
+
+   }
+   auto str = hps::to_string(bag);
+   auto nbag = hps::from_string<Bag>(str);
+
+   return 0;
+
     hero.getBag().get(a,1);
     store.trade(hero.getBag(),hero);
     hero.getBag().display();

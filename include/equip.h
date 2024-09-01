@@ -22,11 +22,9 @@ class BaseEquip{//物品基类 包括装备和药水
 
 };
 
-using PBEquip = std::shared_ptr<BaseEquip>;
 
 
 
-class Equip;
 
 
 struct eqOnObj
@@ -198,15 +196,17 @@ class Bag{
         void changeequip(std::shared_ptr<Equip> equip, Hero& hero);//角色更换装备
         template <class B>
         void serialize(B& buf) const {
-            std::unordered_map<std::string, int> map;
-            map.reserve(equipBag.size() + medicineBag.size());
+            std::unordered_map<std::string, int> equipmap;
+            std::unordered_map<std::string, int> medicinemap;
+            equipmap.reserve(equipBag.size());
+            medicinemap.reserve(medicineBag.size());
             for(const auto& p: equipBag) {
-                map[p.first->name] = p.second;
+                equipmap[p.first->name] = p.second;
             }
             for(const auto& p: medicineBag) {
-                map[p.first->name] = p.second;
+                medicinemap[p.first->name] = p.second;
             }
-            buf << map;
+            buf << equipmap << medicinemap;
             //buf << n_elecs << orbs_from << orbs_to;
         }
 
@@ -215,25 +215,33 @@ class Bag{
             extern 
                 std::unordered_map<
                     std::string,
-                    std::function<void(PBEquip)>
-                > bagmap;
-            std::unordered_map<std::string, int> map;
-            buf >> map;
-            auto hasEnding = [](std::string const &fullString, std::string const &ending) {
-                if (fullString.length() >= ending.length()) {
-                    return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
-                } else {
-                    return false;
-                }
-            };
-            for(const auto& p: map) {
-                // TODO
-                PBEquip pp; 
-                bagmap[p.first](pp);
-                if (hasEnding(p.first, ("edicine")))
-                    medicineBag[(std::shared_ptr<Medicine>)pp] = p.second;
-                else 
-                    equipBag[(std::shared_ptr<Equip>)pp] = p.second;
+                    std::function<void(std::shared_ptr<Equip>)>
+                > equipbagmap;
+
+                std::unordered_map<
+                std::string,
+                std::function<void(std::shared_ptr<Medicine>)>
+                > medicinebagmap;
+
+            std::unordered_map<std::string, int> equipmap;
+            std::unordered_map<std::string, int> medicinemap;
+            buf >> equipmap >> medicinemap;
+            // auto hasEnding = [](std::string const &fullString, std::string const &ending) {
+            //     if (fullString.length() >= ending.length()) {
+            //         return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+            //     } else {
+            //         return false;
+            //     }
+            // };
+            for(const auto& p: equipmap) {
+                std::shared_ptr<Equip> pp;
+                equipbagmap[p.first](pp);
+                equipBag[pp] = p.second;
+            }
+            for(const auto& p: medicinemap) {
+                std::shared_ptr<Medicine> pp; 
+                medicinebagmap[p.first](pp);
+                medicineBag[pp] = p.second;
             }
             
             //buf >> n_elecs >> orbs_from >> orbs_to;

@@ -1,10 +1,24 @@
 
 #include "../../include/equip.h"
 
+
+
+
+
 std::unordered_map<
     std::string,
-    std::function<void(PBEquip)>
-> bagmap;
+    std::function<void(std::shared_ptr<Equip>)>
+> equipbagmap;
+
+std::unordered_map<
+    std::string,
+    std::function<void(std::shared_ptr<Medicine>)>
+> medicinebagmap;
+
+
+
+
+
 
 #define show(cls,str,suffix)\
 {\
@@ -109,11 +123,16 @@ bool BaseEquip::operator== (const BaseEquip& other) const{
     return name == other.name;
 }
 
-#define withName(cls) \
+#define withName1(cls)\
     name = __func__;\
-    bagmap[name] = [](PBEquip p){ p = std::make_shared<cls>(); };\
+    equipbagmap[name] = [](std::shared_ptr<Equip> p){ p = std::make_shared<cls>(); };\
 
-#define DeclWithName(cls) cls::cls(){ withName(cls);}
+#define withName2(cls) \
+    name = __func__;\
+    medicinebagmap[name] = [](std::shared_ptr<Medicine> p){ p = std::make_shared<cls>(); };\
+
+#define DeclWithName2(cls) cls::cls(){ withName2(cls);}
+
 
 
 Equip::Equip(){name = __func__;}
@@ -144,7 +163,7 @@ size_t hashBaseEquip::operator() (const std::shared_ptr<BaseEquip> value) const{
 }
 
 
-DeclWithName(Medicine)
+DeclWithName2(Medicine)
 
 
 void Medicine::display() __unImplement
@@ -336,9 +355,9 @@ void Sword::takeoff(Hero& hero){
 }
 
 
-#define ImplSword(cls, ...) \
+#define ImplSword(cls,...) \
 cls::cls(): Sword(__VA_ARGS__){\
-    withName(cls);\
+    withName1(cls);\
 }\
 
 ImplSword(StoneSword , 10, 5)
@@ -349,10 +368,10 @@ ImplSword(IronSword  , 30, 15)
 RetType(Armhour)
 
 #define def4(cls) \
-cls::cls(double value, double hp, double mp, double def): Equip(value, hp, mp, def){withName(cls);}
+cls::cls(double value, double hp, double mp, double def): Equip(value, hp, mp, def){withName1(cls);}
 
 
-#define ArmOrShoe(cls, ...) def4(cls);\
+#define ArmOrShoe(cls,...) def4(cls);\
 cls::cls(): cls(__VA_ARGS__){}
 
 ArmOrShoe(Armhour,10, 10, 10, 10)
@@ -404,7 +423,7 @@ void Medicine::used(Hero& hero, int n){
     hero.defend += def * n;
 }
 RedMedicine::RedMedicine(){
-    withName(RedMedicine);
+    withName2(RedMedicine);
     hp = 10;
     mp = 0;
     value = 10;
@@ -415,7 +434,7 @@ void RedMedicine::display() const{
 }
 
 BlueMedicine::BlueMedicine(){
-    withName(BlueMedicine);
+    withName2(BlueMedicine);
     hp = 0;
     mp = 10;
     value = 10;

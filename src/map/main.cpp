@@ -3,6 +3,8 @@
 #include "../../include/equip.h"
 #include <cstdlib>
 #include <string>
+#include <array>
+#include <cassert>
 
 #ifdef _WIN32
 # include<windows.h>
@@ -28,20 +30,77 @@ using std::cin;
 using std::cout;
 using std::endl;
 //const char* mapName[11] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
-std::string mapName[11] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
-std::string mapName2[11] = {"  卧龙山  ", "   祸窟   ", "   地宫   ", "  北阳山  ", "  藏经阁  ", "   郊外   ", "  锻造屋  ", " 中央主城 ", "   药铺   ", "  道远村  ", "   郊外   "};
+
+#define mapPlacesNumber 11
+#define MaxMapNameLen 12   // len*3, where len is 4
+
+using MapNameArray = std::array<std::string, mapPlacesNumber>;
+
+// Python's str.center like
+// assert minWidth > 0;
+// assert s consist 3-byte unicode (utf-8's chinese)
+// assume one char is full-width when rendered.
+static
+std::string center(const std::string& s, int minFontWidth) {
+    assert(minFontWidth > 0);
+    auto sFontWidth = s.size() / 3;
+    assert(sFontWidth*3 == s.size());
+    int delta = minFontWidth - sFontWidth;
+    if (delta <= 0) {
+        return s;
+    }
+
+    auto truncHalfInt = delta / 2;
+    std::string prefix, suffix;
+    const char *fill = "  ";
+#define loop(N) for (size_t i = 0; i < (N); i++)
+    loop(truncHalfInt) prefix += fill;
+    loop(delta - truncHalfInt) suffix += fill;
+    if (delta % 2 == 1) {
+        prefix += ' ';
+        suffix.resize(suffix.size() - 1);
+    }
+    return prefix + s + suffix;
+#undef loop
+}
+#define _(s)  (center((s), 5))
+
+static
+MapNameArray mapName = {
+    _("卧龙山"   ),
+    _("祸窟"     ),
+    _("地宫"     ),
+    _("北阳山"   ),
+    _("藏经阁"   ),
+    _("郊外"     ),
+    _("锻造屋"   ),
+    _("中央主城" ),
+    _("药铺"     ),
+    _("道远村"   ),
+    _("郊外"     )
+};
+
+#undef _
+
+//std::string mapName[mapPlacesNumber] = {"  卧龙山  ", "   祸窟   ", "   地宫   ", "  北阳山  ", "  藏经阁  ", "   郊外   ", "  锻造屋  ", " 中央主城 ", "   药铺   ", "  道远村  ", "   郊外   "};
 
 
+static
+void arrangeMapName(MapNameArray& mapName){
+    // for (int i = 0; i < 11; i++) {
+    //     std::string tempname = mapName[i];
+    //     int length = tempname.length();
+    //         tempname += std::string(4 - length, ' ');
+    //         tempname.insert(length / 2, ' ');
+    //     mapName[i] = tempname.c_str();
+    // }
+    for(auto& i: mapName) {
+        assert(i.size() <= MaxMapNameLen);
+        i = center(i, MaxMapNameLen);
+    }
 
-// void arrangeMapName(std::string mapName[]){
-//     for (int i = 0; i < 11; i++) {
-//         std::string tempname = mapName[i];
-//         int length = tempname.length();
-//             tempname += std::string(4 - length, ' ');
-//             tempname.insert(length / 2, ' ');
-//         mapName[i] = tempname.c_str();
-//     }
-// }
+}
+
 const char* const mapsName[][6][4] =
 {
 {
@@ -78,7 +137,13 @@ static void CannotMove()
 {
     cout << "无法移动" << endl;
 }
-
+bool isRandom(int randomNum1,int randomNum2,int randomNum3,int n){
+    if (randomNum1 == n || randomNum2 == n || randomNum3 == n){
+        return true;
+    }
+    else
+        return false;
+}
 Room::Room(Hero &hm,Store& storem, int p):h(hm),store(storem)
 {
 
@@ -107,6 +172,8 @@ Room::Room(Hero &hm,Store& storem, int p):h(hm),store(storem)
         int randomNum1 = 97;
         int randomNum2 = 98;
         int randomNum3 = 99;
+        // 7 as there're 7 places in the map
+#define randMapPos() (rand() % 7)
         while (!enemyNum)
         {
             srand(time(NULL));
@@ -114,56 +181,68 @@ Room::Room(Hero &hm,Store& storem, int p):h(hm),store(storem)
         }
         switch (enemyNum){
             case 1:{
-                randomNum1 = rand() % 7;
+                randomNum1 = randMapPos();
                 break;
             }
             case 2:{
-                randomNum1 = rand() % 7;
-                randomNum2 = rand() % 7;
+                randomNum1 = randMapPos();
+                randomNum2 = randMapPos();
                 break;
             }
             case 3:{
-                randomNum1 = rand() % 7;
-                randomNum2 = rand() % 7;
-                randomNum3 = rand() % 7;
+                randomNum1 = randMapPos();
+                randomNum2 = randMapPos();
+                randomNum3 = randMapPos();
             }
                
             
         }   
             while(randomNum1==randomNum2){
-                randomNum1 = rand() % 7;
+                randomNum1 = randMapPos();
             }
             while (randomNum2 == randomNum3){
-                randomNum2 == rand() % 7;
+                randomNum2 == randMapPos();
             }
-            if (randomNum1 == 0 || randomNum2 == 0 || randomNum3 == 0){
-                posR[0][0] = '#';
+            #define check3is(N) isRandom(randomNum1,randomNum2,randomNum3,N)
+            if (check3is(0)){
+                posR[0][0] = '!';
             }
-            if (randomNum1 == 1 || randomNum2 == 1 || randomNum3 == 1){
-                posR[0][1] = '#';
+            else
+            if (check3is(1)){
+                posR[0][1] = '!';
             }
-            if (randomNum1 == 2 || randomNum2 == 2 || randomNum3 == 2){
-                posR[0][2] = '#';
+            else
+            if (check3is(2)){
+                posR[0][2] = '!';
             }
-            if (randomNum1 == 3 || randomNum2 == 3 || randomNum3 == 3){
-                posR[1][0] = '#';
+            else
+            if (check3is(3)){
+                posR[1][0] = '!';
             }
-            if (randomNum1 == 4 || randomNum2 == 4 || randomNum3 == 4){
-                posR[1][2] = '#';
+            else
+            if (check3is(4)){
+                posR[1][2] = '!';
             }
-            if (randomNum1 == 5 || randomNum2 == 5 || randomNum3 == 5){
-                posR[0][0] = '#';
+            else
+            if (check3is(5)){
+                posR[0][0] = '!';
             }
-            if (randomNum1 == 6 || randomNum2 == 6 || randomNum3 == 6){
-                posR[2][1] = '#';
+            else
+            if (check3is(6)){
+                posR[2][1] = '!';
             }
+            #undef check3is
         
     }
+#undef randMapPos
+}
+
+static void showTips(std::string tips){
+    cout << "'#':移动至此可" << tips << '\n';
 }
 
 void Room::showRoom()
 {
-
     eraseScreen();
     setCursorPos(0, 0);
     cout << "             " << mapName[position] << '\n';
@@ -179,46 +258,35 @@ void Room::showRoom()
 
     cout << "输入wasd在房间移动" << endl;
     cout << "'&':移动至此可退出地图" << '\n';
+
     switch (position)
     {
     case 4:
     {
-        cout << " '#':移动至此可学习技能" << '\n';
+        showTips("学习技能");
         break;
     }
     case 6:
     {
-        cout << "'#':移动至此可打造你的装备" << '\n';
+        showTips("打造装备");
         break;
     }
     case 7:
     {
-        cout << "'#':移动至此可购买物品" << '\n';
+        showTips("购买物品");
         break;
     }
     case 8:
     {
-        cout << "'#':移动至此可治疗和制造药品" << '\n';
+        showTips("购买药物");
         break;
     }
     case 1:
-    {
-        cout << "'#'处可与怪物战斗" << '\n';
-        break;
-    }
     case 2:
-    {
-        cout << "'#':移动至此可与怪物战斗" << '\n';
-        break;
-    }
     case 3:
-    {
-        cout << "'#':移动至此可与怪物战斗" << '\n';
-        break;
-    }
     case 9:
     {
-        cout << "'#':移动至此可与怪物战斗" << '\n';
+        cout << "'!':移动至此可与怪物战斗" << '\n';
         break;
     }
 
@@ -227,13 +295,38 @@ void Room::showRoom()
     }
 }
 
+ static void communciateNpc(int position){
+    switch(position){
+        case 8:{
+            cout << "这里是药铺" << endl;
+            ms_sleep(700);
+            break;
+        }
+        case 7:{
+            cout << "这里是主城" << endl;
+            ms_sleep(700);
+            break;
+        }
+        case 6:{
+            cout << "这里是锻造屋" << endl;
+            ms_sleep(700);
+            break;
+        }
+        case 4:{
+            cout << "这里是藏经阁" << endl;
+            ms_sleep(700);
+            break;
+        }
+        default:{
+            break;
+        }
+    }
+}
 void Room::actionRoom()
 {
     char order = ' ';
-
     while (order != 'n')
     {
-
         order = getch();
         switch (order)
         {
@@ -247,15 +340,12 @@ void Room::actionRoom()
             }
             else if ((positionR == 3) && (position == 4 || position == 6 || position == 7 || position == 8))
             {
-                if (position == 8)
-                {
-                    store.trade(h.getBag(),h);
-                }
+                communciateNpc(position);
             }
-            else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '#')
+            else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '!')
             {
                 eraseScreen();
-                Fight(&h);
+                fightCave(&h);
                 positionR -= 3;
                 dx--;
             }
@@ -276,16 +366,12 @@ void Room::actionRoom()
             }
             else if ((positionR == 1) && (position == 4 || position == 6 || position == 7 || position == 8))
             {
-                cout << "这里有对话" << endl;
-                if (position == 8)
-                {         
-                    store.trade(h.getBag(),h);
-                }
+                communciateNpc(position);
             }
             else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '#')
             {
                 eraseScreen();
-                Fight(&h);
+                fightCave(&h);
                 positionR--;
                 dy--;
             }
@@ -304,10 +390,10 @@ void Room::actionRoom()
             {
                 CannotMove();
             }
-            else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '#')
+            else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '!')
             {
                 eraseScreen();
-                Fight(&h);
+                fightCave(&h);
                 positionR++;
                 dy++;
             }
@@ -329,7 +415,7 @@ void Room::actionRoom()
             else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '#')
             {
                 eraseScreen();
-                Fight(&h);
+                fightCave(&h);
                 dx++;
                 positionR += 3;
             }
@@ -348,7 +434,7 @@ void Room::actionRoom()
         {
             for (int j = 0; j < 3; j++)
             {
-                if ((posR[i][j]) != '#' && (posR[i][j]) != '&')
+                if ((posR[i][j]) != '#' && (posR[i][j]) != '&'&&(posR[i][j]!='!'))
                 {
                     posR[i][j] = ' ';
                 }
@@ -374,67 +460,31 @@ Map::Map(int p /*=7*/)
     Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
     std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
     std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
-    std::shared_ptr<StoneSword> a = std::make_shared<StoneSword> (0,0,0,10,10);
-    std::shared_ptr<IronSword> b = std::make_shared<IronSword> (0,0,0,30,30);
-    std::shared_ptr<BronzeSword> c= std::make_shared<BronzeSword> (0,0,0,20,20);
-    std::shared_ptr<Shoes> d = std::make_shared<Shoes> (5,5,5,10);
-    std::shared_ptr<Armhour> e = std::make_shared<Armhour> (10,10,20,30);
+    std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>() ;
+    std::shared_ptr<IronSword> b = std::make_shared<IronSword>() ;
+    std::shared_ptr<BronzeSword> c = std::make_shared<BronzeSword>();
+    std::shared_ptr<Shoes> d = std::make_shared<Shoes>() ;
+    std::shared_ptr<Armhour> e = std::make_shared<Armhour>() ;
     std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
     std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
     Store store(equipstore,medicinestore);
     h.setSkill(s2);
     position = p;
-
-    if (p == 0)
-    {
-        dx = 2;
-        dy = 0;
-    }
-    if (p == 1)
-    {
-        dx = 2;
-        dy = 1;
-    }
-    if (p == 2)
-    {
-        dx = 0;
-        dy = 2;
-    }
-    if (p == 3)
-    {
-        dx = 1;
-        dy = 2;
-    }
-    if (p == 4)
-    {
-        dx = 2;
-        dy = 2;
-    }
-    if (p == 5)
-    {
-        dx = 3;
-        dy = 2;
-    }
-    if (p == 6)
-    {
-        dx = 1;
-        dy = 3;
-    }
-    if (p == 7)
-    {
-        dx = 2;
-        dy = 3;
-    }
-    if (p == 8)
-    {
-        dx = 2;
-        dy = 4;
-    }
-    if (p == 9)
-    {
-        dx = 2;
-        dy = 5;
-    }
+#define dealStart(N, x, y)      case N: { dx = x;dy = y;break;}
+    switch (p){
+        dealStart(0,2,0)
+        dealStart(1,2,1)
+        dealStart(2,0,2)
+        dealStart(3,1,2)
+        dealStart(4,2,2)
+        dealStart(5,3,2)
+        dealStart(6,1,3)
+        dealStart(7,2,3)
+        dealStart(8,2,4)
+        dealStart(9,2,5)
+    } 
+#undef dealStart
+ 
 
     for (int i = 0; i < 6; i++)
     {
@@ -453,27 +503,27 @@ void Map::showMap()
     cout << "世界地图:" << '\n';
     cout << "                       __________" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |"<<mapName2[0]<<"|" << '\n';
+    cout << "                      |"<<mapName[0]<<"|" << '\n';
     cout << "                      |    " << pos[2][0] << "     |" << '\n';
     cout << "                      |__________|" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |"<<mapName2[1]<<"|" << '\n';
+    cout << "                      |"<<mapName[1]<<"|" << '\n';
     cout << "                      |    " << pos[2][1] << "     |" << '\n';
     cout << "______________________|__________|___________" << '\n';
     cout << "|          |          |          |          |" << '\n';
-    cout << "|"<<mapName2[2]<<"|"<<mapName2[3]<<"|"<<mapName2[4]<<"|"<<mapName2[5]<<"|" << '\n';
+    cout << "|"<<mapName[2]<<"|"<<mapName[3]<<"|"<<mapName[4]<<"|"<<mapName[5]<<"|" << '\n';
     cout << "|    " << pos[0][2] << "     |    " << pos[1][2] << "     |    " << pos[2][2] << "     |    " << pos[3][2] << "     |" << '\n';
     cout << "|__________|__________|__________|__________|" << '\n';
     cout << "           |          |          |          |" << '\n';
-    cout << "           |"<<mapName2[6]<<"|"<<mapName2[7]<<"|"<<mapName2[8]<<"|" << '\n';
+    cout << "           |"<<mapName[6]<<"|"<<mapName[7]<<"|"<<mapName[8]<<"|" << '\n';
     cout << "           |    " << pos[1][3] << "     |    " << pos[2][3] << "     |    " << pos[3][3] << "     |" << '\n';
     cout << "           |__________|__________|__________|" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |"<<mapName2[9]<<"|" << '\n';
+    cout << "                      |"<<mapName[9]<<"|" << '\n';
     cout << "                      |    " << pos[2][4] << "     |" << '\n';
     cout << "                      |__________|" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |"<<mapName2[10]<<"|" << '\n';
+    cout << "                      |"<<mapName[10]<<"|" << '\n';
     cout << "                      |    " << pos[2][5] << "     |" << '\n';
     cout << "                      |__________|" << '\n';
     cout.flush();
@@ -498,7 +548,8 @@ bool Map::action()
     {
         if (position == 0 || position == 2 || position == 3 || position == 5)
         {
-            cout << "移动失败" << endl;
+            
+            CannotMove();
         }
         else if (position == 1 || position == 10)
         {
@@ -522,7 +573,7 @@ bool Map::action()
     {
         if (position == 2 || position == 0 || position == 1 || position == 6 || position == 9 || position == 10)
         {
-            cout << "移动失败" << '\n';
+            CannotMove();
             break;
         }
         if (position == 3 || position == 4 || position == 5 || position == 7 || position == 8)
@@ -575,11 +626,11 @@ bool Map::action()
         
         break;
     }
-    case 'n':
-    {
-        cout << "输入的是i" << endl;
-        break;
-    }
+    // case 'n':
+    // {
+    //     cout << "输入的是i" << endl;
+    //     break;
+    // }
 
     case 13:  // Enter
     {

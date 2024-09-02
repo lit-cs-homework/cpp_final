@@ -67,6 +67,20 @@ void Bag::display() const
     }
 }
 
+void Bag::displayEquipColumn()
+{
+    std::cout << "装备栏:" << std::endl;
+    for(const auto& i: equipColumn){
+        if(i != nullptr){
+            std::cout << i->typ() << "." << i->name << std::endl;
+        } else {
+            std::cout << "(none)" << std::endl;
+        }
+    }
+    std::cout << "是否要更换装备" << std::endl;
+
+}
+
 // #define void Bag::get(std::shared_ptr<typ>,cls,int n)\
 // {\
 //     cls##Bag[cls] += n;\
@@ -80,13 +94,14 @@ void Bag::get(std::shared_ptr<Medicine> medicine, int n){
     medicineBag[medicine] += n;
 }
 
-void Bag::use(std::shared_ptr<Medicine> medicine, int n, Hero& hero){
+bool Bag::use(std::shared_ptr<Medicine> medicine, int n, Hero& hero){
     if(hero.hp < hero.hpMax){
         medicineBag[medicine] = medicineBag[medicine] - n;
         medicine->used(hero, n);
+        return true;
     }
     else{
-        std::cout << hero.name <<" 已经满血" << std::endl;
+        return false;
     }
 
 }
@@ -133,11 +148,13 @@ bool BaseEquip::operator== (const BaseEquip& other) const{
 
 #define withName1(cls)\
     name = __func__;\
+    const char* const MapName##cls = __func__;\
     equipbagmap[name] = [](std::shared_ptr<Equip>& p){ p = std::make_shared<cls>(); };\
     equipcolumnmap[name] = [](std::shared_ptr<Equip>& p){ p = std::make_shared<cls>(); };\
 
 #define withName2(cls) \
     name = __func__;\
+    const char* const MapName##cls = __func__;\
     medicinebagmap[name] = [](std::shared_ptr<Medicine>& p){ p = std::make_shared<cls>(); };\
 
 #define DeclWithName2(cls) cls::cls(){ withName2(cls);}
@@ -258,13 +275,32 @@ void Store::display() const {
 //     buy(cls##bag[i],n,bag,hero);\
 // }
 
+Store::Store(){};
+void Store::refresh(){
+    std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
+    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
+    std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>  ();
+    std::shared_ptr<IronSword> b = std::make_shared<IronSword>    ();
+    std::shared_ptr<BronzeSword> c= std::make_shared<BronzeSword> ();
+    std::shared_ptr<Shoes> d = std::make_shared<Shoes> (10, 20, 5,10);
+    std::shared_ptr<Armhour> e = std::make_shared<Armhour> (20, 20, 20,30);
+    std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
+    std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
+
+    for (const auto& i : equipstore){
+        equipCommodities.insert(std::make_pair(i, 1));   
+    }
+    for (const auto& i : medicinestore){
+        medicineCommodities.insert(std::make_pair(i, 999));   
+    }
+}
 
 void Store::trade(Bag& bag,Hero& hero){
     char choice;
     while(true)
     {
         display();
-        std::cout << "请输入数字" <<std::endl<< "0:退出 " << "1:购买装备 " << "2:购买药水 " << "3:出售装备 " << "4:出售药水 " << "5:背包展示" << std::endl;
+        std::cout << "请输入数字" <<std::endl<< "0:退出 " << "1:购买装备 " << "2:购买药水 " << "3:出售装备 " << "4:出售药水 " << "5:花钱刷新商店 " << "6:背包展示" << std::endl;
         std::cin >> choice;
         if(choice == '0')
         {
@@ -289,6 +325,16 @@ void Store::trade(Bag& bag,Hero& hero){
         }
         else if(choice == '5')
         {
+            const int refreshgold = 5;
+            if(hero.getGold() < refreshgold ){
+                std::cout << "金钱不够,刷新失败"<< std::endl;
+            }
+            else{
+                hero.adjustGold(-refreshgold);
+            }
+        }
+        else if(choice == '6')
+        {
             bag.display();
         }
         else
@@ -298,44 +344,48 @@ void Store::trade(Bag& bag,Hero& hero){
     }
 }
 
-void Store::sold(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero){
+bool Store::sold(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero){
     if(equipCommodities[equip] >= n && hero.getGold() >= n * equip->value){
         equipCommodities[equip] = equipCommodities[equip] - n;
         bag.get(equip, n);
         hero.adjustGold(-(n * equip->value));
+        return true;
     }
     else{
-        std::cout << "超出数量" << std::endl;
+        return false;
      }
 }
 
-void Store::sold(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero){
+bool Store::sold(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero){
     if(medicineCommodities[medicine] >= n && hero.getGold() >= n * medicine->value){
-        medicineCommodities[medicine] = medicineCommodities[medicine] - n;
+        medicineCommodities[medicine] -=  n;
         bag.get(medicine, n);
         hero.adjustGold(-(n * medicine->value));
+        return true;
     }
     else{
-        std::cout << "超出数量" << std::endl;
+        return false;
      }
 }
 
-void Store::buy(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero){
+bool Store::buy(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero){
     if(bag.equipBag[equip] >= n){
         bag.equipBag[equip] -= n;
         hero.adjustGold(n * equip->value);
+        return true;
     }
     else{
-        std::cout << "超出数量" << std::endl;
+        return false;
     }
 }
-void Store::buy(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero){
+bool Store::buy(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero){
     if(bag.medicineBag[medicine] >= n){
         bag.medicineBag[medicine] -= n;
         hero.adjustGold(n * medicine->value);
+        return true;
     }
     else{
-        std::cout << "超出数量" << std::endl;
+        return false;
     }
 }
 
@@ -449,4 +499,12 @@ BlueMedicine::BlueMedicine(){
 
 void BlueMedicine::display() const{
     std::cout << "mp回复" << std::endl;
+}
+
+bool hasEnding(std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
 }

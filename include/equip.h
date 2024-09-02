@@ -18,11 +18,12 @@
 class BaseEquip{//物品基类 包括装备和药水
     public:
         std::string name;
-        bool operator== (const BaseEquip& other) const;//用于哈希表
+        //用于哈希表
+        bool operator== (const BaseEquip& other) const;
 
 };
 
-
+//用于哈希表
 struct eqOnObj
 {
     bool operator() (std::shared_ptr<BaseEquip> const a, std::shared_ptr<BaseEquip> const b) const
@@ -31,7 +32,7 @@ struct eqOnObj
     }
 };
 
-
+//用于哈希表
 struct hashBaseEquip{
     size_t operator()(const std::shared_ptr<BaseEquip> value) const;
 };  
@@ -42,7 +43,9 @@ enum EquipTyp{//装备类型编号 同类型的编号相同
     tArmhour,
     tShoes,
 };
-static constexpr size_t EquipTypCount = 4;//武器装备栏长度
+
+//武器装备栏长度
+static constexpr size_t EquipTypCount = 4;
 
 class Hero;
 
@@ -57,10 +60,14 @@ class Equip: public BaseEquip{//装备基类
         double mp = 0;
         double def = 0;
         double value = 0;
-        operator bool();//判断是否为空装备
-        virtual EquipTyp typ();//获取当前装备的编号
-        virtual void equiped(Hero& hero);//角色穿上装备
-        virtual void takeoff(Hero& hero);//角色脱下装备
+        //判断是否为空装备
+        operator bool();
+        //获取当前装备的编号
+        virtual EquipTyp typ();
+        //角色穿上装备
+        virtual void equiped(Hero& hero);
+        //角色脱下装备
+        virtual void takeoff(Hero& hero);
     protected:
         void setValue(double value);
 };
@@ -74,7 +81,8 @@ class Medicine: public BaseEquip
         double hp;
         double mp;
         double value;
-        void used(Hero& hero, int n);//角色使用药水
+        //角色使用药水
+        void used(Hero& hero, int n);
         virtual void display();
 };
 
@@ -82,16 +90,19 @@ class Medicine: public BaseEquip
 class Bag;
 class Store{
     public:
-        Store(std::vector<std::shared_ptr<Equip>> equipstore = {}, std::vector<std::shared_ptr<Medicine>> medicinestore = {});
-        //void refresh();
+        Store();
+        Store(std::vector<std::shared_ptr<Equip>> equipstore , std::vector<std::shared_ptr<Medicine>> medicinestore = {});
+        void refresh();
         void display() const;
         // void showEquipCommodities() const;
         // void showMedicineCommodities() const;
+
+        //商店交互
         void trade(Bag& bag,Hero& hero);
-        void sold(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色买装备，商店卖装备
-        void sold(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);///角色买药水，商店卖药水
-        void buy(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色卖装备，商店买
-        void buy(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);//角色卖药水
+        bool sold(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色买装备，商店卖装备
+        bool sold(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);///角色买药水，商店卖药水
+        bool buy(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色卖装备，商店买
+        bool buy(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);//角色卖药水
         
         template <class B>
         void serialize(B& buf) const {
@@ -154,8 +165,10 @@ class Sword : public Equip
         Sword(double value, double atk);
         double atk;
         EquipTyp typ();
-        void equiped(Hero& hero);//角色穿上装备
-        void takeoff(Hero& hero);//角色脱下装备
+        //角色穿上装备
+        void equiped(Hero& hero);
+        //角色脱下装备
+        void takeoff(Hero& hero);
 };
 
 class StoneSword : public Sword
@@ -186,8 +199,10 @@ class Armhour :public Equip
         Armhour();
         Armhour(double value, double hp, double mp, double def);
         EquipTyp typ();
-        void equiped(Hero& hero);//角色穿上装备
-        void takeoff(Hero& hero);//角色脱下装备
+        //角色穿上装备
+        void equiped(Hero& hero);
+        //角色脱下装备
+        void takeoff(Hero& hero);
 };
 
 
@@ -227,11 +242,17 @@ class Bag{
         friend class Hero;
         friend class Store;
         friend class Equip;
-        void get(std::shared_ptr<Equip> equip, int n);//角色获得装备
-        void get(std::shared_ptr<Medicine> Medicine, int n);//角色获得药水
+        //角色获得装备
+        void get(std::shared_ptr<Equip> equip, int n);
+        //角色获得药水
+        void get(std::shared_ptr<Medicine> Medicine, int n);
         void display() const;
-        void use(std::shared_ptr<Medicine> medicine, int n, Hero& hero);//角色使用药水
-        void changeequip(std::shared_ptr<Equip> equip, Hero& hero);//角色更换装备
+        // 展示装备栏
+        void displayEquipColumn();
+        //角色使用药水
+        bool use(std::shared_ptr<Medicine> medicine, int n, Hero& hero);
+        //角色更换装备
+        void changeequip(std::shared_ptr<Equip> equip, Hero& hero);
         template <class B>
         void serialize(B& buf) const {
             std::unordered_map<std::string, int> equipmap;
@@ -396,6 +417,11 @@ private:
 	int skillNumber;//技能最大数目；
 	Bag bag;
 };
+
+
+
+bool hasEnding(std::string const &fullString, std::string const &ending);
+
 
 
 /*

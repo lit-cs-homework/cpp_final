@@ -5,18 +5,18 @@
 
 // void fun()
 // {
-    // BlueMedicine bluemedicine;
-    // RedMedicine redMedicine;
-    // Stonesword a(0,0,0,10,10);
-    // Ironsword b(0,0,0,30,30);
-    // Bronzesword c();
-    // Shoes d(5,5,5,10);
-    // Armhour e(10,10,20,30);
-    // std::vector<Equip> equipstore = {a,b,c};
-    // std::vector<Medicine> medicinestore = {redMedicine,bluemedicine};
-    // Store store(equipstore,medicinestore);
-    // Hero hero;
-    // Bag bag;
+//     BlueMedicine bluemedicine;
+//     RedMedicine redMedicine;
+//     Stonesword a(0,0,0,10,10);
+//     Ironsword b(0,0,0,30,30);
+//     Bronzesword c();
+//     Shoes d(5,5,5,10);
+//     Armhour e(10,10,20,30);
+//     std::vector<Equip> equipstore = {a,b,c};
+//     std::vector<Medicine> medicinestore = {redMedicine,bluemedicine};
+//     Store store(equipstore,medicinestore);
+//     Hero hero;
+//     Bag bag;
 // }
 
 #include <memory>
@@ -57,88 +57,64 @@ extern
       std::string,
       std::function<void(std::shared_ptr<Medicine>&)>
   > medicinebagmap;
-extern
-    std::unordered_map<
-    std::string,
-    std::function<void(std::shared_ptr<Equip>&)>
-    > equipcolumnmap;
 
-int main()
-{
-  /*
-    using Ty = std::vector<std::shared_ptr<int>>;
-    Ty ls;
-    ls.push_back(std::make_shared<int>(6));
-    auto ser = hps::to_string(ls);
-    auto par = hps::from_string<Ty>(ser);
-    assert (ls==par);
-    return 0;
-  */
+// extern
+//     std::unordered_map<
+//     std::string,
+//     std::function<void(std::shared_ptr<Equip>&)>
+//     > equipcolumnmap;
 
-    ntermInit();
-    std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
-    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
-    std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>  ();
-    std::shared_ptr<IronSword> b = std::make_shared<IronSword>    ();
-    std::shared_ptr<BronzeSword> c= std::make_shared<BronzeSword> ();
-    std::shared_ptr<Shoes> d = std::make_shared<Shoes> (10, 20, 5,10);
-    std::shared_ptr<Armhour> e = std::make_shared<Armhour> (20, 20, 20,30);
-    std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
-    std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
-    Store store(equipstore,medicinestore);
+// int main()
+// {
+//   /*
+//     using Ty = std::vector<std::shared_ptr<int>>;
+//     Ty ls;
+//     ls.push_back(std::make_shared<int>(6));
+//     auto ser = hps::to_string(ls);
+//     auto par = hps::from_string<Ty>(ser);
+//     assert (ls==par);
+//     return 0;
+//   */
 
-    Hero hero;
-    hero.showHero();
-    std::cout<<hero.getGold() <<std::endl;
-    auto& bag = hero.getBag();
-    bag.get(a,1);
-    bag.get(b,1);
-    bag.get(c,1);
-    bag.get(bluemedicine,10);
-    bag.get(redMedicine,10);
-    bag.changeequip(d,hero);
-    bag.changeequip(e,hero);
-    bag.changeequip(a,hero);
-    bag.changeequip(c,hero);
-    hero.use(bluemedicine,1);
-    store.trade(bag,hero);
-  //  for(const auto& p: equipbagmap) {
-  //      std::cout << p.first << std::endl;
+//     ntermInit();
+//     Store store;
+//     Hero hero;
+//     store.refresh();
+//     store.display();
+//     store.trade(hero.getBag(),hero);
+//   //  for(const auto& p: equipbagmap) {
+//   //      std::cout << p.first << std::endl;
 
-  //  }
-  //  for(const auto& p: medicinebagmap) {
-  //      std::cout << p.first << std::endl;
+//   //  }
+//   //  for(const auto& p: medicinebagmap) {
+//   //      std::cout << p.first << std::endl;
 
-  //  }
-  //  auto str = hps::to_string(bag);
-  //  auto nbag = hps::from_string<Bag>(str);
-  auto str2 = hps::to_string(store);
-  auto nstore = hps::from_string<Store>(str2);
-  auto str1 = hps::to_string(hero);
-  auto nhero = hps::from_string<Hero>(str1);
-  //  bag.display();
-  //  std::cout << std::endl;
-  //  nbag.display();
-  hero.showHero();
-  std::cout<<hero.getGold() <<std::endl;
-  hero.getBag().display();
-  store.display();
-  std::cout << std::endl;
-  nhero.showHero();
-  std::cout<<nhero.getGold() <<std::endl;
-  nhero.getBag().display();
-  nstore.display();
+//   //  }
+//   //  auto str = hps::to_string(bag);
+//   //  auto nbag = hps::from_string<Bag>(str);
+//   // auto str2 = hps::to_string(store);
+//   // auto nstore = hps::from_string<Store>(str2);
+//   // auto str1 = hps::to_string(hero);
+//   // auto nhero = hps::from_string<Hero>(str1);
+//   // //  bag.display();
+//   // //  std::cout << std::endl;
+//   // //  nbag.display();
+//   // hero.showHero();
+//   // std::cout<<hero.getGold() <<std::endl;
+//   // hero.getBag().display();
+//   // store.display();
+//   // std::cout << std::endl;
+//   // nhero.showHero();
+//   // std::cout<<nhero.getGold() <<std::endl;
+//   // nhero.getBag().display();
+//   // nstore.display();
 
 
 
-   return 0;
+//    return 0;
+// }
 
-    hero.getBag().get(a,1);
-    store.trade(hero.getBag(),hero);
-    hero.getBag().display();
-}
 
-/*
 #include <memory>  // for shared_ptr, __shared_ptr_access
 #include <string>  // for operator+, to_string
 
@@ -168,36 +144,118 @@ ButtonOption Style() {
   return option;
 }
 
+
 int main() {
-  int value = 50;
+  ntermInit();
+  auto screen = ScreenInteractive::FitComponent();
+  auto closeFunc = screen.ExitLoopClosure();
+  
+  int value = 1;
+  Store store;
+  store.refresh();
+  Hero hero;
+  Component component;
+
 
   // clang-format off
-  auto btn_dec_01 = Button("-1", [&] { value -= 1; }, Style());
+  auto btn_dec_01 = Button("-1", [&] { if(value<=1) return; value -= 1; }, Style());
   auto btn_inc_01 = Button("+1", [&] { value += 1; }, Style());
-  auto btn_dec_10 = Button("-10", [&] { value -= 10; }, Style());
+  auto btn_dec_10 = Button("-10", [&] { if(value<=10) return;value -= 10; }, Style());
   auto btn_inc_10 = Button("+10", [&] { value += 10; }, Style());
+  auto btn0 = Button("退出", [&] {closeFunc();}, Style());
+  std::string str = "welcome";
+  std::string selectMode = "购买";
+  std::string selectedBtn = "BlueMedicine";
+  auto btn1 = Button("购买", [&] {str="请选择要购买的商品";selectMode = "购买";}, Style());
+  auto btn2 = Button("出售", [&] {str="请选择要出售的商品";selectMode = "出售";}, Style());
+  auto btn3 = Button("刷新商店",[&] {store.refresh();}, Style());
+  auto btn4 = Button("确定", [&] {
+    if(hasEnding(selectedBtn,"edicine"))
+    {
+        std::shared_ptr<Medicine> MP;
+        auto func = medicinebagmap[selectedBtn];
+        func(MP);
+        if(store.sold(MP,value,hero.getBag(),hero) && selectMode == "购买")
+        {
+          str = selectMode + "成功";
+        }
+        else if(store.buy(MP,value,hero.getBag(),hero) && selectMode == "出售")
+        {
+          str = selectMode + "成功";
+        }
+        else
+        {
+          str = selectMode + "失败";
+        }
+        
+    }
+    else
+    {
+        std::shared_ptr<Equip> EP;
+        auto func = equipbagmap[selectedBtn];
+        func(EP);
+        if(store.sold(EP,value,hero.getBag(),hero) && selectMode == "购买")
+        {
+          str = selectMode + "成功";
+        }
+        else if(store.buy(EP,value,hero.getBag(),hero) && selectMode == "出售")
+        {
+          str = selectMode + "成功";
+        }
+        else
+        {
+          str = selectMode + "失败";
+        }
+    }
+                        },Style());
+
+  
+  #define ItemButton(s,str) Button(s,[&]{selectedBtn = s;str="请选择该商品的数量";},Style());
+  auto Commodity1 = ItemButton("BlueMedicine",str)
+  auto Commodity2 = ItemButton("RedMedicine",str)
+  auto Commodity3 = ItemButton("StoneSword",str)
+  auto Commodity4 = ItemButton("BrozenSword",str)
+  auto Commodity5 = ItemButton("IronSword",str)
+  auto Commodity6 = ItemButton("Armhour",str)
+  auto Commodity7 = ItemButton("Shoes",str)
   // clang-format on
 
   // The tree of components. This defines how to navigate using the keyboard.
   // The selected `row` is shared to get a grid layout.
   int row = 0;
   auto buttons = Container::Vertical({
+      
+      Container::Horizontal({btn1,btn2}, &row) | flex,      
       Container::Horizontal({btn_dec_01, btn_inc_01}, &row) | flex,
-      Container::Horizontal({btn_dec_10, btn_inc_10}, &row) | flex,
+      Container::Horizontal({btn_dec_10, btn_inc_10}, &row) | flex,      
+      Container::Horizontal({Commodity1,Commodity2,Commodity3}, &row)  | flex,      
+      Container::Horizontal({Commodity5,Commodity6,Commodity4}, &row)  | flex,
+      Container::Horizontal({Commodity7}, &row)  | flex,
+      Container::Horizontal({btn4,btn3,btn0}, &row)  | flex,
+
   });
 
+  // int row1 = 0;
+  // auto buttons1 = Container::Vertical({
+  //     Container::Horizontal({btn0, btn1}, &row1) | flex,
+  //     Container::Horizontal({btn2, btn3}, &row1) | flex,
+  // });
+
   // Modify the way to render them on screen:
-  auto component = Renderer(buttons, [&] {
+  component = Renderer(buttons, [&] {
     return vbox({
-               text("value = " + std::to_string(value)),
+               text("商店"),
+               separator(),
+               text(str),
+               separator(),
+               text(selectedBtn + " 数量: " + std::to_string(value)),
                separator(),
                buttons->Render() | flex,
            }) |
-           flex | border;
-  });
+           flex | border
+  ;});
 
-  auto screen = ScreenInteractive::FitComponent();
   screen.Loop(component);
+  
   return 0;
 }
-*/

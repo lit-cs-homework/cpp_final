@@ -172,6 +172,8 @@ Room::Room(Hero &hm,Store& storem, int p):h(hm),store(storem)
         int randomNum1 = 97;
         int randomNum2 = 98;
         int randomNum3 = 99;
+        // 7 as there're 7 places in the map
+#define randMapPos() (rand() % 7)
         while (!enemyNum)
         {
             srand(time(NULL));
@@ -179,27 +181,27 @@ Room::Room(Hero &hm,Store& storem, int p):h(hm),store(storem)
         }
         switch (enemyNum){
             case 1:{
-                randomNum1 = rand() % 7;
+                randomNum1 = randMapPos();
                 break;
             }
             case 2:{
-                randomNum1 = rand() % 7;
-                randomNum2 = rand() % 7;
+                randomNum1 = randMapPos();
+                randomNum2 = randMapPos();
                 break;
             }
             case 3:{
-                randomNum1 = rand() % 7;
-                randomNum2 = rand() % 7;
-                randomNum3 = rand() % 7;
+                randomNum1 = randMapPos();
+                randomNum2 = randMapPos();
+                randomNum3 = randMapPos();
             }
                
             
         }   
             while(randomNum1==randomNum2){
-                randomNum1 = rand() % 7;
+                randomNum1 = randMapPos();
             }
             while (randomNum2 == randomNum3){
-                randomNum2 == rand() % 7;
+                randomNum2 == randMapPos();
             }
             #define check3is(N) isRandom(randomNum1,randomNum2,randomNum3,N)
             if (check3is(0)){
@@ -232,7 +234,9 @@ Room::Room(Hero &hm,Store& storem, int p):h(hm),store(storem)
             #undef check3is
         
     }
+#undef randMapPos
 }
+
 static void showTips(std::string tips){
     cout << "'#':移动至此可" << tips << '\n';
 }
@@ -341,7 +345,7 @@ void Room::actionRoom()
             else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '!')
             {
                 eraseScreen();
-                Fight(&h);
+                fightCave(&h);
                 positionR -= 3;
                 dx--;
             }
@@ -367,7 +371,7 @@ void Room::actionRoom()
             else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '#')
             {
                 eraseScreen();
-                Fight(&h);
+                fightCave(&h);
                 positionR--;
                 dy--;
             }
@@ -389,7 +393,7 @@ void Room::actionRoom()
             else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '!')
             {
                 eraseScreen();
-                Fight(&h);
+                fightCave(&h);
                 positionR++;
                 dy++;
             }
@@ -411,7 +415,7 @@ void Room::actionRoom()
             else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '#')
             {
                 eraseScreen();
-                Fight(&h);
+                fightCave(&h);
                 dx++;
                 positionR += 3;
             }

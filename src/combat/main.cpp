@@ -314,6 +314,10 @@ int Battle::playerRound()
 	}
 	case'2'://使用技能
 	{
+		if((*player).getskills().size()==0)
+		{
+			std::cout<<"当前没有技能可用！"<<std::endl;
+		}
 		for (int i = 1; i <= (*player).getskills().size(); i++)
 		{
 			std::cout << i << "." << (*player).getskills()[i - 1].getName() << "  ";
@@ -371,6 +375,10 @@ int Battle::playerRound()
         	std::cout << num01 << "." << i->first->name << "  ";
         	num01++;
         }
+		if(num01 == 1)
+		{
+			std::cout<<"当前没有药品可用！"<<std::endl;
+		}
         std::cout << num01 << ".返回" << std::endl;
         std::cout << "请选择：";
         std::string input;
@@ -425,6 +433,10 @@ void Battle::enemyRound()//对手攻击或使用技能
 {
 	while (1)
 	{
+		if(enemy.getSkillnum()==0)
+		{
+			throw std::invalid_argument("敌人技能数目为0");
+		}
 		int num = rand() % enemy.getSkillnum();
 		if (enemy.getSkill(num).getMagicLose() >= enemy.getMp())
 			continue;
@@ -503,13 +515,30 @@ void Battle::fight()
 	battleEnd();//结算
 }
 
-void Fight(Hero* hero)
+void fightCave(Hero* hero)
 {
 	Enemy e1("小刺球","这种怪物可能全身布满尖锐的小刺，但攻击力不高",30,30,10,10,10,5,1,5,1);
 	Enemy e2("腐叶虫","生活在腐叶堆中的小虫子，外观可能有些恶心，但威胁不大",30,30,10,10,10,5,1,5,1);
 	Enemy e3("咕噜怪","是个会发出咕噜声的小型怪物，攻击力较弱",30,30,10,10,10,5,1,5,1);
 	Enemy e4("蜗牛壳兵","背着蜗牛壳的小型士兵，移动缓慢，攻击力也很有限",30,30,10,10,10,5,1,5,1);
 	Enemy e5("迷途史莱姆","一种透明的、像果冻一样的生物，有时会迷路攻击其他生物",30,30,10,10,10,5,1,5,1);
+
+	Skill s1("冲撞", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+	Skill s2("噬咬", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+	Skill s3("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+	Skill s4("爪击", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+	Skill s5("喷射", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+
+	Skill S1[1] = { s1 };
+	Skill S2[1] = { s2 };
+	Skill S3[1] = { s3 };
+	Skill S4[1] = { s4 };
+	Skill S5[1] = { s5 };
+	e1.setSkill(S1, 1);
+	e2.setSkill(S2, 1);
+	e3.setSkill(S3, 1);
+	e4.setSkill(S4, 1);
+	e5.setSkill(S5, 1);
 	Enemy enem[5]={e1,e2,e3,e4,e5};
 	int num = rand() % 5;
 	Battle battle(hero,enem[num]);

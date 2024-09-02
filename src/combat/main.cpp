@@ -118,10 +118,10 @@ void Hero::addExp(int num)
 		exp -= expMax[level - 1];
 		level++;
 		std::cout << "恭喜你升到了" << level << "级！" << std::endl;
-		hp += 20;
-		mp += 10;
-		attack += 5;
-		defend += 3;
+		hp += 20*level;
+		mp += 10*level;
+		attack += 5*level;
+		defend += 3*level;
 	}
 }
 void Hero::adjustGold(int num)
@@ -276,6 +276,7 @@ void Battle::showRound()//回合演示
 	std::cout << "----回合" << round << "----" << std::endl;
 	ms_sleep(500);
 	(*player).showHero();
+	std::cout<<std::endl;
 	ms_sleep(1000);
 	enemy.showEnemy();
 	ms_sleep(1000);
@@ -317,12 +318,14 @@ int Battle::playerRound()
 		if((*player).getskills().size()==0)
 		{
 			std::cout<<"当前没有技能可用！"<<std::endl;
+			playerRound();
+			return -1;
 		}
 		for (int i = 1; i <= (*player).getskills().size(); i++)
 		{
 			std::cout << i << "." << (*player).getskills()[i - 1].getName() << "  ";
 		}
-		std::cout << (*player).getskills().size() + 1 << "。" << "返回 ";
+		std::cout << (*player).getskills().size() + 1 << "." << "返回 ";
 		std::cout << std::endl;
 		std::cout << "请选择：";
 		std::string input;
@@ -438,7 +441,7 @@ void Battle::enemyRound()//对手攻击或使用技能
 			throw std::invalid_argument("敌人技能数目为0");
 		}
 		int num = rand() % enemy.getSkillnum();
-		if (enemy.getSkill(num).getMagicLose() >= enemy.getMp())
+		if (enemy.getSkill(num).getMagicLose() > enemy.getMp())
 			continue;
 		enemy.adjustMp(-enemy.getSkill(num).getMagicLose());
 		int harm = enemy.getSkill(num).getHarm();
@@ -477,7 +480,7 @@ void Battle::battleEnd()
 	std::cout << "你获得了" << enemy.getExp() << "点经验值。" << std::endl;
 	player->addExp(enemy.getExp());
 	player->adjustGold(enemy.getGold());
-
+	eraseScreen();
 }
 void Battle::fight()
 {
@@ -513,15 +516,16 @@ void Battle::fight()
 		std::cout << "很遗憾，你的旅程到此为止。" << std::endl;
 	}
 	battleEnd();//结算
+	ms_sleep(1000);
 }
 
-void fightCave(Hero* hero)
+void fightTunnel(Hero* hero)
 {
-	Enemy e1("小刺球","这种怪物可能全身布满尖锐的小刺，但攻击力不高",30,30,10,10,10,5,1,5,1);
-	Enemy e2("腐叶虫","生活在腐叶堆中的小虫子，外观可能有些恶心，但威胁不大",30,30,10,10,10,5,1,5,1);
-	Enemy e3("咕噜怪","是个会发出咕噜声的小型怪物，攻击力较弱",30,30,10,10,10,5,1,5,1);
-	Enemy e4("蜗牛壳兵","背着蜗牛壳的小型士兵，移动缓慢，攻击力也很有限",30,30,10,10,10,5,1,5,1);
-	Enemy e5("迷途史莱姆","一种透明的、像果冻一样的生物，有时会迷路攻击其他生物",30,30,10,10,10,5,1,5,1);
+	Enemy e1("小刺球","这种怪物可能全身布满尖锐的小刺，但攻击力不高。",30,30,0,0,10,5,1,5,1);
+	Enemy e2("腐叶虫","生活在腐叶堆中的小虫子，外观可能有些恶心，但威胁不大。",30,30,0,0,10,5,1,5,1);
+	Enemy e3("咕噜怪","是个会发出咕噜声的小型怪物，攻击力较弱。",30,30,10,0,0,5,1,5,1);
+	Enemy e4("蜗牛壳兵","背着蜗牛壳的小型士兵，移动缓慢，攻击力也很有限。",30,30,0,0,10,5,1,5,1);
+	Enemy e5("迷途史莱姆","一种透明的、像果冻一样的生物，有时会迷路攻击其他生物。",30,30,0,0,10,5,1,5,1);
 
 	Skill s1("冲撞", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
 	Skill s2("噬咬", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
@@ -542,4 +546,174 @@ void fightCave(Hero* hero)
 	Enemy enem[5]={e1,e2,e3,e4,e5};
 	int num = rand() % 5;
 	Battle battle(hero,enem[num]);
+}
+void fightCellar(Hero* hero)
+{
+    Enemy e1("毒蛛","一种有毒的蜘蛛类怪物。",80,80,20,20,30,10,2,10,5);
+	Enemy e2("钝刃骷髅","一种由骨骼构成的亡灵类怪物。",80,80,20,20,30,10,2,10,5);
+	Enemy e3("残影妖","一种妖异邪恶的怪物。",80,80,20,20,30,10,2,10,5);
+	Enemy e4("幼岩魔","一种由岩石构成或生活在岩石中的魔物。",80,80,20,20,30,10,2,10,5);
+	Enemy e5("嗜血蝙蝠","一种凶恶的蝙蝠。",80,80,20,20,30,10,2,10,5);
+
+	Skill s11("毒丝缠绕", "毒蛛快速从腹部喷出粘性极强的毒丝进行攻击。", 40, 10);
+	Skill s12("突袭", "毒蛛快速从腹部喷出粘性极强的毒丝进行攻击。", 30, 0);
+	
+	Skill s21("骨盾冲击", "举起由骨骼构成的巨大盾牌，向目标发起冲锋。", 40, 10);
+	Skill s22("横扫", "蓄力向四周挥舞巨剑。", 30, 0);
+
+	Skill s31("幻影", "分裂成多个幻影集中进行打击。", 40, 10);
+	Skill s32("侵蚀", "释放出黑暗能量，对目标造成暗影伤害。", 30, 0);
+
+	Skill s41("岩崩", "从地面召唤出坚硬的岩石砸向目标。", 40, 10);
+	Skill s42("地裂", "用力锤击地面，引发周围地面震动造成伤害。", 30, 0);
+
+	Skill s51("血之诅咒","对目标施加血之诅咒，使其受到伤害。", 40, 10);
+	Skill s52("俯冲", "以极快的速度俯冲向目标，用锋利的爪子发动攻击。", 30, 0);
+
+	Skill S1[2] = { s11,s12 };
+	Skill S2[2] = { s21,s22 };
+	Skill S3[2] = { s31,s32 };
+	Skill S4[2] = { s41,s42 };
+	Skill S5[2] = { s51,s52 };
+
+	e1.setSkill(S1, 2);
+	e2.setSkill(S2, 2);
+	e3.setSkill(S3, 2);
+	e4.setSkill(S4, 2);
+	e5.setSkill(S5, 2);
+	Enemy enem[5]={e1,e2,e3,e4,e5};
+	int num = rand() % 5;
+	Battle battle(hero,enem[num]);
+}
+void fightDenOfDisaster(Hero* hero)
+{    
+	Enemy e1("影魔","恐怖魔物，潜行于黑暗之中，伺机发动致命一击，遇到阳光会被灼伤。",180,180,100,100,60,30,3,50,30);
+	Enemy e2("长角恶鬼","地狱族的勇猛战士，长角狰狞，有强大的肉搏能力。",180,180,100,100,60,30,3,50,30);
+	Enemy e3("骷髅勇士","不死军团的精锐，骨骼非常坚硬。",180,180,100,100,60,30,3,50,30);
+	Enemy e4("僵尸","行动迟缓但攻击性极强的不死生物。",180,180,100,100,60,30,3,50,30);
+	Enemy e5("幽灵","无形之态的恐怖存在。",180,180,100,100,60,30,3,50,30);
+
+	Skill s11("咆哮", "发出尖叫，对周围所有敌人造成音波攻击。", 100, 40);
+	Skill s12("潜袭", "悄无声息地接近目标，并发动突然袭击。", 60, 0);
+
+	Skill s21("地狱之火", "从口中喷出熊熊地狱之火，对敌人造成火焰伤害。", 100, 40);
+	Skill s22("突刺", "快速冲向目标利用长角攻击。", 60, 0);
+
+	Skill s31("骨盾冲击", "举起由骨骼构成的巨大盾牌，向目标发起冲锋。", 100, 40);
+	Skill s32("剧烈冲撞", "利用庞大的身躯猛然发动冲撞。", 60, 0);
+
+	Skill s41("腐烂之触", "通过腐烂的身体接触敌人，传播致命的毒素。", 100, 40);
+	Skill s42("狂暴冲锋", "爆发出惊人的力量，向前方冲锋并攻击。", 60, 0);
+
+	Skill s51("灵魂吸噬","对目标发动吸噬，吸取灵魂，造成伤害。", 100, 40);
+	Skill s52("无形穿梭", "以无形之态穿梭于战场之间，对敌人进行偷袭。", 60, 0);
+
+	Skill S1[2] = { s11,s12 };
+	Skill S2[2] = { s21,s22 };
+	Skill S3[2] = { s31,s32 };
+	Skill S4[2] = { s41,s42 };
+	Skill S5[2] = { s51,s52 };
+
+	e1.setSkill(S1, 2);
+	e2.setSkill(S2, 2);
+	e3.setSkill(S3, 2);
+	e4.setSkill(S4, 2);
+	e5.setSkill(S5, 2);
+	Enemy enem[5]={e1,e2,e3,e4,e5};
+	int num = rand() % 5;
+	Battle battle(hero,enem[num]);
+}
+void fightGrottoes(Hero* hero)
+{
+	Enemy e1("狼人","非常狂暴的一种兽人，行动敏捷，战斗经验丰富。",360,360,100,100,100,50,4,200,40);
+	Enemy e2("食人魔","体型庞大，丑陋贪婪，以掠夺和偷窃为生，偏好食用人类等种族。",360,360,100,100,100,50,4,200,40);
+	Enemy e3("吸血鬼","以人类血液为生的不死生物，拥有超自然力量。",360,360,100,100,100,50,4,200,40);
+
+	Skill s11("狂暴爪击", "利用锋利的手爪攻击目标。", 130, 40);
+	Skill s12("野性突袭", "悄无声息地接近目标，并发动突然袭击。", 100, 0);
+
+	Skill s21("巨力投掷", "抓起身边的一个大型物体向目标砸去。", 130, 40);
+	Skill s22("贪婪噬咬", "张开巨口吞噬敌人。", 100, 0);
+
+	Skill s31("血之盛宴", "瞬间移动到其身边并吸取其血液。", 130, 40);
+	Skill s32("暗影遁击", "化为一团黑雾，接近并攻击敌人。", 100, 0);
+
+
+	Skill S1[2] = { s11,s12 };
+	Skill S2[2] = { s21,s22 };
+	Skill S3[2] = { s31,s32 };
+
+	e1.setSkill(S1, 2);
+	e2.setSkill(S2, 2);
+	e3.setSkill(S3, 2);
+	Enemy enem[3]={e1,e2,e3};
+	int num = rand() % 3;
+	Battle battle(hero,enem[num]);
+	  
+}
+void fightDungeon(Hero* hero)
+{
+	Enemy e1("地狱猎犬","拥有三个头颅的邪恶生物，是地狱的守卫。",600,600,100,100,150,60,5,500,100);
+	Enemy e2("独眼巨人","额头上长有一只独眼。强壮、固执且擅长制造和使用各种工具和武器。",600,600,100,100,150,60,5,500,100);
+	Enemy e3("比蒙巨兽","体型如山，力大无穷，传说中的存在，令人畏惧。",600,600,100,100,150,60,5,500,100);
+
+	Skill s11("狂暴爪击", "利用锋利的手爪攻击目标。", 200, 40);
+	Skill s12("野性突袭", "悄无声息地接近目标，并发动突然袭击。", 150, 0);
+
+	Skill s21("巨力投掷", "抓起身边的一个大型物体向目标砸去。", 200, 40);
+	Skill s22("贪婪噬咬", "张开巨口吞噬敌人。", 150, 0);
+
+	Skill s31("血之盛宴", "瞬间移动到其身边并吸取其血液。", 200, 40);
+	Skill s32("暗影遁击", "化为一团黑雾，接近并攻击敌人。", 150, 0);
+
+
+	Skill S1[2] = { s11,s12 };
+	Skill S2[2] = { s21,s22 };
+	Skill S3[2] = { s31,s32 };
+
+	e1.setSkill(S1, 2);
+	e2.setSkill(S2, 2);
+	e3.setSkill(S3, 2);
+	Enemy enem[3]={e1,e2,e3};
+	int num = rand() % 3;
+	Battle battle(hero,enem[num]); 
+}
+void fightGhostdom(Hero* hero)
+{
+	Enemy e1("鬼眼-阿比斯","地下三巨头之一，本体是一只巨大的眼球。",16000,16000,5000,5000,3000,1000,6,5000,1000);
+
+	Skill s1("幽冥凝视", "阿比斯睁开其深邃的鬼眼，对前方扇形区域内的所有敌人释放一股不可见的幽冥能量。", 4000, 200);
+	Skill s2("灵魂窃取", "阿比斯锁定一个敌人，用其鬼眼直接窥视其灵魂深处，造成不可逆转的伤害。", 4000, 200);
+	Skill s3("终焉之眼", "阿比斯的终极技能，他集中全身的力量于巨眼之中，释放出毁灭性的能量波。", 5000, 2000);
+	Skill s4("阿比冲撞", "利用巨大的身躯压制敌人。", 5000, 0);
+
+	Skill S[4]={s1,s2,s3,s4};
+	e1.setSkill(S, 2);
+	Battle battle(hero,e1); 
+}
+void fightSweatPore(Hero* hero)
+{
+	Enemy e1("冥王","地下三巨头之一，即使本身处于负伤状态在地下也难以遇到对手。",15000,15000,4000,4000,2500,1100,6,5000,1000);
+
+	Skill s1("生死轮回", "冥王挥动权杖，召唤出冥界的轮回之力，选定一名敌人作为目标造成大量伤害。", 3000, 200);
+	Skill s2("幽冥波", "利用法杖对敌人使用能量波进行攻击。", 2500, 0);
+	Skill s3("幽冥审判", "冥王的终极技能，凝聚全身的幽冥之力，对全场所有敌人发动一次致命的审判。", 4000, 1000);
+	Skill s4("冥界之门", "召唤冥界之门吞噬对手。", 3000, 200);
+
+	Skill S[4]={s1,s2,s3,s4};
+	e1.setSkill(S, 2);
+	Battle battle(hero,e1);
+}
+void fightDarkRom(Hero* hero)
+{
+	Enemy e1("地灵","地下空间的掌控者，在很长一段时间内没有得到充足的能量，现在的状态早已不比全胜时期。",20000,20000,8000,8000,5000,3000,6,10000,10000);
+
+	Skill s1("灵魂穿梭", "瞬间移动至敌方身前，对敌人造成精神伤害。", 6000, 1000);
+	Skill s2("精神冲击", "释放出一股强大的精神能量波，对前方直线上的所有敌人造成高额的精神伤害。", 5000, 0);
+	Skill s3("幽影束缚", "从虚空中召唤出数条幽影锁链，束缚住敌人并造成伤害。", 6000, 1000);
+	Skill s4("灵界领域", "张开一个特殊领域，整个地下空间任其调控。", 7000, 4000);
+
+	Skill S[4]={s1,s2,s3,s4};
+	e1.setSkill(S, 2);
+	Battle battle(hero,e1);
 }

@@ -3,6 +3,8 @@
 #include "../../include/equip.h"
 #include <cstdlib>
 #include <string>
+#include <array>
+#include <cassert>
 
 #ifdef _WIN32
 # include<windows.h>
@@ -28,20 +30,77 @@ using std::cin;
 using std::cout;
 using std::endl;
 //const char* mapName[11] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
-std::string mapName[11] = {"卧龙山", "祸窟", "地宫", "北阳山", "藏经阁", "郊外", "锻造屋", "中央主城", "药铺", "道远村", "郊外"};
-std::string mapName2[11] = {"  卧龙山  ", "   祸窟   ", "   地宫   ", "  北阳山  ", "  藏经阁  ", "   郊外   ", "  锻造屋  ", " 中央主城 ", "   药铺   ", "  道远村  ", "   郊外   "};
+
+#define mapPlacesNumber 11
+#define MaxMapNameLen 12   // len*3, where len is 4
+
+using MapNameArray = std::array<std::string, mapPlacesNumber>;
+
+// Python's str.center like
+// assert minWidth > 0;
+// assert s consist 3-byte unicode (utf-8's chinese)
+// assume one char is full-width when rendered.
+static
+std::string center(const std::string& s, int minFontWidth) {
+    assert(minFontWidth > 0);
+    auto sFontWidth = s.size() / 3;
+    assert(sFontWidth*3 == s.size());
+    int delta = minFontWidth - sFontWidth;
+    if (delta <= 0) {
+        return s;
+    }
+
+    auto truncHalfInt = delta / 2;
+    std::string prefix, suffix;
+    const char *fill = "  ";
+#define loop(N) for (size_t i = 0; i < (N); i++)
+    loop(truncHalfInt) prefix += fill;
+    loop(delta - truncHalfInt) suffix += fill;
+    if (delta % 2 == 1) {
+        prefix += ' ';
+        suffix.resize(suffix.size() - 1);
+    }
+    return prefix + s + suffix;
+#undef loop
+}
+#define _(s)  (center((s), 5))
+
+static
+MapNameArray mapName = {
+    _("卧龙山"   ),
+    _("祸窟"     ),
+    _("地宫"     ),
+    _("北阳山"   ),
+    _("藏经阁"   ),
+    _("郊外"     ),
+    _("锻造屋"   ),
+    _("中央主城" ),
+    _("药铺"     ),
+    _("道远村"   ),
+    _("郊外"     )
+};
+
+#undef _
+
+//std::string mapName[mapPlacesNumber] = {"  卧龙山  ", "   祸窟   ", "   地宫   ", "  北阳山  ", "  藏经阁  ", "   郊外   ", "  锻造屋  ", " 中央主城 ", "   药铺   ", "  道远村  ", "   郊外   "};
 
 
+static
+void arrangeMapName(MapNameArray& mapName){
+    // for (int i = 0; i < 11; i++) {
+    //     std::string tempname = mapName[i];
+    //     int length = tempname.length();
+    //         tempname += std::string(4 - length, ' ');
+    //         tempname.insert(length / 2, ' ');
+    //     mapName[i] = tempname.c_str();
+    // }
+    for(auto& i: mapName) {
+        assert(i.size() <= MaxMapNameLen);
+        i = center(i, MaxMapNameLen);
+    }
 
-// void arrangeMapName(std::string mapName[]){
-//     for (int i = 0; i < 11; i++) {
-//         std::string tempname = mapName[i];
-//         int length = tempname.length();
-//             tempname += std::string(4 - length, ' ');
-//             tempname.insert(length / 2, ' ');
-//         mapName[i] = tempname.c_str();
-//     }
-// }
+}
+
 const char* const mapsName[][6][4] =
 {
 {
@@ -440,27 +499,27 @@ void Map::showMap()
     cout << "世界地图:" << '\n';
     cout << "                       __________" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |"<<mapName2[0]<<"|" << '\n';
+    cout << "                      |"<<mapName[0]<<"|" << '\n';
     cout << "                      |    " << pos[2][0] << "     |" << '\n';
     cout << "                      |__________|" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |"<<mapName2[1]<<"|" << '\n';
+    cout << "                      |"<<mapName[1]<<"|" << '\n';
     cout << "                      |    " << pos[2][1] << "     |" << '\n';
     cout << "______________________|__________|___________" << '\n';
     cout << "|          |          |          |          |" << '\n';
-    cout << "|"<<mapName2[2]<<"|"<<mapName2[3]<<"|"<<mapName2[4]<<"|"<<mapName2[5]<<"|" << '\n';
+    cout << "|"<<mapName[2]<<"|"<<mapName[3]<<"|"<<mapName[4]<<"|"<<mapName[5]<<"|" << '\n';
     cout << "|    " << pos[0][2] << "     |    " << pos[1][2] << "     |    " << pos[2][2] << "     |    " << pos[3][2] << "     |" << '\n';
     cout << "|__________|__________|__________|__________|" << '\n';
     cout << "           |          |          |          |" << '\n';
-    cout << "           |"<<mapName2[6]<<"|"<<mapName2[7]<<"|"<<mapName2[8]<<"|" << '\n';
+    cout << "           |"<<mapName[6]<<"|"<<mapName[7]<<"|"<<mapName[8]<<"|" << '\n';
     cout << "           |    " << pos[1][3] << "     |    " << pos[2][3] << "     |    " << pos[3][3] << "     |" << '\n';
     cout << "           |__________|__________|__________|" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |"<<mapName2[9]<<"|" << '\n';
+    cout << "                      |"<<mapName[9]<<"|" << '\n';
     cout << "                      |    " << pos[2][4] << "     |" << '\n';
     cout << "                      |__________|" << '\n';
     cout << "                      |          |" << '\n';
-    cout << "                      |"<<mapName2[10]<<"|" << '\n';
+    cout << "                      |"<<mapName[10]<<"|" << '\n';
     cout << "                      |    " << pos[2][5] << "     |" << '\n';
     cout << "                      |__________|" << '\n';
     cout.flush();

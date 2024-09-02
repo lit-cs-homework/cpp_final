@@ -16,10 +16,14 @@ public:
 	Enemy(std::string name, std::string introduce, int hp, int hpMax, int mp, int mpMax, int attack, int defend, int threaten, int exp, int gold);
 	~Enemy();
 	void showEnemy();
-	void adjustHp(int num);//增加或减少生命值
-	void adjustMp(int num);//增加或减少魔法值
-	void adjustAttack(int num);//增加或减少攻击
-	void adjustDefend(int num);//增加或减少防御
+	//增加或减少生命值
+	void adjustHp(int num);
+	//增加或减少魔法值
+	void adjustMp(int num);
+	//增加或减少攻击
+	void adjustAttack(int num);
+	//增加或减少防御
+	void adjustDefend(int num);
 	std::string getName();
 	int getHp();
 	int getMp();
@@ -30,7 +34,8 @@ public:
 	int getExp();
 	int getGold();
 	Skill getSkill(int pos);
-	void setSkill(Skill skill[], int num);//设置技能
+	//设置技能
+	void setSkill(Skill skill[], int num);
 private:
 	std::string name;
 	std::string introduce;
@@ -52,21 +57,25 @@ class Battle
 public:
 	Battle(Hero* hero, Enemy enemy);//构造
 	~Battle();//析构
+    //战斗开始
+	void fight();
+	//回合演示
+	void showRound();
 
-	void fight();//战斗开始
-	void showRound();//回合演示
+	//玩家行动
+	int playerRound();
 
-	int playerRound();//玩家行动
-
-	void enemyRound();//对手行动
-
-	bool ifEnd();//战斗是否结束
-
-	void battleEnd();//结算
+	///对手行动
+	///@throw invalid_argument when no skill is set
+	void enemyRound();
+	//战斗是否结束
+	bool ifEnd();
+	//结算
+	void battleEnd();
 private:
 	Hero* player;
 	Enemy enemy;
 	int round;//回合
 };
 
-void Fight(Hero* hero);
+void fightCave(Hero* hero);

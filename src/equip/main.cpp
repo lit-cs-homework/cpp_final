@@ -216,7 +216,7 @@ void Store::display() const {
 // }
 
 
-#define fun(typ,cls,suffix1,suffix2,action,...)\
+#define fun(typ,cls,str,suffix1,suffix2,action,...)\
 {\
     std::vector<std::shared_ptr<typ>> cls##suffix1;\
     cls##suffix1.reserve(__VA_ARGS__ __VA_OPT__(.) cls##suffix2.size());\
@@ -230,7 +230,7 @@ void Store::display() const {
         std::cout << "  ";\
         styledWriteLine(styleItalic, (std::to_string(__VA_ARGS__ __VA_OPT__(.) cls##suffix2[ele]).c_str()));\
     }\
-    std::cout << "请输入要购买的商品的序号和数量" << std::endl;\
+    std::cout << #str << std::endl;\
     int i;\
     std::cin >> i;\
     int n;\
@@ -264,7 +264,7 @@ void Store::trade(Bag& bag,Hero& hero){
     while(true)
     {
         display();
-        std::cout << "请输入数字" <<std::endl<< "0:退出 " << "1:购买装备 " << "2:购买药水 " << "3:出售装备 " << "4:出售药水" << "5:背包展示" << std::endl;
+        std::cout << "请输入数字" <<std::endl<< "0:退出 " << "1:购买装备 " << "2:购买药水 " << "3:出售装备 " << "4:出售药水 " << "5:背包展示" << std::endl;
         std::cin >> choice;
         if(choice == '0')
         {
@@ -273,19 +273,19 @@ void Store::trade(Bag& bag,Hero& hero){
         else if (choice == '1')
         {
             //showEquipCommodities();
-            fun(Equip,equip,store,Commodities,sold);
+            fun(Equip,equip,请输入要购买的商品的序号和数量,store,Commodities,sold);
         }
         else if(choice == '2')
         {
-            fun(Medicine,medicine,store,Commodities,sold);
+            fun(Medicine,medicine,请输入要购买的商品的序号和数量,store,Commodities,sold);
         }
         else if(choice == '3')
         {
-            fun(Equip,equip,bag,Bag,buy,bag);
+            fun(Equip,equip,请输入要出售的商品的序号和数量,bag,Bag,buy,bag);
         }
         else if(choice == '4')
         {
-            fun(Medicine,medicine,bag,Bag,buy,bag);
+            fun(Medicine,medicine,请输入要出售的商品的序号和数量,bag,Bag,buy,bag);
         }
         else if(choice == '5')
         {
@@ -428,8 +428,6 @@ void Medicine::used(Hero& hero, int n){
     }else{
         hero.mp = hero.mpMax;
     }
-    hero.attack += atk * n;
-    hero.defend += def * n;
 }
 RedMedicine::RedMedicine(){
     withName2(RedMedicine);

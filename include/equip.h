@@ -73,8 +73,6 @@ class Medicine: public BaseEquip
         // delta:
         double hp;
         double mp;
-        double atk;
-        double def;
         double value;
         void used(Hero& hero, int n);//角色使用药水
         virtual void display();
@@ -94,6 +92,50 @@ class Store{
         void sold(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);///角色买药水，商店卖药水
         void buy(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色卖装备，商店买
         void buy(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);//角色卖药水
+        
+        template <class B>
+        void serialize(B& buf) const {
+            std::unordered_map<std::string, int> equipstoremap;
+            std::unordered_map<std::string, int> medicinestoremap;
+            equipstoremap.reserve(equipCommodities.size());
+            medicinestoremap.reserve(medicineCommodities.size());
+            for(const auto& p: equipCommodities) {
+                equipstoremap[p.first->name] = p.second;
+            }
+            for(const auto& p: medicineCommodities) {
+                medicinestoremap[p.first->name] = p.second;
+            }
+            buf << equipstoremap << medicinestoremap;
+            //buf << n_elecs << orbs_from << orbs_to;
+        }
+
+        template <class B>
+        void parse(B& buf) {
+            extern
+            std::unordered_map<
+                std::string,
+                std::function<void(std::shared_ptr<Equip>&)>
+            > equipbagmap;
+            extern
+            std::unordered_map<
+            std::string,
+            std::function<void(std::shared_ptr<Medicine>&)>
+            > medicinebagmap;
+            std::unordered_map<std::string, int> equipstoremap;
+            std::unordered_map<std::string, int> medicinestoremap;
+            buf >> equipstoremap >> medicinestoremap;
+            for(const auto& p: equipstoremap) {
+                std::shared_ptr<Equip> pp ;//= std::make_shared<Equip>();
+                equipbagmap[p.first](pp);
+                equipCommodities[pp] = p.second;
+            }
+            for(const auto& p: medicinestoremap) {
+                std::shared_ptr<Medicine> pp ;//= std::make_shared<Medicine>(); 
+                medicinebagmap[p.first](pp);
+                medicineCommodities[pp] = p.second;
+            }
+            //buf >> n_elecs >> orbs_from >> orbs_to;
+        }
     private:
         std::unordered_map<std::shared_ptr<Equip>, int, hashBaseEquip, eqOnObj> equipCommodities;//商店的装备
         std::unordered_map<std::shared_ptr<Medicine>, int, hashBaseEquip, eqOnObj> medicineCommodities;//商店的药水
@@ -275,6 +317,15 @@ public:
 	std::string getIntroduce();
 	int getHarm();
 	int getMagicLose();
+    template <class B>
+    void serialize(B& buf) const {
+        buf << name << introduce << harm << magicLose;
+    }
+
+    template <class B>
+    void parse(B& buf) {
+        buf >> name >> introduce >> harm >> magicLose;
+    }
 private:
 	std::string name;//名称
 	std::string introduce;//介绍
@@ -318,6 +369,17 @@ public:
 	std::vector<Skill>& getskills();
 	void use(std::shared_ptr<Medicine> medicine, int n);
     //void changeequip(std::shared_ptr<Equip> equip);
+    template <class B>
+    void serialize(B& buf) const {
+        buf << name << hp << hpMax << mp << mpMax << attack << defend << exp << expMax[10] << level<< gold << skills << skillNumber << bag;
+        //buf << n_elecs << orbs_from << orbs_to;
+    }
+
+    template <class B>
+    void parse(B& buf) {
+        buf >> name >> hp >> hpMax >> mp >> mpMax >> attack >> defend >> exp >> expMax[10] >> level >> gold >> skills >> skillNumber >> bag;
+        //buf >> n_elecs >> orbs_from >> orbs_to;
+    }
 private:
 	std::string name;
 	int hp;//血量

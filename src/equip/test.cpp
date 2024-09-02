@@ -9,7 +9,7 @@
     // RedMedicine redMedicine;
     // Stonesword a(0,0,0,10,10);
     // Ironsword b(0,0,0,30,30);
-    // Bronzesword c(0,0,0,20,20);
+    // Bronzesword c();
     // Shoes d(5,5,5,10);
     // Armhour e(10,10,20,30);
     // std::vector<Equip> equipstore = {a,b,c};
@@ -88,6 +88,8 @@ int main()
     Store store(equipstore,medicinestore);
 
     Hero hero;
+    hero.showHero();
+    std::cout<<hero.getGold() <<std::endl;
     auto& bag = hero.getBag();
     bag.get(a,1);
     bag.get(b,1);
@@ -98,6 +100,8 @@ int main()
     bag.changeequip(e,hero);
     bag.changeequip(a,hero);
     bag.changeequip(c,hero);
+    hero.use(bluemedicine,1);
+    store.trade(bag,hero);
   //  for(const auto& p: equipbagmap) {
   //      std::cout << p.first << std::endl;
 
@@ -106,11 +110,24 @@ int main()
   //      std::cout << p.first << std::endl;
 
   //  }
-   auto str = hps::to_string(bag);
-   auto nbag = hps::from_string<Bag>(str);
-   bag.display();
-   std::cout << std::endl;
-   nbag.display();
+  //  auto str = hps::to_string(bag);
+  //  auto nbag = hps::from_string<Bag>(str);
+  auto str2 = hps::to_string(store);
+  auto nstore = hps::from_string<Store>(str2);
+  auto str1 = hps::to_string(hero);
+  auto nhero = hps::from_string<Hero>(str1);
+  //  bag.display();
+  //  std::cout << std::endl;
+  //  nbag.display();
+  hero.showHero();
+  std::cout<<hero.getGold() <<std::endl;
+  hero.getBag().display();
+  store.display();
+  std::cout << std::endl;
+  nhero.showHero();
+  std::cout<<nhero.getGold() <<std::endl;
+  nhero.getBag().display();
+  nstore.display();
 
 
 

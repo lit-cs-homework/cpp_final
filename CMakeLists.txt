@@ -92,6 +92,7 @@ target_link_libraries(test_combat PRIVATE equip)
 
 target_link_libraries(map PRIVATE combat equip)
 
+target_link_libraries(scenario PRIVATE combat equip)
 
 # 4. link all ${DIR} target for default target
 

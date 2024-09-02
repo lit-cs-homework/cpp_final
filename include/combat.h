@@ -78,4 +78,12 @@ private:
 	int round;//回合
 };
 
-void fightCave(Hero* hero);
+void fightTunnel(Hero* hero);
+void fightCellar(Hero* hero);
+void fightDenOfDisaster(Hero* hero);
+void fightGrottoes(Hero* hero);
+void fightGrottoes(Hero* hero);
+void fightDungeon(Hero* hero);
+void fightGhostdom(Hero* hero);
+void fightSweatPore(Hero* hero);
+void fightDarkRom(Hero* hero);

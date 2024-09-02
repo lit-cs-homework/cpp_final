@@ -1,6 +1,6 @@
 
 #include "../../include/combat.h"
-#include <windows.h>
+
 #include "../../include/equip.h"
 #include "../../lib/nterm.h"
 
@@ -20,6 +20,9 @@ int main()
     h.setSkill(s2);
     std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
     h.getBag().get(redMedicine,10);
-    fightCave(&h);
+    //fightTunnel(&h);
+    std::cout<<"11";
+    cursorDown(1);
+    std::cout<<"22";
     return 0;
 }

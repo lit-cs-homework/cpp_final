@@ -146,7 +146,15 @@ extern
 
 
 int main() {
-  UIforStore();
+  Store store;
+  std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>();
+  std::shared_ptr<Medicine> redMedicine = std::make_shared<RedMedicine>();
+  store.refresh();
+  Hero hero;
+  hero.adjustGold(50);
+  hero.getBag().get(a,1);
+  hero.getBag().get(redMedicine,2);
+  store.trade(hero.getBag(), hero);
   return 0;
   // ntermInit();
   // auto screen = ScreenInteractive::FitComponent();

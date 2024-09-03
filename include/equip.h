@@ -103,6 +103,8 @@ class Store{
 
         //商店交互
         void trade(Bag& bag,Hero& hero);
+        // 纯 CLI 交互
+        void tradeCli(Bag& bag,Hero& hero);
         bool sold(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色买装备，商店卖装备
         bool sold(std::shared_ptr<Medicine> medicine, int n, Bag& bag, Hero& hero);///角色买药水，商店卖药水
         bool buy(std::shared_ptr<Equip> equip, int n, Bag& bag, Hero& hero);//角色卖装备，商店买
@@ -151,7 +153,6 @@ class Store{
             }
             //buf >> n_elecs >> orbs_from >> orbs_to;
         }
-    private:
         std::unordered_map<std::shared_ptr<Equip>, int, hashBaseEquip, eqOnObj> equipCommodities;//商店的装备
         std::unordered_map<std::shared_ptr<Medicine>, int, hashBaseEquip, eqOnObj> medicineCommodities;//商店的药水
 };
@@ -324,7 +325,6 @@ class Bag{
             }
             //buf >> n_elecs >> orbs_from >> orbs_to;
         }
-    private:
         std::unordered_map<std::shared_ptr<Equip>, int, hashBaseEquip, eqOnObj> equipBag;//未装备的装备
         std::unordered_map<std::shared_ptr<Medicine>, int, hashBaseEquip, eqOnObj> medicineBag;//药水
         std::array<std::shared_ptr<Equip>, EquipTypCount> equipColumn;//已装备的装备 武器栏
@@ -427,7 +427,7 @@ private:
 bool hasEnding(std::string const &fullString, std::string const &ending);
 
 
-void UIforStore();
+void UIforStore(Store& store,Hero& hero);
 
 
 

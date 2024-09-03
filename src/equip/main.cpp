@@ -1,11 +1,16 @@
 
 #include "../../include/equip.h"
+#include <cstdio>
 
-#include "../../lib/ftxui/include/ftxui/component/captured_mouse.hpp"  // for ftxui
-#include "../../lib/ftxui/include/ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
-#include "../../lib/ftxui/include/ftxui/component/component_base.hpp"      // for ComponentBase
-#include "../../lib/ftxui/include/ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
-#include "../../lib/ftxui/include/ftxui/dom/elements.hpp"  // for separator, gauge, text, Element, operator|, vbox, border
+#include "ftxui/component/captured_mouse.hpp"  // for ftxui
+#include "ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
+#include "ftxui/component/component_base.hpp"      // for ComponentBase
+#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+#include "ftxui/dom/elements.hpp"  // for separator, gauge, text, Element, operator|, vbox, border
+#include "ftxui/dom/node.hpp"
+#include "ftxui/dom/elements.hpp"  // for color, Fit, LIGHT, align_right, bold, DOUBLE
+#include "ftxui/dom/table.hpp"      // for Table, TableSelection
+#include "ftxui/screen/screen.hpp"
 
 using namespace ftxui;
 
@@ -205,10 +210,10 @@ Store::Store(
         )
 {
     for (const auto& i : equipstore){
-        equipCommodities.insert(std::make_pair(i, 1));   
+        equipCommodities[i] = 1;   
     }
     for (const auto& i : medicinestore){
-        medicineCommodities.insert(std::make_pair(i, 999));   
+        medicineCommodities[i] = 999;   
     }
 }
 
@@ -292,14 +297,14 @@ void Store::refresh(){
     std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
 
     for (const auto& i : equipstore){
-        equipCommodities.insert(std::make_pair(i, 1));   
+        equipCommodities[i] = 1;   
     }
     for (const auto& i : medicinestore){
-        medicineCommodities.insert(std::make_pair(i, 999));   
+        medicineCommodities[i] = 999;   
     }
 }
 
-void Store::trade(Bag& bag,Hero& hero){
+void Store::tradeCli(Bag& bag,Hero& hero){
     char choice;
     while(true)
     {
@@ -505,14 +510,7 @@ void BlueMedicine::display() const{
     std::cout << "mp回复" << std::endl;
 }
 
-bool hasEnding(std::string const &fullString, std::string const &ending) {
-    if (fullString.length() >= ending.length()) {
-        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
-    } else {
-        return false;
-    }
-}
-
+static
 ButtonOption Style(){
     auto option = ButtonOption::Animated();
     option.transform = [](const EntryState& s) {
@@ -524,16 +522,140 @@ ButtonOption Style(){
   };
   return option;
 }
-void UIforStore()
+
+
+
+bool hasEnding(std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
+static
+ftxui::Table createBagTable(const Hero& hero,const Bag& bag)
 {
-  ntermInit();
+    std::vector<std::vector<std::string>> vec;
+    vec.push_back(
+        {"玩家背包"}
+    );
+    vec.push_back(
+        {"序号", "名称", "数量"}
+    );
+    auto i = 1;
+    #define add(p) do{\
+        if (p.second != 0) \
+            vec.push_back({std::to_string(i), p.first->name, std::to_string(p.second)}); i++;}while(0)
+    for(const auto& p: bag.equipBag) add(p);
+    for(const auto& p: bag.medicineBag) add(p);
+    return Table(vec);
+}
+
+static
+ftxui::Table createEquipColumnTable(Hero& hero,const Bag& bag)
+{
+    std::vector<std::vector<std::string>> vec;
+    vec.push_back({"装备栏"});
+    vec.push_back(
+        {"背包金币数量:", std::to_string(hero.getGold())}
+    );
+    vec.push_back(
+        {"类型","剑", "盔甲","鞋子"}
+    );
+    auto i = 1;
+    std::string str1;
+    std::string str2;
+    std::string str3;
+    if(bag.equipColumn[1] == nullptr ) str1 = "None";else str1=bag.equipColumn[1]->name;
+    if(bag.equipColumn[2] == nullptr ) str2 = "None";else str2=bag.equipColumn[2]->name;
+    if(bag.equipColumn[3] == nullptr ) str3 = "None";else str3=bag.equipColumn[3]->name;
+    vec.push_back({"名称",str1,str2,str3});
+    return Table(vec);
+}
+
+// digits(float) is 15, a.k.a.
+// Number of decimal digits that can be represented in a 64-bit floating-point type without losing precision
+// is 15,
+// so 15+1(dot)+1(NUL char)  ->  17 is enough
+// And x won't be negative, so no sign char will be preappended.
+static char buffer[17];
+
+static std::string formatCurrency(double x) {
+    sprintf(buffer, "%.2f", x);
+    return std::string(buffer);
+}
+
+static
+ftxui::Table createPriceTable(const Store& store)
+{
+    std::vector<std::vector<std::string>> vec;
+    vec.push_back(
+        {"价格表"}
+    );
+    vec.push_back(
+        {"序号", "名称", "价格","数量"}
+    );
+    auto i = 1;
+    #define add1(p) do{\
+        if(p.second!=0) vec.push_back({\
+        std::to_string(i), p.first->name, formatCurrency(p.first->value),std::to_string(p.second)\
+        }); i++;}while(0)
+    for(const auto& p: store.equipCommodities) add1(p);
+    for(const auto& p: store.medicineCommodities) add1(p);
+    return Table(vec);
+}
+
+
+static
+ftxui::Element getBagTableElement(const Hero& hero,const Bag& bag)
+{
+  auto table = createBagTable(hero, bag);
+  table.SelectAll().Border(LIGHT);
+  table.SelectColumn(0).Border(LIGHT);
+  table.SelectColumn(2).Border(LIGHT);
+  table.SelectRow(0).Decorate(bold);
+  table.SelectRow(0).SeparatorVertical(LIGHT);
+  table.SelectRow(0).Border(DOUBLE);
+  table.SelectRow(0).Border(DOUBLE);
+  return table.Render();
+}
+
+static
+ftxui::Element getEquipColumnTableElement(Hero& hero,const Bag& bag)
+{
+  auto table = createEquipColumnTable(hero, bag);
+  table.SelectAll().Border(LIGHT);
+  table.SelectColumn(0).Border(LIGHT);
+  table.SelectColumn(2).Border(LIGHT);
+  table.SelectRow(0).Decorate(bold);
+  table.SelectRow(0).SeparatorVertical(LIGHT);
+  table.SelectRow(0).Border(DOUBLE);
+  table.SelectRow(1).Border(LIGHT);
+  return table.Render();
+}
+
+
+
+static
+ftxui::Element getPriceTableElement(const Store& store)
+{
+  auto table = createPriceTable(store);
+  table.SelectAll().Border(LIGHT);
+  table.SelectColumn(0).Border(LIGHT);
+  table.SelectColumn(2).Border(LIGHT);
+  table.SelectRow(0).Decorate(bold);
+  table.SelectRow(0).SeparatorVertical(LIGHT);
+  table.SelectRow(0).Border(DOUBLE);
+  return table.Render();
+}
+
+void Store::trade(Bag&bag, Hero& hero)
+{
   auto screen = ScreenInteractive::FitComponent();
   auto closeFunc = screen.ExitLoopClosure();
   
   int value = 1;
-  Store store;
-  store.refresh();
-  Hero hero;
   Component component;
 
 
@@ -543,23 +665,25 @@ void UIforStore()
   auto btn_dec_10 = Button("-10", [&] { if(value<=10) return;value -= 10; }, Style());
   auto btn_inc_10 = Button("+10", [&] { value += 10; }, Style());
   auto btn0 = Button("退出", [&] {closeFunc();}, Style());
-  std::string str = "welcome";
+  std::string str = "Welcome! 请选择购买或者出售 ";
   std::string selectMode = "购买";
   std::string selectedBtn = "BlueMedicine";
   auto btn1 = Button("购买", [&] {str="请选择要购买的商品";selectMode = "购买";}, Style());
   auto btn2 = Button("出售", [&] {str="请选择要出售的商品";selectMode = "出售";}, Style());
-  auto btn3 = Button("刷新商店",[&] {store.refresh();}, Style());
+  auto btn3 = Button("刷新商店", [this] {
+    this->refresh();
+    }, Style());
   auto btn4 = Button("确定", [&] {
     if(hasEnding(selectedBtn,"edicine"))
     {
         std::shared_ptr<Medicine> MP;
         auto func = medicinebagmap[selectedBtn];
         func(MP);
-        if(store.sold(MP,value,hero.getBag(),hero) && selectMode == "购买")
+        if(selectMode == "购买" &&  this->sold(MP,value,bag,hero))
         {
           str = selectMode + "成功";
         }
-        else if(store.buy(MP,value,hero.getBag(),hero) && selectMode == "出售")
+        else if(selectMode == "出售" &&  this->buy(MP,value,bag,hero))
         {
           str = selectMode + "成功";
         }
@@ -574,11 +698,11 @@ void UIforStore()
         std::shared_ptr<Equip> EP;
         auto func = equipbagmap[selectedBtn];
         func(EP);
-        if(store.sold(EP,value,hero.getBag(),hero) && selectMode == "购买")
+        if(selectMode == "购买" &&  this->sold(EP,value,bag,hero))
         {
           str = selectMode + "成功";
         }
-        else if(store.buy(EP,value,hero.getBag(),hero) && selectMode == "出售")
+        else if(selectMode == "出售" &&  this->buy(EP,value,bag,hero))
         {
           str = selectMode + "成功";
         }
@@ -590,14 +714,14 @@ void UIforStore()
                         },Style());
 
   
-  #define ItemButton(s,str) Button(s,[&]{selectedBtn = s;str="请选择该商品的数量";},Style());
-  auto Commodity1 = ItemButton("BlueMedicine",str)
-  auto Commodity2 = ItemButton("RedMedicine",str)
-  auto Commodity3 = ItemButton("StoneSword",str)
-  auto Commodity4 = ItemButton("BrozenSword",str)
-  auto Commodity5 = ItemButton("IronSword",str)
-  auto Commodity6 = ItemButton("Armhour",str)
-  auto Commodity7 = ItemButton("Shoes",str)
+  #define ItemButton(s) Button(s,[&]{selectedBtn = s;},Style());
+  auto Commodity1 = ItemButton("BlueMedicine")
+  auto Commodity2 = ItemButton("RedMedicine")
+  auto Commodity3 = ItemButton("StoneSword")
+  auto Commodity4 = ItemButton("BronzeSword")
+  auto Commodity5 = ItemButton("IronSword")
+  auto Commodity6 = ItemButton("Armhour")
+  auto Commodity7 = ItemButton("Shoes")
   // clang-format on
 
   // The tree of components. This defines how to navigate using the keyboard.
@@ -622,8 +746,9 @@ void UIforStore()
   // });
 
   // Modify the way to render them on screen:
-  component = Renderer(buttons, [&] {
-    return vbox({
+  component = Renderer(buttons, [&, this] {
+    return hbox({
+        vbox({
                text("商店"),
                separator(),
                text(str),
@@ -632,8 +757,20 @@ void UIforStore()
                separator(),
                buttons->Render() | flex,
            }) |
-           flex | border
-  ;});
+           flex | border,
+           vbox({
+                getPriceTableElement(*this),
+           })
+           ,
+           vbox({
+                getBagTableElement(hero, bag),
+                getEquipColumnTableElement(hero, bag) 
+           }),
+
+           filler()
+    });
+  });
+
 
   screen.Loop(component);
 }

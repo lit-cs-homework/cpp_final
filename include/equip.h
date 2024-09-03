@@ -15,6 +15,10 @@
 
 
 
+
+
+
+
 class BaseEquip{//物品基类 包括装备和药水
     public:
         std::string name;
@@ -421,6 +425,9 @@ private:
 
 
 bool hasEnding(std::string const &fullString, std::string const &ending);
+
+
+void UIforStore();
 
 
 

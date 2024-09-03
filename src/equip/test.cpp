@@ -115,16 +115,16 @@ extern
 // }
 
 
-#include <memory>  // for shared_ptr, __shared_ptr_access
-#include <string>  // for operator+, to_string
+// #include <memory>  // for shared_ptr, __shared_ptr_access
+// #include <string>  // for operator+, to_string
 
-#include "../../lib/ftxui/include/ftxui/component/captured_mouse.hpp"  // for ftxui
-#include "../../lib/ftxui/include/ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
-#include "../../lib/ftxui/include/ftxui/component/component_base.hpp"      // for ComponentBase
-#include "../../lib/ftxui/include/ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
-#include "../../lib/ftxui/include/ftxui/dom/elements.hpp"  // for separator, gauge, text, Element, operator|, vbox, border
+// #include "../../lib/ftxui/include/ftxui/component/captured_mouse.hpp"  // for ftxui
+// #include "../../lib/ftxui/include/ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
+// #include "../../lib/ftxui/include/ftxui/component/component_base.hpp"      // for ComponentBase
+// #include "../../lib/ftxui/include/ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+// #include "../../lib/ftxui/include/ftxui/dom/elements.hpp"  // for separator, gauge, text, Element, operator|, vbox, border
 
-using namespace ftxui;
+// using namespace ftxui;
 
 // This is a helper function to create a button with a custom style.
 // The style is defined by a lambda function that takes an EntryState and
@@ -132,130 +132,132 @@ using namespace ftxui;
 // We are using `center` to center the text inside the button, then `border` to
 // add a border around the button, and finally `flex` to make the button fill
 // the available space.
-ButtonOption Style() {
-  auto option = ButtonOption::Animated();
-  option.transform = [](const EntryState& s) {
-    auto element = text(s.label);
-    if (s.focused) {
-      element |= bold;
-    }
-    return element | center | borderEmpty | flex;
-  };
-  return option;
-}
+// ButtonOption Style() {
+//   auto option = ButtonOption::Animated();
+//   option.transform = [](const EntryState& s) {
+//     auto element = text(s.label);
+//     if (s.focused) {
+//       element |= bold;
+//     }
+//     return element | center | borderEmpty | flex;
+//   };
+//   return option;
+// }
 
 
 int main() {
-  ntermInit();
-  auto screen = ScreenInteractive::FitComponent();
-  auto closeFunc = screen.ExitLoopClosure();
+  UIforStore();
+  return 0;
+  // ntermInit();
+  // auto screen = ScreenInteractive::FitComponent();
+  // auto closeFunc = screen.ExitLoopClosure();
   
-  int value = 1;
-  Store store;
-  store.refresh();
-  Hero hero;
-  Component component;
+  // int value = 1;
+  // Store store;
+  // store.refresh();
+  // Hero hero;
+  // Component component;
 
 
-  // clang-format off
-  auto btn_dec_01 = Button("-1", [&] { if(value<=1) return; value -= 1; }, Style());
-  auto btn_inc_01 = Button("+1", [&] { value += 1; }, Style());
-  auto btn_dec_10 = Button("-10", [&] { if(value<=10) return;value -= 10; }, Style());
-  auto btn_inc_10 = Button("+10", [&] { value += 10; }, Style());
-  auto btn0 = Button("退出", [&] {closeFunc();}, Style());
-  std::string str = "welcome";
-  std::string selectMode = "购买";
-  std::string selectedBtn = "BlueMedicine";
-  auto btn1 = Button("购买", [&] {str="请选择要购买的商品";selectMode = "购买";}, Style());
-  auto btn2 = Button("出售", [&] {str="请选择要出售的商品";selectMode = "出售";}, Style());
-  auto btn3 = Button("刷新商店",[&] {store.refresh();}, Style());
-  auto btn4 = Button("确定", [&] {
-    if(hasEnding(selectedBtn,"edicine"))
-    {
-        std::shared_ptr<Medicine> MP;
-        auto func = medicinebagmap[selectedBtn];
-        func(MP);
-        if(store.sold(MP,value,hero.getBag(),hero) && selectMode == "购买")
-        {
-          str = selectMode + "成功";
-        }
-        else if(store.buy(MP,value,hero.getBag(),hero) && selectMode == "出售")
-        {
-          str = selectMode + "成功";
-        }
-        else
-        {
-          str = selectMode + "失败";
-        }
+  // // clang-format off
+  // auto btn_dec_01 = Button("-1", [&] { if(value<=1) return; value -= 1; }, Style());
+  // auto btn_inc_01 = Button("+1", [&] { value += 1; }, Style());
+  // auto btn_dec_10 = Button("-10", [&] { if(value<=10) return;value -= 10; }, Style());
+  // auto btn_inc_10 = Button("+10", [&] { value += 10; }, Style());
+  // auto btn0 = Button("退出", [&] {closeFunc();}, Style());
+  // std::string str = "welcome";
+  // std::string selectMode = "购买";
+  // std::string selectedBtn = "BlueMedicine";
+  // auto btn1 = Button("购买", [&] {str="请选择要购买的商品";selectMode = "购买";}, Style());
+  // auto btn2 = Button("出售", [&] {str="请选择要出售的商品";selectMode = "出售";}, Style());
+  // auto btn3 = Button("刷新商店",[&] {store.refresh();}, Style());
+  // auto btn4 = Button("确定", [&] {
+  //   if(hasEnding(selectedBtn,"edicine"))
+  //   {
+  //       std::shared_ptr<Medicine> MP;
+  //       auto func = medicinebagmap[selectedBtn];
+  //       func(MP);
+  //       if(store.sold(MP,value,hero.getBag(),hero) && selectMode == "购买")
+  //       {
+  //         str = selectMode + "成功";
+  //       }
+  //       else if(store.buy(MP,value,hero.getBag(),hero) && selectMode == "出售")
+  //       {
+  //         str = selectMode + "成功";
+  //       }
+  //       else
+  //       {
+  //         str = selectMode + "失败";
+  //       }
         
-    }
-    else
-    {
-        std::shared_ptr<Equip> EP;
-        auto func = equipbagmap[selectedBtn];
-        func(EP);
-        if(store.sold(EP,value,hero.getBag(),hero) && selectMode == "购买")
-        {
-          str = selectMode + "成功";
-        }
-        else if(store.buy(EP,value,hero.getBag(),hero) && selectMode == "出售")
-        {
-          str = selectMode + "成功";
-        }
-        else
-        {
-          str = selectMode + "失败";
-        }
-    }
-                        },Style());
+  //   }
+  //   else
+  //   {
+  //       std::shared_ptr<Equip> EP;
+  //       auto func = equipbagmap[selectedBtn];
+  //       func(EP);
+  //       if(store.sold(EP,value,hero.getBag(),hero) && selectMode == "购买")
+  //       {
+  //         str = selectMode + "成功";
+  //       }
+  //       else if(store.buy(EP,value,hero.getBag(),hero) && selectMode == "出售")
+  //       {
+  //         str = selectMode + "成功";
+  //       }
+  //       else
+  //       {
+  //         str = selectMode + "失败";
+  //       }
+  //   }
+  //                       },Style());
 
   
-  #define ItemButton(s,str) Button(s,[&]{selectedBtn = s;str="请选择该商品的数量";},Style());
-  auto Commodity1 = ItemButton("BlueMedicine",str)
-  auto Commodity2 = ItemButton("RedMedicine",str)
-  auto Commodity3 = ItemButton("StoneSword",str)
-  auto Commodity4 = ItemButton("BrozenSword",str)
-  auto Commodity5 = ItemButton("IronSword",str)
-  auto Commodity6 = ItemButton("Armhour",str)
-  auto Commodity7 = ItemButton("Shoes",str)
-  // clang-format on
+  // #define ItemButton(s,str) Button(s,[&]{selectedBtn = s;str="请选择该商品的数量";},Style());
+  // auto Commodity1 = ItemButton("BlueMedicine",str)
+  // auto Commodity2 = ItemButton("RedMedicine",str)
+  // auto Commodity3 = ItemButton("StoneSword",str)
+  // auto Commodity4 = ItemButton("BrozenSword",str)
+  // auto Commodity5 = ItemButton("IronSword",str)
+  // auto Commodity6 = ItemButton("Armhour",str)
+  // auto Commodity7 = ItemButton("Shoes",str)
+  // // clang-format on
 
-  // The tree of components. This defines how to navigate using the keyboard.
-  // The selected `row` is shared to get a grid layout.
-  int row = 0;
-  auto buttons = Container::Vertical({
+  // // The tree of components. This defines how to navigate using the keyboard.
+  // // The selected `row` is shared to get a grid layout.
+  // int row = 0;
+  // auto buttons = Container::Vertical({
       
-      Container::Horizontal({btn1,btn2}, &row) | flex,      
-      Container::Horizontal({btn_dec_01, btn_inc_01}, &row) | flex,
-      Container::Horizontal({btn_dec_10, btn_inc_10}, &row) | flex,      
-      Container::Horizontal({Commodity1,Commodity2,Commodity3}, &row)  | flex,      
-      Container::Horizontal({Commodity5,Commodity6,Commodity4}, &row)  | flex,
-      Container::Horizontal({Commodity7}, &row)  | flex,
-      Container::Horizontal({btn4,btn3,btn0}, &row)  | flex,
+  //     Container::Horizontal({btn1,btn2}, &row) | flex,      
+  //     Container::Horizontal({btn_dec_01, btn_inc_01}, &row) | flex,
+  //     Container::Horizontal({btn_dec_10, btn_inc_10}, &row) | flex,      
+  //     Container::Horizontal({Commodity1,Commodity2,Commodity3}, &row)  | flex,      
+  //     Container::Horizontal({Commodity5,Commodity6,Commodity4}, &row)  | flex,
+  //     Container::Horizontal({Commodity7}, &row)  | flex,
+  //     Container::Horizontal({btn4,btn3,btn0}, &row)  | flex,
 
-  });
-
-  // int row1 = 0;
-  // auto buttons1 = Container::Vertical({
-  //     Container::Horizontal({btn0, btn1}, &row1) | flex,
-  //     Container::Horizontal({btn2, btn3}, &row1) | flex,
   // });
 
-  // Modify the way to render them on screen:
-  component = Renderer(buttons, [&] {
-    return vbox({
-               text("商店"),
-               separator(),
-               text(str),
-               separator(),
-               text(selectedBtn + " 数量: " + std::to_string(value)),
-               separator(),
-               buttons->Render() | flex,
-           }) |
-           flex | border
-  ;});
+  // // int row1 = 0;
+  // // auto buttons1 = Container::Vertical({
+  // //     Container::Horizontal({btn0, btn1}, &row1) | flex,
+  // //     Container::Horizontal({btn2, btn3}, &row1) | flex,
+  // // });
 
-  screen.Loop(component);
+  // // Modify the way to render them on screen:
+  // component = Renderer(buttons, [&] {
+  //   return vbox({
+  //              text("商店"),
+  //              separator(),
+  //              text(str),
+  //              separator(),
+  //              text(selectedBtn + " 数量: " + std::to_string(value)),
+  //              separator(),
+  //              buttons->Render() | flex,
+  //          }) |
+  //          flex | border
+  // ;});
+
+  // screen.Loop(component);
   
-  return 0;
+  // return 0;
 }

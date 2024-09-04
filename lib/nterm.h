@@ -78,9 +78,9 @@ _NFII( setCursorPos )
 
 #undef _NFII
 
-#define _FI(sym) _PRE void sym(FILE*, NI);
+#define _FI(sym) _PRE void sym(FILE*, NI n = 1);
 #define _NFI(sym) _FI(sym)\
-  void sym(NI n);
+  void sym(NI n = 1);
 
 _NFI( setCursorXPos )
 //_NFI( setCursorYPos ) // only support in windows

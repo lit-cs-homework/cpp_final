@@ -211,8 +211,8 @@ std::vector<Skill>& Hero::getskills()
 {
 	return skills;
 }
-void Hero::use(std::shared_ptr<Medicine> medicine, int n){
-    bag.use(medicine, n, *this);
+bool Hero::use(std::shared_ptr<Medicine> medicine, int n){
+    return bag.use(medicine, n, *this);
 }
 //void Hero::changeequip(std::shared_ptr<Equip> equip){
 //    bag.changeequip(equip, *this);

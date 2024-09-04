@@ -600,12 +600,13 @@ void fightTunnel(Hero* hero)
 	Enemy enem[5]={e1,e2,e3,e4,e5};
 	int num = rand() % 5;
 	std::cout<<enem[num].getName()<<"："<<enem[num].getIntroduce()<<" "<<"威胁指数："<<"*"<<std::endl;
-	if(ifFight()==-1)
-	{
-		ms_sleep(500);
-		eraseScreen();
-		Battle battle(hero,enem[num]);
-	}
+	Battle battle(hero,enem[num]);
+	// if(ifFight()==-1)
+	// {
+	// 	ms_sleep(500);
+	// 	eraseScreen();
+	// 	Battle battle(hero,enem[num]);
+	// }
 }
 void fightCellar(Hero* hero)
 {

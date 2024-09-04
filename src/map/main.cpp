@@ -455,9 +455,8 @@ void Room::actionRoom()
     }
 }
 
-Map::Map(int p /*=7*/)
+Map::Map(int p /*=7*/): sc(h)
 {
-    Hero h;
 
     Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
     std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;

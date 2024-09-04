@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <ios>
 #include <cstdlib>
@@ -6,6 +7,7 @@
 #include "../lib/hps/hps.h"
 #include "../include/combat.h"
 #include "../include/equip.h"
+#include "../include/backup.h"
 
 class Room{
 public:
@@ -41,17 +43,18 @@ public:
    void showMenu();
     template <class B>
     void serialize(B& buf) const {
-        buf << position << dx << dy;
+        buf << position << dx << dy << h << store ;
     }
 
     template <class B>
     void parse(B& buf) {
-        buf >> position >> dx >> dy;
+        buf >> position >> dx >> dy >> h >> store;
     }
 private:
     int position;
     int dx, dy;
     Store store;
     Hero h;
-
+    std::fstream backupFile;
+    Scenario sc;
 };

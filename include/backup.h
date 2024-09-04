@@ -40,7 +40,7 @@ public:
     }
 
     template <typename T>
-    bool trySave(T x) {
+    bool trySave(const T& x) {
         /*  C++ cannot truncate???
         out.seekp(0);
         out.truncate();
@@ -55,7 +55,7 @@ public:
     }
     /// @throw runtime_error if failed to write
     template <typename T>
-    void save(T x) {
+    void save(const T& x) {
         if(trySave(x)) return;
         throw std::runtime_error(
           std::string("failed to save to file: ")+getFilePath());

@@ -22,6 +22,44 @@ void ms_sleep(int ms)
 #endif
 }
 
+ftxui::ButtonOption Style() {
+  using namespace ftxui;
+  auto option = ButtonOption::Animated();
+  option.transform = [](const EntryState& s) {
+    auto element = text(s.label);
+    if (s.focused) {
+      element |= bold;
+    }
+    return element | center | borderEmpty | flex;
+  };
+  return option;
+}
+
+int ifFight()
+{
+  using namespace ftxui;
+	int value = 0;
+    auto screen = ScreenInteractive::FitComponent();
+    auto closeFunc = screen.ExitLoopClosure();
+
+
+  //-1 战斗
+    auto btn_dec_01 = Button("战斗", [&] { value -= 1;  closeFunc();}, Style());
+  //1 逃跑
+  auto btn_inc_01 = Button("逃跑", [&] { value += 1;   closeFunc();}, Style());
+  int row = 0;
+  auto buttons = Container::Vertical({
+      Container::Horizontal({btn_dec_01, btn_inc_01}, &row) | flex,
+  });
+    auto component = Renderer(buttons, [&] {
+    return vbox({ text("请选择"),separator(),buttons->Render() | flex,}) |flex | border;});
+
+
+   screen.Loop(component);
+   return value;
+}
+
+
 Skill::Skill() {}
 Skill::Skill(std::string name, std::string introduce, int harm, int magicLose) :name(name), introduce(introduce), harm(harm), magicLose(magicLose) {}
 Skill::~Skill() {}
@@ -219,7 +257,13 @@ void Enemy::adjustDefend(int num)
 std::string Enemy::getName()
 {
 	return name;
+	
 }
+std::string Enemy::getIntroduce()
+{
+	return introduce;
+}
+
 int Enemy::getHp()
 {
 	return hp;
@@ -284,17 +328,28 @@ void Battle::showRound()//回合演示
 
 int Battle::playerRound()
 {
-	//while(int c = getchar()!=EOF)  {}
-	std::cout << "请选择：" << "1.攻击  2.使用技能  3.使用物品   4.尝试逃跑" << std::endl;
-	//std::string input;
-	//std::cin >> input;
-	char inp = getch();
-	while (inp - 48 < 1 || inp - 48 > 4)//输入错误
-	{
-		//std::cout << "输入错误，请重新选择：";
-		inp = getch();
-	}
-	switch (inp)
+	// using namespace ftxui;
+	// int value = 0;
+
+    // auto screen = ScreenInteractive::FitComponent();
+    // auto closeFunc = screen.ExitLoopClosure();
+
+    // auto btn_dec_01 = Button("攻击", [&] { value += 1;  closeFunc();}, Style());
+	// auto btn_inc_01 = Button("技能", [&] { value += 2;   closeFunc();}, Style());
+ 	// auto btn_dec_10 = Button("物品", [&] { value += 3;   closeFunc();}, Style());
+  	// auto btn_inc_10 = Button("逃跑", [&] { value += 4;   closeFunc();}, Style());
+ 
+  	// int row = 0;
+    // auto buttons = Container::Vertical({
+    // Container::Horizontal({btn_dec_01, btn_inc_01,btn_dec_10, btn_inc_10}, &row) | flex, });
+    // auto component = Renderer(buttons, [&] {
+    // return vbox({text("请选择"),separator(),buttons->Render() | flex,}) |flex | border; });
+
+
+    // screen.Loop(component);
+	int value=getch();
+	std::cout<<"请选择：1.攻击 2.技能 3.物品 4.逃跑"<<std::endl;
+	switch (value)
 	{
 	case '1'://攻击
 	{
@@ -313,7 +368,7 @@ int Battle::playerRound()
 		}
 		return -1;
 	}
-	case'2'://使用技能
+	case '2'://使用技能
 	{
 		if((*player).getskills().size()==0)
 		{
@@ -370,7 +425,7 @@ int Battle::playerRound()
 		}
 		return -1;
 	}
-	case'3'://使用物品
+	case '3'://使用物品
 	{
 		int num01 = 1;
         for (auto i = player->getMedicine().begin(); i != player->getMedicine().end(); i++)
@@ -412,7 +467,7 @@ int Battle::playerRound()
         playerRound();
 		return -1;
 	}
-	case'4'://逃跑,返回0逃跑失败，返回1逃跑成功
+	case '4'://逃跑,返回0逃跑失败，返回1逃跑成功
 	{
 		if (enemy.getThreaten() < 3)
 		{
@@ -480,6 +535,7 @@ void Battle::battleEnd()
 	std::cout << "你获得了" << enemy.getExp() << "点经验值。" << std::endl;
 	player->addExp(enemy.getExp());
 	player->adjustGold(enemy.getGold());
+	ms_sleep(2000);
 	eraseScreen();
 }
 void Battle::fight()
@@ -510,13 +566,13 @@ void Battle::fight()
 	if (enemy.getHp() <= 0)
 	{
 		std::cout << "你成功打败了对手。" << std::endl;
+		ms_sleep(2000);
 	}
 	else if (((*player).getHp() <= 0))
 	{
 		std::cout << "很遗憾，你的旅程到此为止。" << std::endl;
 	}
 	battleEnd();//结算
-	ms_sleep(1000);
 }
 
 void fightTunnel(Hero* hero)
@@ -545,7 +601,14 @@ void fightTunnel(Hero* hero)
 	e5.setSkill(S5, 1);
 	Enemy enem[5]={e1,e2,e3,e4,e5};
 	int num = rand() % 5;
+	//std::cout<<enem[num].getName()<<"："<<enem[num].getIntroduce()<<" "<<"威胁指数："<<"*"<<std::endl;
 	Battle battle(hero,enem[num]);
+	// if(ifFight()==-1)
+	// {
+	// 	ms_sleep(500);
+	// 	eraseScreen();
+	// 	Battle battle(hero,enem[num]);
+	// }
 }
 void fightCellar(Hero* hero)
 {
@@ -583,7 +646,14 @@ void fightCellar(Hero* hero)
 	e5.setSkill(S5, 2);
 	Enemy enem[5]={e1,e2,e3,e4,e5};
 	int num = rand() % 5;
+	//std::cout<<enem[num].getName()<<"："<<enem[num].getIntroduce()<<" "<<"威胁指数："<<"*"<<std::endl;
 	Battle battle(hero,enem[num]);
+	// if(ifFight()==-1)
+	// {
+	// 	ms_sleep(500);
+	// 	eraseScreen();
+	// 	Battle battle(hero,enem[num]);
+	// }
 }
 void fightDenOfDisaster(Hero* hero)
 {    
@@ -621,7 +691,14 @@ void fightDenOfDisaster(Hero* hero)
 	e5.setSkill(S5, 2);
 	Enemy enem[5]={e1,e2,e3,e4,e5};
 	int num = rand() % 5;
-	Battle battle(hero,enem[num]);
+	//std::cout<<enem[num].getName()<<"："<<enem[num].getIntroduce()<<" "<<"威胁指数："<<"*"<<std::endl;
+		Battle battle(hero,enem[num]);
+	// if(ifFight()==-1)
+	// {
+	// 	ms_sleep(500);
+	// 	eraseScreen();
+	// 	Battle battle(hero,enem[num]);
+	// }
 }
 void fightGrottoes(Hero* hero)
 {
@@ -648,7 +725,14 @@ void fightGrottoes(Hero* hero)
 	e3.setSkill(S3, 2);
 	Enemy enem[3]={e1,e2,e3};
 	int num = rand() % 3;
-	Battle battle(hero,enem[num]);
+	//std::cout<<enem[num].getName()<<"："<<enem[num].getIntroduce()<<" "<<"威胁指数："<<"*"<<std::endl;
+		Battle battle(hero,enem[num]);
+	// if(ifFight()==-1)
+	// {
+	// 	ms_sleep(500);
+	// 	eraseScreen();
+	// 	Battle battle(hero,enem[num]);
+	// }
 	  
 }
 void fightDungeon(Hero* hero)
@@ -676,7 +760,14 @@ void fightDungeon(Hero* hero)
 	e3.setSkill(S3, 2);
 	Enemy enem[3]={e1,e2,e3};
 	int num = rand() % 3;
-	Battle battle(hero,enem[num]); 
+	//std::cout<<enem[num].getName()<<"："<<enem[num].getIntroduce()<<" "<<"威胁指数："<<"*"<<std::endl;
+	Battle battle(hero,enem[num]);
+	// if(ifFight()==-1)
+	// {
+	// 	ms_sleep(500);
+	// 	eraseScreen();
+	// 	Battle battle(hero,enem[num]);
+	// }
 }
 void fightGhostdom(Hero* hero)
 {

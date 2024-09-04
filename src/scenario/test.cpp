@@ -7,7 +7,7 @@ int main()
     ntermInit();
     Hero h;
     Scenario s(h);
-    s.adjustScenario(7);
-    s.Dungeon();
+    s.adjustScenario(1);
+    s.Tunnel();
     return 0;
 }

@@ -68,17 +68,17 @@ std::string center(const std::string& s, int minFontWidth) {
 
 static
 MapNameArray mapName = {
-    _("卧龙山"   ),
+    _("鬼门"   ),
     _("祸窟"     ),
     _("地宫"     ),
-    _("北阳山"   ),
-    _("藏经阁"   ),
-    _("郊外"     ),
-    _("锻造屋"   ),
-    _("中央主城" ),
-    _("药铺"     ),
-    _("道远村"   ),
-    _("郊外"     )
+    _("地窖"   ),
+    _("地道"   ),
+    _("暗室"     ),
+    _("石窟"   ),
+    _("岩穴" ),
+    _("穴口"     ),
+    _("地牢"   ),
+    _("冥界"     )
 };
 
 #undef _
@@ -455,39 +455,40 @@ void Room::actionRoom()
     }
 }
 
-Map::Map(int p /*=7*/)
+Map::Map(int p /*=7*/): sc(h), backup(Backup::Cwd())
 {
-    Hero h;
+    if(backup.hasData()) {
+        backup.tryLoad(*this); // discard result
+    } else {
 
-    Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
-    std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
-    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
-    std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>() ;
-    std::shared_ptr<IronSword> b = std::make_shared<IronSword>() ;
-    std::shared_ptr<BronzeSword> c = std::make_shared<BronzeSword>();
-    std::shared_ptr<Shoes> d = std::make_shared<Shoes>() ;
-    std::shared_ptr<Armhour> e = std::make_shared<Armhour>() ;
-    std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
-    std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
-    Store store(equipstore,medicinestore);
-    h.setSkill(s2);
-    position = p;
+        Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
+        std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
+        std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
+        std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>() ;
+        std::shared_ptr<IronSword> b = std::make_shared<IronSword>() ;
+        std::shared_ptr<BronzeSword> c = std::make_shared<BronzeSword>();
+        std::shared_ptr<Shoes> d = std::make_shared<Shoes>() ;
+        std::shared_ptr<Armhour> e = std::make_shared<Armhour>() ;
+        std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
+        std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
+        Store store(equipstore,medicinestore);
+        h.setSkill(s2);
+        position = p;
 #define dealStart(N, x, y)      case N: { dx = x;dy = y;break;}
-    switch (p){
-        dealStart(0,2,0)
-        dealStart(1,2,1)
-        dealStart(2,0,2)
-        dealStart(3,1,2)
-        dealStart(4,2,2)
-        dealStart(5,3,2)
-        dealStart(6,1,3)
-        dealStart(7,2,3)
-        dealStart(8,2,4)
-        dealStart(9,2,5)
-    } 
+        switch (p){
+            dealStart(0,2,0)
+            dealStart(1,2,1)
+            dealStart(2,0,2)
+            dealStart(3,1,2)
+            dealStart(4,2,2)
+            dealStart(5,3,2)
+            dealStart(6,1,3)
+            dealStart(7,2,3)
+            dealStart(8,2,4)
+            dealStart(9,2,5)
+        } 
 #undef dealStart
- 
-
+    }
     for (int i = 0; i < 6; i++)
     {
         for (int j = 0; j < 6; j++)
@@ -730,9 +731,9 @@ bool Map::action()
     }
     case 'v':
     {
+        backup.save(*this);
         displayBelowMap("游戏进度已保存。");
-
-        auto save = hps::to_string(*this);
+        
         
         break;
     }

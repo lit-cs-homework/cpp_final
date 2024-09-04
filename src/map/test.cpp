@@ -2,6 +2,7 @@
 #include "../../include/map.h"
 #include "../../include/combat.h"
 #include "../../include/equip.h"
+#include "../../include/backup.h"
 
 
 #ifdef _WIN32
@@ -22,6 +23,7 @@ int main(){
     SetConsoleOutputCP(CP_UTF8);
     #endif
     */
+   
     Map myMap = Map(7);
     do{
         myMap.showMap();

@@ -201,6 +201,8 @@ void fun(int r, int g, int b);
 _genColor( setBackgroundColor )
 _genColor( setForegroundColor )
 
+#undef _genColor
+
 enum
  Style{
   styleBright = 1,          // bright text

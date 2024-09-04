@@ -455,38 +455,40 @@ void Room::actionRoom()
     }
 }
 
-Map::Map(int p /*=7*/): sc(h)
+Map::Map(int p /*=7*/): sc(h), backup(Backup::Cwd())
 {
+    if(backup.hasData()) {
+        backup.tryLoad(*this); // discard result
+    } else {
 
-    Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
-    std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
-    std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
-    std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>() ;
-    std::shared_ptr<IronSword> b = std::make_shared<IronSword>() ;
-    std::shared_ptr<BronzeSword> c = std::make_shared<BronzeSword>();
-    std::shared_ptr<Shoes> d = std::make_shared<Shoes>() ;
-    std::shared_ptr<Armhour> e = std::make_shared<Armhour>() ;
-    std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
-    std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
-    Store store(equipstore,medicinestore);
-    h.setSkill(s2);
-    position = p;
+        Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
+        std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
+        std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
+        std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>() ;
+        std::shared_ptr<IronSword> b = std::make_shared<IronSword>() ;
+        std::shared_ptr<BronzeSword> c = std::make_shared<BronzeSword>();
+        std::shared_ptr<Shoes> d = std::make_shared<Shoes>() ;
+        std::shared_ptr<Armhour> e = std::make_shared<Armhour>() ;
+        std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
+        std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
+        Store store(equipstore,medicinestore);
+        h.setSkill(s2);
+        position = p;
 #define dealStart(N, x, y)      case N: { dx = x;dy = y;break;}
-    switch (p){
-        dealStart(0,2,0)
-        dealStart(1,2,1)
-        dealStart(2,0,2)
-        dealStart(3,1,2)
-        dealStart(4,2,2)
-        dealStart(5,3,2)
-        dealStart(6,1,3)
-        dealStart(7,2,3)
-        dealStart(8,2,4)
-        dealStart(9,2,5)
-    } 
+        switch (p){
+            dealStart(0,2,0)
+            dealStart(1,2,1)
+            dealStart(2,0,2)
+            dealStart(3,1,2)
+            dealStart(4,2,2)
+            dealStart(5,3,2)
+            dealStart(6,1,3)
+            dealStart(7,2,3)
+            dealStart(8,2,4)
+            dealStart(9,2,5)
+        } 
 #undef dealStart
- 
-
+    }
     for (int i = 0; i < 6; i++)
     {
         for (int j = 0; j < 6; j++)
@@ -729,9 +731,9 @@ bool Map::action()
     }
     case 'v':
     {
+        backup.save(*this);
         displayBelowMap("游戏进度已保存。");
-
-        auto save = hps::to_string(*this);
+        
         
         break;
     }

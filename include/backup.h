@@ -24,7 +24,7 @@ public:
         std::ifstream in(getFilePath());
         if (!hasData())
           return false;
-        res = hps::from_stream<T>(in);
+        hps::from_stream<T>(in, res);
         in.close();
         return true;
     }

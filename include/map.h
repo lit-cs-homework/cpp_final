@@ -56,6 +56,6 @@ private:
     int dx, dy;
     Store store;
     Hero h;
-    std::fstream backupFile;
+    Backup backup;
     Scenario sc;
 };

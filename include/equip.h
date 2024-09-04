@@ -392,7 +392,7 @@ public:
 	std::unordered_map<std::shared_ptr<Medicine>, int, hashBaseEquip, eqOnObj>& getMedicine();
 	void setSkill(Skill skill);
 	std::vector<Skill>& getskills();
-	void use(std::shared_ptr<Medicine> medicine, int n);
+	bool use(std::shared_ptr<Medicine> medicine, int n);
     //void changeequip(std::shared_ptr<Equip> equip);
     template <class B>
     void serialize(B& buf) const {

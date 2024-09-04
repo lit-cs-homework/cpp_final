@@ -396,7 +396,7 @@ public:
     //void changeequip(std::shared_ptr<Equip> equip);
     template <class B>
     void serialize(B& buf) const {
-        buf << name << hp << hpMax << mp << mpMax << attack << defend << exp  << level<< gold << skills << skillNumber << bag;
+        buf << name << hp << hpMax << mp << mpMax << attack << defend << exp << level<< gold << skills << skillNumber << bag;
         //buf << n_elecs << orbs_from << orbs_to;
     }
 

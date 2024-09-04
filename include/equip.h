@@ -392,17 +392,17 @@ public:
 	std::unordered_map<std::shared_ptr<Medicine>, int, hashBaseEquip, eqOnObj>& getMedicine();
 	void setSkill(Skill skill);
 	std::vector<Skill>& getskills();
-	void use(std::shared_ptr<Medicine> medicine, int n);
+	bool use(std::shared_ptr<Medicine> medicine, int n);
     //void changeequip(std::shared_ptr<Equip> equip);
     template <class B>
     void serialize(B& buf) const {
-        buf << name << hp << hpMax << mp << mpMax << attack << defend << exp << expMax[10] << level<< gold << skills << skillNumber << bag;
+        buf << name << hp << hpMax << mp << mpMax << attack << defend << exp  << level<< gold << skills << skillNumber << bag;
         //buf << n_elecs << orbs_from << orbs_to;
     }
 
     template <class B>
     void parse(B& buf) {
-        buf >> name >> hp >> hpMax >> mp >> mpMax >> attack >> defend >> exp >> expMax[10] >> level >> gold >> skills >> skillNumber >> bag;
+        buf >> name >> hp >> hpMax >> mp >> mpMax >> attack >> defend >> exp >> level >> gold >> skills >> skillNumber >> bag;
         //buf >> n_elecs >> orbs_from >> orbs_to;
     }
 private:
@@ -414,7 +414,7 @@ private:
 	int attack;
 	int defend;
 	int exp;
-	int expMax[10] = { 10, 50, 150, 500, 1000, 2000, 4000, 8000, 15000, 30000 };
+	const int expMax[10] = { 10, 50, 150, 500, 1000, 2000, 4000, 8000, 15000, 30000 };
 	int level;
 	int gold;
 	std::vector<Skill> skills;

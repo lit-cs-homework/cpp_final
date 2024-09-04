@@ -1,12 +1,15 @@
+#pragma once
+
+
 #include <iostream>
 #include "./equip.h"
 #include "../lib/nterm.h"
 #include "./combat.h"
 
 
-void narration(std::string m);
-void npcTalk(std::string m);
-void heroTalk(std::string m);
+void narration(const char* m);
+void npcTalk(const char* m);
+void heroTalk(const char* m);
 
 class Scenario {
 
@@ -28,6 +31,15 @@ public:
     void adjustScenario(int n);
 
     int getScenario();
+    template <class B>
+    void serialize(B& buf) const {
+        buf << scenario ;
+    }
+
+    template <class B>
+    void parse(B& buf) {
+        buf >> scenario ;
+    }
 private:
     Hero& h;
     int scenario;

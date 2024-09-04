@@ -25,41 +25,37 @@ void ms_sleep(int ms)
 }
 
 #include <cstring>
-void narration(const char* m)
+static
+void narrationImpl(const char* m, ForegroundColor color)
 {
+    hideCursor();
     //std::cout<<m;
     for(int i=0;i<strlen(m);i+=3)
     {
         char print[]={m[i],m[i+1],m[i+2], '\0'};
-        styledWrite(fgYellow, StyleSet{styleBright},print);
+        styledWrite(color, StyleSet{styleBright},print);
         ms_sleep(100);
     }
     std::cout<<std::endl;
+    showCursor();
 }
 
-void npcTalk(std::string m)
+void narration(const char* m)
 {
-    for(int i=0;i!=m.size();i+=3)
-    {
-        char print[]={m[i],m[i+1],m[i+2], '\0'};
-        styledWrite(fgGreen, StyleSet{styleBright},print);
-        ms_sleep(100);
-    }
-    std::cout<<std::endl;
+    narrationImpl(m, fgYellow);
 }
 
-void heroTalk(std::string m)
+void npcTalk(const char* m)
 {
-    for(int i=0;i!=m.size();i+=3)
-    {
-        char print[]={m[i],m[i+1],m[i+2], '\0'};
-        styledWrite(fgWhite, StyleSet{styleBright},print);
-        ms_sleep(100);
-    }
-    std::cout<<std::endl;
+    narrationImpl(m, fgGreen);
 }
 
-Scenario::Scenario(Hero&hero):h(hero)
+void heroTalk(const char* m)
+{
+    narrationImpl(m, fgWhite);
+}
+
+Scenario::Scenario(Hero& hero):h(hero)
 {
     scenario=0;
 }
@@ -266,7 +262,7 @@ void  Scenario::Grottoes()
         adjustScenario(10);
     }
 }
-//地牢
+// 
 void  Scenario::Dungeon()
 {
     if(getScenario() == 6)

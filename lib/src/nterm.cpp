@@ -51,7 +51,7 @@ _NFI( cursorBackward )
 
 
 #define _FBcB(sym, en) \
-  void sym(en _color, bool bright=false){sym(stdout, _color, bright);}
+  void sym(en _color, bool bright/*=false*/){sym(stdout, _color, bright);}
 
 _FBcB( setBackgroundColor, BackgroundColor )
 _FBcB( setForegroundColor, ForegroundColor )

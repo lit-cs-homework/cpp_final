@@ -2,62 +2,73 @@
 #include "../../include/combat.h"
 #include "../../lib/nterm.h"
 
-#ifdef _WIN32
-# include<windows.h>
-#else
-//#include <unistd.h>
-#endif
+#include "../../include/utils.h"
 
-static
-void ms_sleep(int ms)
-{
-#ifdef _WIN32
-	Sleep(ms);
-#else
-	struct timespec tp = {
-		ms / 1000,    // second
-		ms % 1000000  // ns
-	};
-	nanosleep(&tp, NULL);
-#endif
-}
+#include "ftxui/component/captured_mouse.hpp"  // for ftxui
+#include "ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
+#include "ftxui/component/component_base.hpp"      // for ComponentBase
+#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+#include "ftxui/dom/elements.hpp"  // for separator, gauge, text, Element, operator|, vbox, border
+#include "ftxui/dom/node.hpp"
+#include "ftxui/dom/elements.hpp"  // for color, Fit, LIGHT, align_right, bold, DOUBLE
+#include "ftxui/dom/table.hpp"      // for Table, TableSelection
+#include "ftxui/screen/screen.hpp"
+#include "ftxui/component/captured_mouse.hpp"  // for ftxui
+#include "ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
+#include "ftxui/component/component_base.hpp"      // for ComponentBase
+#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+#include "ftxui/dom/elements.hpp"  // for separator, gauge, text, Element, operator|, vbox, border
+#include "ftxui/dom/node.hpp"
+#include "ftxui/dom/elements.hpp"  // for color, Fit, LIGHT, align_right, bold, DOUBLE
+#include "ftxui/dom/table.hpp"      // for Table, TableSelection
+#include "ftxui/screen/screen.hpp"
 
-ftxui::ButtonOption Style() {
-  using namespace ftxui;
-  auto option = ButtonOption::Animated();
-  option.transform = [](const EntryState& s) {
-    auto element = text(s.label);
-    if (s.focused) {
-      element |= bold;
-    }
-    return element | center | borderEmpty | flex;
-  };
-  return option;
-}
-
-int ifFight()
-{
-  using namespace ftxui;
-	int value = 0;
-    auto screen = ScreenInteractive::FitComponent();
-    auto closeFunc = screen.ExitLoopClosure();
-
-
-  //-1 战斗
-    auto btn_dec_01 = Button("战斗", [&] { value -= 1;  closeFunc();}, Style());
-  //1 逃跑
-  auto btn_inc_01 = Button("逃跑", [&] { value += 1;   closeFunc();}, Style());
-  int row = 0;
-  auto buttons = Container::Vertical({
-      Container::Horizontal({btn_dec_01, btn_inc_01}, &row) | flex,
-  });
-    auto component = Renderer(buttons, [&] {
-    return vbox({ text("请选择"),separator(),buttons->Render() | flex,}) |flex | border;});
+using ftxui::Element;
+using ftxui::Table;
+using ftxui::center;
+using ftxui::bold;
+using ftxui::LIGHT;
+using ftxui::ButtonOption;
+using ftxui::EntryState;
+using ftxui::text;
+using ftxui::flex;
+using ftxui::borderEmpty;
+using ftxui::Component;
+using ftxui::hbox;
+using ftxui::vbox;
+using ftxui::Render;
+using ftxui::separator;
+using ftxui::Renderer;
+using ftxui::gauge;
+using ftxui::align_right;
+using ftxui::border;
+using ftxui::filler;
+using ftxui::ScreenInteractive;
 
 
-   screen.Loop(component);
-   return value;
-}
+// int ifFight()
+// {
+//   using namespace ftxui;
+// 	int value = 0;
+//     auto screen = ScreenInteractive::FitComponent();
+//     auto closeFunc = screen.ExitLoopClosure();
+
+
+//   //-1 战斗
+//     auto btn_dec_01 = Button("战斗", [&] { value -= 1;  closeFunc();}, Style());
+//   //1 逃跑
+//   auto btn_inc_01 = Button("逃跑", [&] { value += 1;   closeFunc();}, Style());
+//   int row = 0;
+//   auto buttons = Container::Vertical({
+//       Container::Horizontal({btn_dec_01, btn_inc_01}, &row) | flex,
+//   });
+//     auto component = Renderer(buttons, [&] {
+//     return vbox({ text("请选择"),separator(),buttons->Render() | flex,}) |flex | border;});
+
+
+//    screen.Loop(component);
+//    return value;
+// }
 
 
 Skill::Skill() {}
@@ -170,6 +181,10 @@ int Hero::getHp()
 {
 	return hp;
 }
+int Hero::getHpMax()
+{
+	return hpMax;
+}
 int Hero::getMp()
 {
 	return mp;
@@ -268,6 +283,11 @@ int Enemy::getHp()
 {
 	return hp;
 }
+int Enemy::getHpMax()
+{
+	return hpMax;
+}
+
 int Enemy::getMp()
 {
 	return mp;
@@ -312,7 +332,7 @@ void Enemy::setSkill(Skill skill[], int num)//设置技能
 Battle::Battle(Hero* hero, Enemy enemy) :player(hero), enemy(enemy)//构造
 {
 	round = 1;
-	fight();
+	fight1(enemy);
 }
 Battle::~Battle() {}
 void Battle::showRound()//回合演示
@@ -807,4 +827,299 @@ void fightDarkRom(Hero* hero)
 	Skill S[4]={s1,s2,s3,s4};
 	e1.setSkill(S, 2);
 	Battle battle(hero,e1);
+}
+
+
+
+
+static
+ButtonOption Style(){
+    auto option = ButtonOption::Animated();
+    option.transform = [](const EntryState& s) {
+    auto element = text(s.label);
+    if (s.focused) {
+      element |= bold;
+    }
+    return element | center | borderEmpty | flex;
+  };
+  return option;
+}
+
+
+static
+ftxui::Table createMedicineTable(const Hero& hero,const Bag& bag)
+{
+    std::vector<std::vector<std::string>> vec;
+    vec.push_back(
+        {"玩家背包"}
+    );
+    vec.push_back(
+        {"序号", "名称", "数量"}
+    );
+    auto i = 1;
+    #define add(p) do{\
+        if (p.second != 0) \
+            vec.push_back({std::to_string(i), p.first->name, std::to_string(p.second)}); i++;}while(0)
+    for(const auto& p: bag.medicineBag) add(p);
+    return Table(vec);
+}
+
+static
+ftxui::Element getMedicineTableElement(const Hero& hero,const Bag& bag)
+{
+  auto table = createMedicineTable(hero, bag);
+  table.SelectAll().Border(LIGHT);
+  table.SelectColumn(0).Border(LIGHT);
+  table.SelectColumn(2).Border(LIGHT);
+  table.SelectRow(0).Decorate(bold);
+  table.SelectRow(0).SeparatorVertical(LIGHT);
+  table.SelectRow(0).Border(ftxui::DOUBLE);
+  table.SelectRow(0).Border(ftxui::DOUBLE);
+  return table.Render();
+}
+
+Hero hero;
+Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
+std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
+Enemy enemy("A","",100,100,0,0,10,5,4,5,1);
+Skill s1("冲撞", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
+Skill S1[1] = { s1 };
+const char* const defVal = "                     ";
+std::string str = defVal;
+std::string str1 = defVal;
+std::string str2 = defVal;
+std::string str3 = defVal;
+
+bool end = false;
+
+static void enemyAttack(Hero& hero,Enemy& enemy);
+
+static
+void fun(Hero& player,Enemy& enemy,Skill& skill)
+{
+    str = "你对" + enemy.getName() + "使用了技能--" + skill.getName() + ".";
+    // ms_sleep(1000);
+    player.adjustMp(-skill.getMagicLose());
+    if (enemy.getDefend() > skill.getHarm())
+    {
+        str1 = enemy.getName() + "抵挡住了你的攻击。";
+        // ms_sleep(1000);
+    }
+    else
+    {
+        str1 = "你对" + enemy.getName() + "造成了" + std::to_string(skill.getHarm() - enemy.getDefend()) + "点伤害。";
+        // ms_sleep(1000);
+        enemy.adjustHp(enemy.getDefend() - skill.getHarm());
+        if (enemy.getHp() <= 0 || player.getHp() <= 0)
+	    {
+		    end = true;
+	    }
+	    else
+        {
+            end = false;
+        };
+    }
+    if(end == false)
+    {
+        enemyAttack(player,enemy);
+    }
+}
+
+
+void enemyAttack(Hero& hero,Enemy& enemy)
+{
+    int num = rand() % enemy.getSkillnum();
+    if (enemy.getSkill(num).getMagicLose() <= enemy.getMp())
+    {
+        enemy.adjustMp(-enemy.getSkill(num).getMagicLose());
+        int harm = enemy.getSkill(num).getHarm();
+
+        str2 = enemy.getName() + "使用了" + enemy.getSkill(num).getName() + ".";
+        // ms_sleep(1000);
+        if (harm - hero.getDefend() > 0)
+        {
+            str3 = enemy.getName() + "对你造成了" + std::to_string(harm - hero.getDefend())  + "点伤害。";
+            // ms_sleep(1000);
+            hero.adjustHp(hero.getDefend() - harm);
+        }
+        else
+        {
+            str3 = "你成功抵御了" + enemy.getName() + "攻击。";
+            // ms_sleep(1000);
+        } 
+    }
+    else
+    {
+        enemyAttack(hero, enemy);
+    }
+
+}
+
+void fight1(Enemy& enemy)
+{
+    enemy.setSkill(S1,1);
+    hero.setSkill(s2);
+    hero.getBag().get(redMedicine,10);
+    auto screen = ScreenInteractive::FitComponent();
+    auto closeFunc = screen.ExitLoopClosure();
+    Component component;
+
+    auto btn0 = Button("普通攻击",[&]{
+        str = "你对" + enemy.getName() + "进行了攻击。";
+		if (enemy.getDefend() > hero.getAttack())
+		{
+			str1 = enemy.getName() + "抵挡住了你的攻击。";
+			// ms_sleep(1000);
+		}
+		else
+		{
+			str1 = "你对" + enemy.getName() + "造成了" +std::to_string(hero.getAttack() - enemy.getDefend())+ "点伤害。";
+			// ms_sleep(1000);
+			enemy.adjustHp(enemy.getDefend() - hero.getAttack());
+            if (enemy.getHp() <= 0 || hero.getHp() <= 0)
+	        {
+		        end = true;
+	        }
+	        else
+            {
+                end = false;
+            };
+		}
+        if(end == false)
+        {
+            enemyAttack(hero,enemy);
+        }
+        else
+        {
+            closeFunc();
+            if (hero.getHp() <= 0)
+            {
+                std::cout << std::endl <<"战斗失败";
+            }
+            else if(enemy.getHp() <= 0 )
+            {
+                std::cout <<std::endl<< "战斗成功";
+            }
+            
+        }
+        
+    },Style());
+
+    auto btn1 = Button("尝试逃跑",[&]{
+        if (enemy.getThreaten() < 3)
+		{
+			str = "逃跑失败" ;
+            str1 = defVal;
+            str2 = defVal;
+            str3 = defVal;
+		}
+		else
+		{
+			if (rand() % 6 < enemy.getThreaten())
+			{
+				str = "逃跑成功" ;
+                closeFunc();
+                std::cout << str;
+			}
+            else
+            {
+                str = "逃跑失败" ;
+                str1 = defVal;
+                str2 = defVal;
+                str3 = defVal;
+            }
+		}
+    },Style());
+
+    std::vector<ftxui::Component> skill;
+
+    if(hero.getskills().size() == 0) skill.push_back(Button("当前没有技能可用",[]{},Style()));
+
+    for(int i=0;i<hero.getskills().size();i++)
+    {
+        skill.push_back(Button(hero.getskills()[i].getName(),[&, i]{
+            auto& sk = hero.getskills()[i];
+            if(sk.getMagicLose() > hero.getMp())
+            {
+                str = "当前魔法不足，请重新选择";
+                str1 = defVal;
+                str2 = defVal;
+                str3 = defVal;
+            }
+            else
+            {
+                fun(hero,enemy,sk);
+            }
+        },Style()));
+    }
+
+    std::vector<ftxui::Component> medicine;
+    ;
+
+    if(hero.getBag().medicineBag.size() == 0) medicine.push_back(Button("当前没有药水可用",[]{},Style()));
+    for(auto& i: hero.getBag().medicineBag)
+    {
+        if(i.first != nullptr)
+            medicine.push_back(Button(i.first->name,[&,i]{
+            if(hero.use(i.first,1))
+            {
+                str = "使用成功" ;
+                str1 = defVal;
+                str2 = defVal;
+                str3 = defVal;
+            }
+            else
+            {
+                str = "使用失败" ;
+                str1 = defVal;
+                str2 = defVal;
+                str3 = defVal;
+            } 
+        },Style()));
+    }
+
+    int row = 0;
+    auto buttons = ftxui::Container::Vertical({ 
+      ftxui::Container::Horizontal({btn0}, &row) | flex,
+      ftxui::Container::Horizontal(skill, &row) | flex,
+      ftxui::Container::Horizontal(medicine, &row) | flex,      
+      ftxui::Container::Horizontal({btn1}, &row)  | flex,
+  });
+
+    component = Renderer(buttons, [&] {
+        return hbox({
+            vbox({
+
+                }),
+            vbox({
+                    text("敌人血量:"+std::to_string(enemy.getHp())),
+                    separator(),
+                    gauge(enemy.getHp()/(double)enemy.getHpMax()),
+                    text(str2),
+                    text(str3),
+                    separator(),
+                    text("玩家血量:"+std::to_string(hero.getHp())) | align_right,
+                    separator(),
+                    gauge(hero.getHp()/(double)hero.getHpMax()),
+                    separator(),
+                    text(str),
+                    text(str1),
+                    separator(),
+                    separator(),
+                    buttons->Render() | flex,
+                }) |
+                flex | border,
+                vbox({
+                    getMedicineTableElement(hero,hero.getBag()),
+                })
+                ,
+                vbox({
+                }),
+
+                filler()
+        });
+    });
+
+
+  screen.Loop(component);
 }

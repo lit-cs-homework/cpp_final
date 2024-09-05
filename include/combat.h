@@ -36,6 +36,7 @@ public:
 	std::string getName();
 	std::string getIntroduce();
 	int getHp();
+	int getHpMax();
 	int getMp();
 	int getAttack();
 	int getDefend();
@@ -97,3 +98,4 @@ void fightDungeon(Hero* hero);
 void fightGhostdom(Hero* hero);
 void fightSweatPore(Hero* hero);
 void fightDarkRom(Hero* hero);
+void fight1(Enemy& enemy);

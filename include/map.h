@@ -13,10 +13,11 @@
 class Room{
 public:
     char posR[10][10];
-    Room(Hero& h,Store& store,int p = 7);
+    Room(Hero& h, Store& store , Scenario& scm, int p = 7);
     void showRoom();
     void actionRoom();
-    
+    void communciateNpc(int position);
+    void roomBattle(int pos);
     template <class B>
     void serialize(B& buf) const {
         buf << position << dx << dy;
@@ -33,6 +34,7 @@ private:
     int positionR;
     Store& store;
     Hero& h;
+    Scenario& sc;
 };
   
 class Map{

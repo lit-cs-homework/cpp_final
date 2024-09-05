@@ -156,10 +156,10 @@ void Hero::addExp(int num)
 		exp -= expMax[level - 1];
 		level++;
 		std::cout << "恭喜你升到了" << level << "级！" << std::endl;
-		hp += 20*level;
-		mp += 10*level;
-		attack += 5*level;
-		defend += 3*level;
+		addHp(20*level);
+		addMp(20*level);
+		adjustAttack(5*level);
+		adjustDefend(5*level);
 	}
 }
 void Hero::adjustGold(int num)
@@ -347,8 +347,8 @@ int Battle::playerRound()
 
 
     // screen.Loop(component);
-	int value=getch();
 	std::cout<<"请选择：1.攻击 2.技能 3.物品 4.逃跑"<<std::endl;
+	int value=getch();
 	switch (value)
 	{
 	case '1'://攻击
@@ -692,7 +692,7 @@ void fightDenOfDisaster(Hero* hero)
 	Enemy enem[5]={e1,e2,e3,e4,e5};
 	int num = rand() % 5;
 	//std::cout<<enem[num].getName()<<"："<<enem[num].getIntroduce()<<" "<<"威胁指数："<<"*"<<std::endl;
-		Battle battle(hero,enem[num]);
+	Battle battle(hero,enem[num]);
 	// if(ifFight()==-1)
 	// {
 	// 	ms_sleep(500);
@@ -726,7 +726,7 @@ void fightGrottoes(Hero* hero)
 	Enemy enem[3]={e1,e2,e3};
 	int num = rand() % 3;
 	//std::cout<<enem[num].getName()<<"："<<enem[num].getIntroduce()<<" "<<"威胁指数："<<"*"<<std::endl;
-		Battle battle(hero,enem[num]);
+	Battle battle(hero,enem[num]);
 	// if(ifFight()==-1)
 	// {
 	// 	ms_sleep(500);

@@ -382,6 +382,7 @@ public:
 	void addExp(int num);//增加或减少经验
 	void adjustGold(int num);//增加或减少金币
 	int getHp();
+    int getHpMax();
 	int getMp();
 	int getAttack();
 	int getDefend();

@@ -1,5 +1,6 @@
 
 #include "../../include/equip.h"
+#include "../../include/utils.h"
 #include <cstdio>
 
 #include "ftxui/component/captured_mouse.hpp"  // for ftxui
@@ -773,5 +774,18 @@ void Store::trade(Bag&bag, Hero& hero)
 
 
   screen.Loop(component);
+
+  std::cout << "商店关闭" << std::endl;
+  std::cout << "商店关闭" << std::endl;
+  std::cout << "商店关闭" << std::endl;
+  std::cout << "商店关闭" << std::endl;
+  std::cout << "商店关闭" << std::endl;
+  std::cout << std:: endl;
+  std::cout << std:: endl;
+  std::cout << std:: endl;
+  std::cout << std:: endl;
+  std::cout << std:: endl;
+  std::cout << std:: endl;
+  ms_sleep(1000);
 }
 

@@ -145,14 +145,12 @@ bool isRandom(int randomNum1,int randomNum2,int randomNum3,int n){
     else
         return false;
 }
-Room::Room(Hero &hm,Store& storem, int p):h(hm),store(storem)
+Room::Room(Hero &hm,Store& storem, Scenario& scm, int p):h(hm),store(storem),sc(scm)
 {
-
     position = p;
     dx = 1;
     dy = 1;
     positionR = 4;
-
     for (int i = 0; i < 3; i++)
     {
         for (int j = 0; j < 3; j++)
@@ -162,85 +160,141 @@ Room::Room(Hero &hm,Store& storem, int p):h(hm),store(storem)
     }
     posR[1][1] = '*';
     posR[2][2] = '&';
-    if (position == 4 || position == 6 || position == 7 || position == 8)
+    switch(position)
     {
-        posR[0][0] = '#';
-    }
-
-    if (position == 1 || position == 3 || position == 2 || position == 9)
-    {
-        int enemyNum = 0;
-        int randomNum1 = 97;
-        int randomNum2 = 98;
-        int randomNum3 = 99;
-        // 7 as there're 7 places in the map
-#define randMapPos() (rand() % 7)
-        while (!enemyNum)
+        case 1:
+        case 3:
+        case 4:
+        case 6:
+        case 9:
         {
-            srand(time(NULL));
-            enemyNum = rand() % 4;
+            int num1=rand()%3;
+            int num2=rand()%3;
+            while((num1 == 1 && num2 == 2)||(num1 == 2 && num2 == 2)||(num1 == 1 && num2 == 1))
+            {
+                num1=rand()%3;
+                num2=rand()%3;
+            }
+            posR[num1][num2]='!';
         }
-        switch (enemyNum){
-            case 1:{
-                randomNum1 = randMapPos();
-                break;
-            }
-            case 2:{
-                randomNum1 = randMapPos();
-                randomNum2 = randMapPos();
-                break;
-            }
-            case 3:{
-                randomNum1 = randMapPos();
-                randomNum2 = randMapPos();
-                randomNum3 = randMapPos();
-            }
-               
-            
-        }   
-            while(randomNum1==randomNum2){
-                randomNum1 = randMapPos();
-            }
-            while (randomNum2 == randomNum3){
-                randomNum2 == randMapPos();
-            }
-            #define check3is(N) isRandom(randomNum1,randomNum2,randomNum3,N)
-            if (check3is(0)){
-                posR[0][0] = '!';
-            }
-            else
-            if (check3is(1)){
-                posR[0][1] = '!';
-            }
-            else
-            if (check3is(2)){
-                posR[0][2] = '!';
-            }
-            else
-            if (check3is(3)){
-                posR[1][0] = '!';
-            }
-            else
-            if (check3is(4)){
-                posR[1][2] = '!';
-            }
-            else
-            if (check3is(5)){
-                posR[0][0] = '!';
-            }
-            else
-            if (check3is(6)){
-                posR[2][1] = '!';
-            }
-            #undef check3is
-        
     }
-#undef randMapPos
+    switch(position)
+    {
+         case 0:
+        {
+            if(sc.getScenario() == 12)
+            {
+                posR[0][0] = '#';
+            }
+             break;
+        }
+        case 1:
+        {
+            if(sc.getScenario() == 3)
+            {
+                posR[0][0] = '#';
+            }
+             break;
+        }
+        case 3:
+        {
+            if(sc.getScenario() >=2 && sc.getScenario() <= 4)
+            {
+                posR[0][0] = '#';
+            }
+             break;
+        }
+        case 4:
+        {
+            if(sc.getScenario() == 1)
+            {
+                posR[0][0] = '#';
+            }
+             break;
+        }
+        case 6:
+        {
+            if(sc.getScenario() >=5 && sc.getScenario() <= 9)
+            {
+                posR[0][0] = '#';
+            }
+             break;
+        }
+        case 9:
+        {
+            if(sc.getScenario() >=7 && sc.getScenario() <= 8)
+            {
+                posR[0][0] = '#';
+            }
+             break;
+        }
+        case 7:
+        {
+            if(sc.getScenario() <= 6)
+            {
+                posR[0][0] = '#';
+            }
+             break;
+        }
+        case 2:
+        {
+            if(sc.getScenario() <= 8)
+            {
+                posR[0][0] = '#';
+            }
+             break;
+        }
+        case 5:
+        {
+            if(sc.getScenario() == 12)
+            {
+                posR[0][0] = '#';
+            }
+             break;
+        }
+        case 10:
+        {
+            if(sc.getScenario() <= 10)
+            {
+                posR[0][0] = '#';
+            }
+            break;
+        }
+    }
 }
 
-static void showTips(std::string tips){
-    cout << "'#':移动至此可" << tips << '\n';
+void Room::roomBattle(int pos)
+{
+    switch(pos)
+    {
+        case 1:
+        {
+            fightDenOfDisaster(&h);
+            break;
+        }
+        case 3:
+        {
+            fightCellar(&h);
+            break;
+        }
+        case 4:
+        {
+            fightTunnel(&h);
+            break;
+        }
+        case 6:
+        {
+            fightGrottoes(&h);
+            break;
+        }
+        case 9:
+        {
+            fightDungeon(&h);
+            break;
+        }
+    }
 }
+
 
 void Room::showRoom()
 {
@@ -258,36 +312,25 @@ void Room::showRoom()
     cout << "      |____________________|" << '\n';
 
     cout << "输入wasd在房间移动" << endl;
+    cout << " * :当前你的位置"<<endl;
     cout << "'&':移动至此可退出地图" << '\n';
-
     switch (position)
     {
-    case 4:
-    {
-        showTips("学习技能");
-        break;
-    }
-    case 6:
-    {
-        showTips("打造装备");
-        break;
-    }
-    case 7:
-    {
-        showTips("购买物品");
-        break;
-    }
-    case 8:
-    {
-        showTips("购买药物");
-        break;
-    }
     case 1:
-    case 2:
     case 3:
+    case 4:
+    case 6:
     case 9:
     {
         cout << "'!':移动至此可与怪物战斗" << '\n';
+    }
+    case 7:
+    case 0:
+    case 2:
+    case 5:
+    case 10:
+    {
+        cout << "'#':移动至此可触发事件。" << '\n';
         break;
     }
 
@@ -296,25 +339,54 @@ void Room::showRoom()
     }
 }
 
- static void communciateNpc(int position){
+void Room::communciateNpc(int position){
     switch(position){
-        case 8:{
-            cout << "这里是药铺" << endl;
+        case 0:{
+            sc.ghostdom();
             ms_sleep(700);
             break;
         }
-        case 7:{
-            cout << "这里是主城" << endl;
+        case 1:{
+            sc.DenOfDisaster();
             ms_sleep(700);
             break;
         }
-        case 6:{
-            cout << "这里是锻造屋" << endl;
+        case 2:{
+            sc.underPalace();
+            ms_sleep(700);
+            break;
+        }
+        case 3:{
+            sc.Cellar();
             ms_sleep(700);
             break;
         }
         case 4:{
-            cout << "这里是藏经阁" << endl;
+            sc.Tunnel();
+            ms_sleep(700);
+            break;
+        }
+        case 5:{
+            sc.darkroom();
+            ms_sleep(700);
+            break;
+        }
+        case 7:{
+            sc.Cave();
+            break;
+        }
+        case 6:{
+            sc.Grottoes();
+            ms_sleep(700);
+            break;
+        }
+        case 9:{
+            sc.Dungeon();
+            ms_sleep(700);
+            break;
+        }
+        case 10:{
+            sc.SweatPore();
             ms_sleep(700);
             break;
         }
@@ -339,14 +411,17 @@ void Room::actionRoom()
             {
                 CannotMove();
             }
-            else if ((positionR == 3) && (position == 4 || position == 6 || position == 7 || position == 8))
+            else if (positionR == 3 && posR[temp][dy] == '#')
             {
-                communciateNpc(position);
+                if(position != 8)
+                {
+                    communciateNpc(position);
+                }
             }
-            else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '!')
+            else if ((position == 1 || position == 3 || position == 4 || position == 6 ||position == 9) && posR[temp][dy] == '!')
             {
                 eraseScreen();
-                fightTunnel(&h);
+                roomBattle(position);
                 positionR -= 3;
                 dx--;
             }
@@ -365,14 +440,17 @@ void Room::actionRoom()
             {
                 CannotMove();
             }
-            else if ((positionR == 1) && (position == 4 || position == 6 || position == 7 || position == 8))
+            else if (positionR == 1 && posR[dx][temp] == '#')
             {
-                communciateNpc(position);
+                if(position != 8)
+                {
+                    communciateNpc(position);
+                }
             }
-            else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '#')
+            else if ((position == 1 || position == 3 || position == 4 || position == 6 ||position == 9) && posR[dx][temp] == '!')
             {
                 eraseScreen();
-                fightTunnel(&h);
+                roomBattle(position);
                 positionR--;
                 dy--;
             }
@@ -391,10 +469,10 @@ void Room::actionRoom()
             {
                 CannotMove();
             }
-            else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[dx][temp] == '!')
+            else if ((position == 1 || position == 3 || position == 4 || position == 4 ||position == 9) && posR[dx][temp] == '!')
             {
                 eraseScreen();
-                fightTunnel(&h);
+                roomBattle(position);
                 positionR++;
                 dy++;
             }
@@ -413,10 +491,10 @@ void Room::actionRoom()
             {
                 CannotMove();
             }
-            else if ((position == 1 || position == 3 || position == 2 || position == 9) && posR[temp][dy] == '#')
+            else if ((position == 1 || position == 3 || position == 4 || position == 6 ||position == 9) && posR[temp][dy] == '#')
             {
                 eraseScreen();
-                fightTunnel(&h);
+                roomBattle(position);
                 dx++;
                 positionR += 3;
             }
@@ -455,7 +533,7 @@ void Room::actionRoom()
     }
 }
 
-Map::Map(int p /*=7*/): sc(h), backup(Backup::Cwd())
+Map::Map(int p /*=7*/): sc(h,store), backup(Backup::Cwd())
 {
     if(backup.hasData()) {
         backup.tryLoad(*this); // discard result
@@ -488,7 +566,7 @@ Map::Map(int p /*=7*/): sc(h), backup(Backup::Cwd())
             dealStart(9,2,5)
         } 
 #undef dealStart
-    }
+     }
     for (int i = 0; i < 6; i++)
     {
         for (int j = 0; j < 6; j++)
@@ -497,6 +575,7 @@ Map::Map(int p /*=7*/): sc(h), backup(Backup::Cwd())
         }
     }
     pos[dx][dy] = '*';
+    sc.Cave();
 }
 
 void Map::showMap()
@@ -549,16 +628,17 @@ bool Map::action()
     {
     case 'w':
     {
-        if(position == 1 && sc.getScenario()<=9)
+        if(position == 1 && sc.getScenario() <= 10)
         {
             narration("一个法阵挡在路前，无法通过。");
+            ms_sleep(1000);
             break;
         }
-        if(position == 1 && sc.getScenario() ==10)
+        if(position == 1 && sc.getScenario() ==11)
         {
             narration("你使用冥界之石破除了法阵。");
-            sc.adjustScenario(11);
-            break;
+            ms_sleep(1000);
+            sc.adjustScenario(12);
         }
         if (position == 0 || position == 2 || position == 3 || position == 5)
         {
@@ -585,14 +665,26 @@ bool Map::action()
     }
     case 'a':
     {
-        if(position == 3 && sc.getScenario()<=4)
+        if(position == 3 && sc.getScenario() <= 4)
         {
             narration("尘封的大门，已经被一把大锁锁住了。");
+            ms_sleep(1000);
             break;
         }
-        if(position == 7 && sc.getScenario()<=4)
+        if(position == 3 && sc.getScenario() >= 5 &&sc.getScenario() <= 8)
+        {
+            narration("大锁不知何时已经被打开。");
+            ms_sleep(1000);
+        }
+        if(position == 3 && sc.getScenario() >= 9)
+        {
+            narration("不只是锁，连门都已被破开。里面已经什么都没有了。");
+            ms_sleep(1000);
+        }
+        if(position == 7 && sc.getScenario() <= 4)
         {
             narration("一堆黑石挡住了去路");
+            ms_sleep(1000);
             break;
         }
         if (position == 2 || position == 0 || position == 1 || position == 6 || position == 9 || position == 10)
@@ -610,54 +702,32 @@ bool Map::action()
     }
     case 'd':
     {
-        if(position == 4 && sc.getScenario() <= 10)
+        if(position == 4 && sc.getScenario() <= 11)
         {
             narration("地图上标出了这个地方但是却没有路可走。");
+            ms_sleep(1000);
             break;
         }
-        if(position == 4 && sc.getScenario() ==11)
+        if(position == 4 && sc.getScenario() ==12)
         {
             narration("你来到一处墙角，手握剑柄释出全力，墙壁破开，露出了通道。");
-            sc.adjustScenario(12);
-            break;
+            ms_sleep(1000);
         }
-        if(position == 4 && sc.getScenario() == 12)
+        if(position == 4 && sc.getScenario() == 13)
         {
             narration("里面还有一下微弱的声音，但现在要紧的事是前往穴口。");
+            ms_sleep(1000);
             break;
         }
-        if(position == 7 && sc.getScenario() <= 11)
+        if(position == 7 && sc.getScenario() <= 12)
         {
             narration("地图上标出了这个地方但是却没有路可走。");
+            ms_sleep(1000);
             break;
         }
-        if(position == 7 && sc.getScenario() == 12)
+        if(position == 7 && sc.getScenario() == 13)
         {
-            narration("你来到了另一处墙角，一剑轰出，又是一条通道。你刚要进去，后面传来了熟悉的声音。");
-            npcTalk("邓锋魄：真是太麻烦你了，还专门为我打通了一条出去的路。");
-            heroTalk("你：你知道的，我从不为别人做事。");
-            npcTalk("邓锋魄：我可不这么想。与地灵一战，你已经没多少剩余了吧？我一直存下的魂印都能成为我的助力，你不是我的对手。");
-            heroTalk("你：你太自信了，之前和我还有那三巨头对抗你就没什么剩余了。为了防止引起地灵的注意你也不敢大肆屠杀魔物。就算你这段时间把所有人类都杀了，抢了他们身上的所有魂印。杀黑龙去无嗔戒的时候估计也没多少剩余了吧？");
-            npcTalk("邓锋魄：那就来试试！我就不信...");
-            ms_sleep(1000);
-            heroTalk("你突然插口：你以为利用地牢的石碑能骗过我？");
-            narration("邓锋魄的脸色闪过一丝慌乱。");
-            heroTalk("你：我早就有疑问，我失忆之前为什么会把最多的信息放在最有可能遭破坏的石碑上？看来你有十足的把握，我被你清除的记忆绝对找不回来，这样我就能百分百相信已经被你修改过的内容。让我猜猜，和我打你会立刻示弱然后逃跑消去踪迹，等我进入穴口，然后就会被你这段时间花大代价设下的封印困住是吧？");
-            ms_sleep(2000);      
-            npcTalk("邓锋魄：你...");
-            heroTalk("你：看来你是真的舍不得多花一点力量把石窟打开啊，不然要是石窟石碑也被修改了，我就真的要相信石碑说的话了。又或者说，你根本不敢去石窟，害怕引起黑龙的注意？想来你胆子也没有多大，连尝试吸收石碑下我的力量都不敢，看来是不愿冒一点险啊！");
-            ms_sleep(2000);      
-            heroTalk("你接着说：你料定我没能力在石窟石碑里刻下记忆。却没想到我留下的装备里恰好有一张地下的地图，里面根本没穴口这个地方！其实你不知道怎么样才能出去，你也不想出去，你只是觉得一直待在这个地方，你就可以获得越来越强大的力量，这样你迟早可以摆脱束缚。但我不一样，我是真受不了这个地方的味道了。");
-            ms_sleep(2000);      
-            npcTalk("邓锋魄：你要做什么？");
-            heroTalk("你举起了鬼玺，高喊道：地灵，想必你也听到了吧！留你一命就是为了这个！我不在乎你最终能达到什么实力，我只想要自己能逃出去！现在，我可以让所有地下怪物全都自杀，你可以汲取到无穷的力量，足以让你恢复状态，然后杀了这个小人！以后你还能达成你的目的！你需要做的，就只是让我逃出去而已。否则，我会除了你的性命，成为地下新的主宰！");
-            npcTalk("邓锋魄：等一下！地灵！千万别答应他！");
-            narration("地下空间传了沉闷的回响，你的身后出现了一道漆黑的洞口。");
-            narration("你迅速来到洞口前，控制一只影魔钻了进去，片刻后，影魔又出来了，身上遍布着黑痕，你一眼就认出是这属于阳光对影魔的伤害。");
-            heroTalk("你再次举起鬼玺：杀害所有怪物的事情就交给锋魄兄弟了！");
-            narration("地下空间里的怪物几乎全向岩穴涌了过去，向邓锋魄发起了攻击...");
-            narration("群攻之下，邓锋魄只能边战边退，根本来不及收集魂印。而落到地上的魂印会被地灵吸收，届时邓锋魄无处可逃。");
-            narration("你一剑将邓锋魄逼退，转身跳入黑洞。一眨眼，眼前便是磷光点点的树林，你一剑再出，黑洞瞬间崩溃。");
+            sc.end();
             break;
         }
         if (position == 1 || position == 5 || position == 8 || position == 9 || position == 10 || position == 0)
@@ -674,20 +744,28 @@ bool Map::action()
     }
     case 's':
     {
+        if(position == 5)
+        {
+            narration("这里没有路可走。");
+            ms_sleep(1000);
+            break;
+        }
          if(position == 9)
         {
             narration("墙面上刻有歪七扭八的字迹：欲入冥界，必先做好死的准备！");
-            break;
+            ms_sleep(1000);
         }
         if(position == 7 && sc.getScenario() <=6)
         {
             npcTalk("邓锋魄的声音从后面传来：劝你别去，地牢里的怪物可不像地道里的那样简单！");    
             narration("你想了想，还是停下了脚步。");
+            ms_sleep(1000);
             break;
         }
         if(position == 3 && sc.getScenario()<=4)
         {
             narration("一堆黑石挡住了去路");
+            ms_sleep(1000);
             break;
         }
         if (position == 2 || position == 6 || position == 10 || position == 8)
@@ -724,7 +802,7 @@ bool Map::action()
 
     case 13:  // Enter
     {
-        Room myRoom = Room(h,store, position);
+        Room myRoom(h,store, sc, position);
         myRoom.showRoom();
         myRoom.actionRoom();
         break;

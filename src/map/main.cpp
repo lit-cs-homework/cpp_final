@@ -491,7 +491,7 @@ void Room::actionRoom()
             {
                 CannotMove();
             }
-            else if ((position == 1 || position == 3 || position == 4 || position == 6 ||position == 9) && posR[temp][dy] == '#')
+            else if ((position == 1 || position == 3 || position == 4 || position == 6 ||position == 9) && posR[temp][dy] == '!')
             {
                 eraseScreen();
                 roomBattle(position);

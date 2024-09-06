@@ -29,6 +29,7 @@ void ExecuteBoard(GameConfig config,
                   std::function<void()> win,
                   std::function<void()> lose,
                   std::function<void()> quit) {
+  /*
   auto screen = ScreenInteractive::Fullscreen();
   auto exit = screen.ExitLoopClosure();
   auto on_quit = [=] {
@@ -42,7 +43,7 @@ void ExecuteBoard(GameConfig config,
   auto on_lose= [=] {
     lose();
     exit();
-  };
+  };*/
 
   // Page page(config, on_win, on_lose);
 
@@ -51,16 +52,22 @@ void ExecuteBoard(GameConfig config,
 
   // screen.Loop(component);
   // return;
+    ntermInit();
+    Map myMap = Map(7);
+    do{
+        myMap.showMap();
+        myMap.showMenu();
 
-  Loop loop(&screen, component);
+    } while (myMap.action());
+  // Loop loop(&screen, component);
 
-  while (!loop.HasQuitted()) {
-    loop.RunOnce();
-    using namespace std::chrono_literals;
-    const auto refresh_time = 1.0s / 60.0;
-    std::this_thread::sleep_for(refresh_time);
-    //screen.PostEvent(Event::Custom);
-  }
+  // while (!loop.HasQuitted()) {
+  //   loop.RunOnce();
+  //   using namespace std::chrono_literals;
+  //   const auto refresh_time = 1.0s / 60.0;
+  //   std::this_thread::sleep_for(refresh_time);
+  //   //screen.PostEvent(Event::Custom);
+  // }
 }
 
 void ExecuteWinScreen(int coins) {
@@ -100,41 +107,43 @@ void ExecuteIntro(bool* enable_audio) {
 
 
 // The component responsible for renderering the game board.
-ftxui::Component GameScreen(Page& page,
-                            ScreenInteractive& screen,
-                            std::function<void()> lose,
-                            std::function<void()> quit) {
-  auto button_back = Button("Back", lose, ButtonOption::Animated(Color::Blue));
-  auto button_quit = Button("Quit", quit, ButtonOption::Animated(Color::Red));
 
-  auto layout = Container::Vertical({
-      button_back,
-      button_quit,
-  });
+// ftxui::Component GameScreen(Page& page,
+//                             ScreenInteractive& screen,
+//                             std::function<void()> lose,
+//                             std::function<void()> quit) {
+//   auto button_back = Button("Back", lose, ButtonOption::Animated(Color::Blue));
+//   auto button_quit = Button("Quit", quit, ButtonOption::Animated(Color::Red));
 
-  //auto component = page.Render(screen, button_back, button_quit);
+//   auto layout = Container::Vertical({
+//       button_back,
+//       button_quit,
+//   });
 
-  auto layout = Container::Vertical({
-      button_back,
-      button_quit,
-  });
+//   //auto component = page.Render(screen, button_back, button_quit);
 
-  /*
-  auto component = Renderer(layout, [&, button_back, button_quit] {
-    return board.Draw(button_back->Render(), button_quit->Render());
-  });
-  component |= CatchEvent([&](Event event) {  // NOLINT
-    if (event == Event::Custom) {
-      page.Step();
-      return true;
-    }
+//   auto layout = Container::Vertical({
+//       button_back,
+//       button_quit,
+//   });
 
-    return page.OnEvent(event);
-  });*/
-  auto component = layout->;
+//   /*
+//   auto component = Renderer(layout, [&, button_back, button_quit] {
+//     return board.Draw(button_back->Render(), button_quit->Render());
+//   });
+//   component |= CatchEvent([&](Event event) {  // NOLINT
+//     if (event == Event::Custom) {
+//       page.Step();
+//       return true;
+//     }
 
-  return component;
-}
+//     return page.OnEvent(event);
+//   });*/
+//   auto component = layout->;
+
+//   return component;
+// }
+
 
 // The main logic, moving the players in between the various screens.
 

@@ -332,7 +332,7 @@ void Enemy::setSkill(Skill skill[], int num)//设置技能
 Battle::Battle(Hero* hero, Enemy enemy) :player(hero), enemy(enemy)//构造
 {
 	round = 1;
-	fight1(enemy);
+	fight1(*player,enemy);
 }
 Battle::~Battle() {}
 void Battle::showRound()//回合演示
@@ -878,13 +878,7 @@ ftxui::Element getMedicineTableElement(const Hero& hero,const Bag& bag)
   return table.Render();
 }
 
-Hero hero;
-Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
-std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
-Enemy enemy("A","",100,100,0,0,10,5,4,5,1);
-Skill s1("冲撞", "大凶兔气势汹汹的一击，威力不可小觑。", 20, 0);
-Skill S1[1] = { s1 };
-const char* const defVal = "                     ";
+const char* const defVal = "                                                 ";
 std::string str = defVal;
 std::string str1 = defVal;
 std::string str2 = defVal;
@@ -955,11 +949,8 @@ void enemyAttack(Hero& hero,Enemy& enemy)
 
 }
 
-void fight1(Enemy& enemy)
+void fight1(Hero& hero,Enemy& enemy)
 {
-    enemy.setSkill(S1,1);
-    hero.setSkill(s2);
-    hero.getBag().get(redMedicine,10);
     auto screen = ScreenInteractive::FitComponent();
     auto closeFunc = screen.ExitLoopClosure();
     Component component;
@@ -1102,6 +1093,7 @@ void fight1(Enemy& enemy)
                     separator(),
                     gauge(hero.getHp()/(double)hero.getHpMax()),
                     separator(),
+					text(defVal),
                     text(str),
                     text(str1),
                     separator(),

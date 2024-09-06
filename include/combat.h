@@ -98,4 +98,4 @@ void fightDungeon(Hero* hero);
 void fightGhostdom(Hero* hero);
 void fightSweatPore(Hero* hero);
 void fightDarkRom(Hero* hero);
-void fight1(Enemy& enemy);
+void fight1(Hero& hero,Enemy& enemy);

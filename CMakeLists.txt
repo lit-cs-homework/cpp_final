@@ -90,6 +90,8 @@ target_link_libraries(test_equip PRIVATE combat)
 target_link_libraries(test_combat PRIVATE equip)
 # almost a cycle !
 
+target_link_libraries(combat PRIVATE utils)
+
 target_link_libraries(map PRIVATE combat equip backup scenario utils)
 
 target_link_libraries(scenario PRIVATE combat equip)

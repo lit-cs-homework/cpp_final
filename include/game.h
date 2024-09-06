@@ -15,7 +15,7 @@ void StartGame();
 ftxui::Component Intro(bool* enable_audio, std::function<void()> quit);  // in intro.cpp
 ftxui::Component WinScreen(int coins, std::function<void()> continuation);  // in win.cpp
 ftxui::Component LoseScreen(std::function<void()> continuation); // in lose.cpp
-DialogPage GameScreen(Page& page,
+ftxui::Component GameScreen(Page& page,
                             ftxui::ScreenInteractive& screen,
                             std::function<void()> lose,
                             std::function<void()> quit);

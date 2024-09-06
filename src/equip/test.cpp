@@ -146,9 +146,11 @@ extern
 
 
 int main() {
-  Store store;
+  std::shared_ptr<Medicine> __ = std::make_shared<Medicine>();
   std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>();
-  std::shared_ptr<Medicine> redMedicine = std::make_shared<RedMedicine>();
+  std::shared_ptr<BlueMedicine> redMedicine = std::make_shared<BlueMedicine>();
+  Store store;
+  // 
   store.refresh();
   Hero hero;
   hero.adjustGold(50);

@@ -176,6 +176,40 @@ class Sword : public Equip
         void takeoff(Hero& hero);
 };
 
+//木剑
+class WoodenSword:public  Sword
+{
+    public:
+        friend class Bag;
+        WoodenSword();
+};
+
+//铁剑
+class IronSword : public Sword
+{
+    public:
+        friend class Bag;
+        IronSword();
+};
+
+//青钢剑
+class GreenSword:public Sword
+{
+    public:
+        friend class Bag;
+        GreenSword();
+};
+
+//倚天剑
+class HeavenlySword:public Sword
+{
+    public:
+        friend class Bag;
+        HeavenlySword();
+};
+
+
+
 class StoneSword : public Sword
 {
     public:
@@ -190,12 +224,7 @@ class BronzeSword : public Sword
         BronzeSword();
 };
 
-class IronSword : public Sword
-{
-    public:
-        friend class Bag;
-        IronSword();
-};
+
 
 class Armhour :public Equip
 {
@@ -208,6 +237,34 @@ class Armhour :public Equip
         void equiped(Hero& hero);
         //角色脱下装备
         void takeoff(Hero& hero);
+};
+
+class ClothArmhour:public Armhour
+{
+    public:
+        friend class Bag;
+        ClothArmhour();
+};
+
+//晶冰甲
+class CrystalIceArmhour:public Armhour
+{
+    public:
+        CrystalIceArmhour();
+}; 
+
+//烈火甲
+class BlazeArmhour:public Armhour
+{
+    public:
+        BlazeArmhour();
+};
+
+//天魔甲
+class HeavenlyDemonArmhour:public Armhour
+{
+    public:
+        HeavenlyDemonArmhour();
 };
 
 
@@ -224,12 +281,67 @@ class Shoes :public Equip
 };
 
 
+class ClothShoes:public Shoes
+{
+    public:
+        friend class Bag;
+        ClothShoes();
+};
+
+
+//疾风靴
+class SwiftShoes : public Shoes
+{
+    public:
+        SwiftShoes();
+};
+
+class ThunderLightingShoes: public Shoes
+{
+    public:
+        ThunderLightingShoes();
+};
+
+//暗影之鞋
+class ShadowShoes : public Shoes
+{
+    public:
+        ShadowShoes();
+};
+
+
+//生命药水
+class LifeMedicine : public Medicine
+{
+    public:
+        LifeMedicine();
+        void display() const;
+};
+
 class RedMedicine : public Medicine
 {
     public:
         RedMedicine();
         void display() const;
 };
+
+//回天丹
+class LifeResortingMedicine : public Medicine
+{
+    public:
+        LifeResortingMedicine();
+        void display() const;
+};
+
+//还魂丹
+class SoulRevivingMedicine: public Medicine
+{
+    public:
+        SoulRevivingMedicine();
+        void display() const;
+};
+
+
 
 class BlueMedicine : public Medicine
 {
@@ -238,6 +350,31 @@ class BlueMedicine : public Medicine
         BlueMedicine();
         void display() const;
 }; 
+
+
+//凝神丹
+class SpiritConcentratingMedicine : public Medicine
+{
+    public:
+        SpiritConcentratingMedicine();
+        void display() const;
+};
+
+//天元丹
+class HeavenlyOriginMedicine :public Medicine
+{
+    public:
+        HeavenlyOriginMedicine();
+        void display() const;
+};
+
+//圣露
+class HolyMedicine : public Medicine
+{
+    public:
+        HolyMedicine();
+        void display() const;
+};
 
 std::shared_ptr<Equip> parseEquip(std::string name);
 std::shared_ptr<Medicine> parseMedicine(std::string name);

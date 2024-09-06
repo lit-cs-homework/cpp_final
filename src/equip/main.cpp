@@ -164,7 +164,6 @@ bool BaseEquip::operator== (const BaseEquip& other) const{
 
 #define withName2(cls) \
     name = __func__;\
-    const char* const MapName##cls = __func__;\
     medicinebagmap[name] = [](std::shared_ptr<Medicine>& p){ p = std::make_shared<cls>(); };\
 
 #define DeclWithName2(cls) cls::cls(){ withName2(cls);}
@@ -289,12 +288,17 @@ Store::Store(){};
 void Store::refresh(){
     std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
     std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
-    std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>  ();
+    std::shared_ptr<GreenSword> a = std::make_shared<GreenSword>  ();
     std::shared_ptr<IronSword> b = std::make_shared<IronSword>    ();
-    std::shared_ptr<BronzeSword> c= std::make_shared<BronzeSword> ();
-    std::shared_ptr<Shoes> d = std::make_shared<Shoes> (10, 20, 5,10);
-    std::shared_ptr<Armhour> e = std::make_shared<Armhour> (20, 20, 20,30);
-    std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
+    std::shared_ptr<HeavenlySword> c= std::make_shared<HeavenlySword> ();
+    std::shared_ptr<CrystalIceArmhour> e = std::make_shared<CrystalIceArmhour> ();
+    std::shared_ptr<BlazeArmhour> f = std::make_shared<BlazeArmhour> ();
+    std::shared_ptr<ClothShoes> h = std::make_shared<ClothShoes>  ();
+    std::shared_ptr<SwiftShoes> i = std::make_shared<SwiftShoes>  ();
+    std::shared_ptr<ThunderLightingShoes> j = std::make_shared<ThunderLightingShoes>  ();
+
+    
+    std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c,e,f,h,i,j};
     std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
 
     for (const auto& i : equipstore){
@@ -424,14 +428,21 @@ void Sword::takeoff(Hero& hero){
 }
 
 
-#define ImplSword(cls,...) \
-cls::cls(): Sword(__VA_ARGS__){\
+#define ImplClsWithBase(cls,base,...) \
+cls::cls(): base(__VA_ARGS__){\
     withName1(cls);\
-}\
+}
+
+#define ImplSword(cls,...) ImplClsWithBase(cls, Sword, __VA_ARGS__)
+
+ImplSword(WoodenSword, 10, 10)
+ImplSword(IronSword  , 30, 30)
+ImplSword(GreenSword , 60, 60)
+ImplSword(HeavenlySword,6000,6000)
+
 
 ImplSword(StoneSword , 10, 5)
 ImplSword(BronzeSword, 20, 10)
-ImplSword(IronSword  , 30, 15)
 
 
 RetType(Armhour)
@@ -446,8 +457,30 @@ cls::cls(): cls(__VA_ARGS__){}
 ArmOrShoe(Armhour,10, 10, 10, 10)
 ArmOrShoe(Shoes  ,10, 10, 10, 10)
 
+
+
+#define ImplArm(cls,...) ImplClsWithBase(cls, Armhour, __VA_ARGS__)
+
+ImplArm(ClothArmhour,10, 30, 0, 10)
+ImplArm(CrystalIceArmhour,60,60,20,60)
+ImplArm(BlazeArmhour,100,100,40,100)
+ImplArm(HeavenlyDemonArmhour,6000,6000,3000,1500)
+
+#undef ImplArm
+
+#define ImplShoe(cls,...) ImplClsWithBase(cls, Shoes, __VA_ARGS__)
+
+ImplShoe(ClothShoes,5, 5, 0, 5)
+ImplShoe(SwiftShoes,30,30,5,30)
+ImplShoe(ThunderLightingShoes,60,60,20,60)
+ImplShoe(ShadowShoes,2000,2000,1000,500)
+
+
 #undef def4
 #undef ArmOrShoe
+
+
+
 
 void Armhour::equiped(Hero& hero){
     hero.hpMax += hp;
@@ -500,6 +533,39 @@ void RedMedicine::display() const{
     std::cout << "hp回复" << std::endl;
 }
 
+LifeMedicine::LifeMedicine(){
+    withName2(LifeMedicine);
+    hp = 50;
+    mp = 0;
+    value = 10;
+}
+
+void LifeMedicine::display() const{
+    std::cout << "hp回复" << std::endl;
+}
+
+LifeResortingMedicine::LifeResortingMedicine(){
+    withName2(LifeResortingMedicine);
+    hp = 200;
+    mp = 0;
+    value = 10;
+}
+
+void LifeResortingMedicine::display() const{
+    std::cout << "hp回复" << std::endl;
+}
+
+SoulRevivingMedicine::SoulRevivingMedicine(){
+    withName2(SoulRevivingMedicine);
+    hp = 10;
+    mp = 0;
+    value = 10;
+}
+
+void SoulRevivingMedicine::display() const{
+    std::cout << "hp回复" << std::endl;
+}
+
 BlueMedicine::BlueMedicine(){
     withName2(BlueMedicine);
     hp = 0;
@@ -509,6 +575,39 @@ BlueMedicine::BlueMedicine(){
 
 void BlueMedicine::display() const{
     std::cout << "mp回复" << std::endl;
+}
+
+SpiritConcentratingMedicine::SpiritConcentratingMedicine(){
+    withName2(SpiritConcentratingMedicine);
+    hp = 0;
+    mp = 30;
+    value = 10;
+}
+
+void SpiritConcentratingMedicine::display() const{
+    std::cout << "mp回复" << std::endl;
+}
+
+HeavenlyOriginMedicine::HeavenlyOriginMedicine(){
+    withName2(HeavenlyOriginMedicine);
+    hp = 0;
+    mp = 100;
+    value = 10;
+}
+
+void HeavenlyOriginMedicine::display() const{
+    std::cout << "hp回复" << std::endl;
+}
+
+HolyMedicine::HolyMedicine(){
+    withName2(HolyMedicine);
+    hp = 10000;
+    mp = 5000;
+    value = 10;
+}
+
+void HolyMedicine::display() const{
+    std::cout << "hp回复" << std::endl;
 }
 
 static
@@ -651,7 +750,7 @@ ftxui::Element getPriceTableElement(const Store& store)
   return table.Render();
 }
 
-void Store::trade(Bag&bag, Hero& hero)
+void Store::trade(Bag& bag, Hero& hero)
 {
   auto screen = ScreenInteractive::FitComponent();
   auto closeFunc = screen.ExitLoopClosure();
@@ -668,7 +767,7 @@ void Store::trade(Bag&bag, Hero& hero)
   auto btn0 = Button("退出", [&] {closeFunc();}, Style());
   std::string str = "Welcome! 请选择购买或者出售 ";
   std::string selectMode = "购买";
-  std::string selectedBtn = "BlueMedicine";
+  std::string selectedBtn = "LifeMedicine";
   auto btn1 = Button("购买", [&] {str="请选择要购买的商品";selectMode = "购买";}, Style());
   auto btn2 = Button("出售", [&] {str="请选择要出售的商品";selectMode = "出售";}, Style());
   auto btn3 = Button("刷新商店", [this] {
@@ -716,13 +815,17 @@ void Store::trade(Bag&bag, Hero& hero)
 
   
   #define ItemButton(s) Button(s,[&]{selectedBtn = s;},Style());
-  auto Commodity1 = ItemButton("BlueMedicine")
-  auto Commodity2 = ItemButton("RedMedicine")
-  auto Commodity3 = ItemButton("StoneSword")
-  auto Commodity4 = ItemButton("BronzeSword")
-  auto Commodity5 = ItemButton("IronSword")
-  auto Commodity6 = ItemButton("Armhour")
-  auto Commodity7 = ItemButton("Shoes")
+  auto Commodity1 = ItemButton("LifeMedicine")
+  auto Commodity2 = ItemButton("LifeResortingMedicine")
+  auto Commodity3 = ItemButton("SoulRevivingMedicine")
+  auto Commodity5 = ItemButton("SpiritConcentratingMedicine")
+  auto Commodity4 = ItemButton("HeavenlyOriginMedicine")
+  auto Commodity6 = ItemButton("IronSword")
+  auto Commodity7 = ItemButton("GreenSword")
+  auto Commodity8 = ItemButton("CrystalIceArmhour")
+  auto Commodity9 = ItemButton("BlazeArmhour")
+  auto Commodity10 = ItemButton("SwiftShoes")
+  auto Commodity11 = ItemButton("ThunderLightingShoes")
   // clang-format on
 
   // The tree of components. This defines how to navigate using the keyboard.
@@ -733,9 +836,9 @@ void Store::trade(Bag&bag, Hero& hero)
       Container::Horizontal({btn1,btn2}, &row) | flex,      
       Container::Horizontal({btn_dec_01, btn_inc_01}, &row) | flex,
       Container::Horizontal({btn_dec_10, btn_inc_10}, &row) | flex,      
-      Container::Horizontal({Commodity1,Commodity2,Commodity3}, &row)  | flex,      
-      Container::Horizontal({Commodity5,Commodity6,Commodity4}, &row)  | flex,
-      Container::Horizontal({Commodity7}, &row)  | flex,
+      Container::Horizontal({Commodity1,Commodity2,Commodity3,Commodity4}, &row)  | flex,      
+      Container::Horizontal({Commodity5,Commodity6,Commodity7,Commodity8}, &row)  | flex,
+      Container::Horizontal({Commodity9,Commodity10,Commodity11}, &row)  | flex,
       Container::Horizontal({btn4,btn3,btn0}, &row)  | flex,
 
   });
@@ -776,16 +879,6 @@ void Store::trade(Bag&bag, Hero& hero)
   screen.Loop(component);
 
   std::cout << "商店关闭" << std::endl;
-  std::cout << "商店关闭" << std::endl;
-  std::cout << "商店关闭" << std::endl;
-  std::cout << "商店关闭" << std::endl;
-  std::cout << "商店关闭" << std::endl;
-  std::cout << std:: endl;
-  std::cout << std:: endl;
-  std::cout << std:: endl;
-  std::cout << std:: endl;
-  std::cout << std:: endl;
-  std::cout << std:: endl;
   ms_sleep(1000);
 }
 

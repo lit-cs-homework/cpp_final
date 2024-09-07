@@ -986,10 +986,12 @@ void fight1(Hero& hero,Enemy& enemy)
             if (hero.getHp() <= 0)
             {
                 std::cout << std::endl <<"战斗失败";
+				closeFunc();
             }
             else if(enemy.getHp() <= 0 )
             {
                 std::cout <<std::endl<< "战斗成功";
+				closeFunc();
             }
             
         }
@@ -1051,7 +1053,7 @@ void fight1(Hero& hero,Enemy& enemy)
     for(auto& i: hero.getBag().medicineBag)
     {
         if(i.first != nullptr)
-            medicine.push_back(Button(i.first->name,[&,i]{
+            medicine.push_back(Button(i.first->name ,[&,i]{
             if(hero.use(i.first,1))
             {
                 str = "使用成功" ;
@@ -1114,4 +1116,5 @@ void fight1(Hero& hero,Enemy& enemy)
 
 
   screen.Loop(component);
+  screen.Clear();
 }

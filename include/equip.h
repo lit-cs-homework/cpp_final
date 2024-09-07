@@ -407,7 +407,7 @@ class Bag{
         void get(std::shared_ptr<Medicine> Medicine, int n);
         void display() const;
         // 展示装备栏
-        void displayEquipColumnCil();
+        void displayEquipColumnCil(Hero& hero);
         void displayEquipColumnAndChange(Hero& hero);
         //角色使用药水
         bool use(std::shared_ptr<Medicine> medicine, int n, Hero& hero);

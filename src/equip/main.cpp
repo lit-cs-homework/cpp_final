@@ -77,18 +77,64 @@ void Bag::display() const
     }
 }
 
-void Bag::displayEquipColumnCil()
+void Bag::displayEquipColumnCil(Hero& hero)
 {
-    std::cout << "装备栏:" << std::endl;
-    for(const auto& i: equipColumn){
-        if(i != nullptr){
-            std::cout << i->typ() << "." << i->name << std::endl;
-        } else {
-            std::cout << "(none)" << std::endl;
+    while(true)
+    {
+        std::cout << "装备栏:" << std::endl;
+        int p = 0;
+        for(const auto& i: equipColumn){
+            if(i != nullptr){
+                p++;
+                std::cout << i->typ() << "." << i->name << std::endl;
+            } else {
+                p++;
+                if(p != 1)
+                {
+                    std::cout << "(none)" << std::endl;
+                }
+            }
         }
-    }
-    std::cout << "是否要更换装备" << std::endl;
+        std::cout << "是否要更换装备,请输入y或者n,输入n退出" << std::endl;
+        char choice;
+        std::cin >> choice;
+        if(choice == 'y')
+        {
+            std::cout << "装备背包:" << std::endl;
+            int k = 0;
+            int j = 0;
+            for(const auto& i: equipBag){
+                if(i.second >= 0){
+                    std::cout << ++j << ". ";
+                    std::cout << i.first->name << " " << i.second << std::endl;
+                }
+            }
+            int key;
+            std::cout << "请输入序号" << std::endl;
+            std::cin >> key;
+            if(key > j)
+            {
+                std::cout << "请重新输入" << std::endl;
+            }
+            for(const auto& i: equipBag){
+                k++;
+                if(k==key)
+                {
+                    changeequip(i.first,hero);
+                }
+            }
+            
+        }
+        else if(choice == 'n')
+        {
+            break;
+        }
+        else
+        {
+            std::cout <<  "请重新输入" << std::endl;
+        }
 
+    }
 }
 
 // #define void Bag::get(std::shared_ptr<typ>,cls,int n)\

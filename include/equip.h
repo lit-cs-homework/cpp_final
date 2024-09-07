@@ -72,6 +72,7 @@ class Equip: public BaseEquip{//装备基类
         virtual void equiped(Hero& hero);
         //角色脱下装备
         virtual void takeoff(Hero& hero);
+        // virtual std::string display();
     protected:
         void setValue(double value);
 };
@@ -87,7 +88,7 @@ class Medicine: public BaseEquip
         double value;
         //角色使用药水
         void used(Hero& hero, int n);
-        virtual void display();
+        std::string display();
 };
 
 
@@ -174,6 +175,7 @@ class Sword : public Equip
         void equiped(Hero& hero);
         //角色脱下装备
         void takeoff(Hero& hero);
+        std::string display1() const;
 };
 
 //木剑
@@ -190,6 +192,7 @@ class IronSword : public Sword
     public:
         friend class Bag;
         IronSword();
+        std::string display() const;
 };
 
 //青钢剑
@@ -198,6 +201,7 @@ class GreenSword:public Sword
     public:
         friend class Bag;
         GreenSword();
+        std::string display() const;
 };
 
 //倚天剑
@@ -206,6 +210,7 @@ class HeavenlySword:public Sword
     public:
         friend class Bag;
         HeavenlySword();
+        std::string display() const;
 };
 
 
@@ -215,6 +220,7 @@ class StoneSword : public Sword
     public:
         friend class Bag;
         StoneSword();
+        std::string display() const;
 };
 
 class BronzeSword : public Sword
@@ -222,6 +228,7 @@ class BronzeSword : public Sword
     public:
         friend class Bag;
         BronzeSword();
+        std::string display() const;
 };
 
 
@@ -237,6 +244,7 @@ class Armhour :public Equip
         void equiped(Hero& hero);
         //角色脱下装备
         void takeoff(Hero& hero);
+        std::string display1() const;
 };
 
 class ClothArmhour:public Armhour
@@ -244,6 +252,7 @@ class ClothArmhour:public Armhour
     public:
         friend class Bag;
         ClothArmhour();
+        std::string display() const;
 };
 
 //晶冰甲
@@ -251,6 +260,7 @@ class CrystalIceArmhour:public Armhour
 {
     public:
         CrystalIceArmhour();
+        std::string display() const;
 }; 
 
 //烈火甲
@@ -258,6 +268,7 @@ class BlazeArmhour:public Armhour
 {
     public:
         BlazeArmhour();
+        std::string display() const;
 };
 
 //天魔甲
@@ -265,6 +276,7 @@ class HeavenlyDemonArmhour:public Armhour
 {
     public:
         HeavenlyDemonArmhour();
+        std::string display() const;
 };
 
 
@@ -278,15 +290,17 @@ class Shoes :public Equip
         EquipTyp typ();
         void equiped(Hero& hero);
         void takeoff(Hero& hero);
+        std::string display1() const;
 };
 
 
-class ClothShoes:public Shoes
-{
-    public:
-        friend class Bag;
-        ClothShoes();
-};
+// class ClothShoes:public Shoes
+// {
+//     public:
+//         friend class Bag;
+//         ClothShoes();
+//         std::string display() const;
+// };
 
 
 //疾风靴
@@ -294,12 +308,14 @@ class SwiftShoes : public Shoes
 {
     public:
         SwiftShoes();
+        std::string display() const;
 };
 
 class ThunderLightingShoes: public Shoes
 {
     public:
         ThunderLightingShoes();
+        std::string display() const;
 };
 
 //暗影之鞋
@@ -307,6 +323,7 @@ class ShadowShoes : public Shoes
 {
     public:
         ShadowShoes();
+        std::string display() const;
 };
 
 
@@ -315,14 +332,14 @@ class LifeMedicine : public Medicine
 {
     public:
         LifeMedicine();
-        void display() const;
+        std::string display() const;
 };
 
 class RedMedicine : public Medicine
 {
     public:
         RedMedicine();
-        void display() const;
+        std::string display() const;
 };
 
 //回天丹
@@ -330,7 +347,7 @@ class LifeResortingMedicine : public Medicine
 {
     public:
         LifeResortingMedicine();
-        void display() const;
+        std::string display() const;
 };
 
 //还魂丹
@@ -338,7 +355,7 @@ class SoulRevivingMedicine: public Medicine
 {
     public:
         SoulRevivingMedicine();
-        void display() const;
+        std::string display() const;
 };
 
 
@@ -348,7 +365,7 @@ class BlueMedicine : public Medicine
     public:
         friend class Hero;
         BlueMedicine();
-        void display() const;
+        std::string display() const;
 }; 
 
 
@@ -357,7 +374,7 @@ class SpiritConcentratingMedicine : public Medicine
 {
     public:
         SpiritConcentratingMedicine();
-        void display() const;
+        std::string display() const;
 };
 
 //天元丹
@@ -365,7 +382,7 @@ class HeavenlyOriginMedicine :public Medicine
 {
     public:
         HeavenlyOriginMedicine();
-        void display() const;
+        std::string display() const;
 };
 
 //圣露
@@ -373,7 +390,7 @@ class HolyMedicine : public Medicine
 {
     public:
         HolyMedicine();
-        void display() const;
+        std::string display() const;
 };
 
 std::shared_ptr<Equip> parseEquip(std::string name);
@@ -390,7 +407,8 @@ class Bag{
         void get(std::shared_ptr<Medicine> Medicine, int n);
         void display() const;
         // 展示装备栏
-        void displayEquipColumn();
+        void displayEquipColumnCil();
+        void displayEquipColumnAndChange(Hero& hero);
         //角色使用药水
         bool use(std::shared_ptr<Medicine> medicine, int n, Hero& hero);
         //角色更换装备

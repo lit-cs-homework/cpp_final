@@ -147,8 +147,8 @@ extern
 
 int main() {
   std::shared_ptr<Medicine> __ = std::make_shared<Medicine>();
-  std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>();
-  std::shared_ptr<BlueMedicine> redMedicine = std::make_shared<BlueMedicine>();
+  std::shared_ptr<IronSword> a = std::make_shared<IronSword>();
+  std::shared_ptr<LifeMedicine> redMedicine = std::make_shared<LifeMedicine>();
   Store store;
   // 
   store.refresh();
@@ -156,7 +156,8 @@ int main() {
   hero.adjustGold(50);
   hero.getBag().get(a,1);
   hero.getBag().get(redMedicine,2);
-  store.trade(hero.getBag(), hero);
+  // store.trade(hero.getBag(),hero);
+  hero.getBag().displayEquipColumnAndChange(hero);
   return 0;
   // ntermInit();
   // auto screen = ScreenInteractive::FitComponent();

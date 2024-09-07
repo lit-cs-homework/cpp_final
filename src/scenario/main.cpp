@@ -160,6 +160,7 @@ void  Scenario::Tunnel()
         ms_sleep(3000);
         narration("3秒后，你把他身上所有的装备物品都扒了下来");
         heroTalk("你：无主之物，不拿白不拿");
+        h.adjustGold(100);
         adjustScenario(2);
     }
 }
@@ -340,6 +341,11 @@ void  Scenario::Dungeon()
             npcTalk("怪脸：我本是由魂印创造，这一千枚魂印或许也能摧毁我，你便达成你的目的了。");
             narration("一枚枚“金币”飘起，贴在了石碑上，又渐渐消失，接下来的魂印继续贴上...");
             narration("石碑渐渐消融，一点点光芒升起，进入了你体内。你感受到了前所未有的力量。");
+            ms_sleep(800);
+            h.addHp(10000);
+            h.addMp(2000);
+            h.adjustAttack(2000);
+            h.adjustDefend(1000);
             narration("接下来该去石窟了...");
             adjustScenario(9);
         }

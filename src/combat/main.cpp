@@ -97,7 +97,16 @@ int Skill::getMagicLose()
 {
 	return magicLose;
 }
-
+//1级
+Skill skill1("全力一击", "奋力向对方发动一次攻击。 ", 40, 20);
+//3级
+Skill skill2("剑气纵横", "向前方释放出一道锋利的剑气攻击敌人。", 100, 40);
+//5级
+Skill skill3("破甲突击", "剑尖对目标进行强力刺击。 ", 200, 100);
+//8级
+Skill skill4("凌天一斩", "以全身为媒介调用所有魂力发动一次斩击。 ", 500, 300);
+//10级
+Skill skill5("神天并地", "体内深藏的力量逐渐苏醒，通过燃烧魂力来终结敌人。 ", 12000, 3000);
 
 
 Hero::Hero()
@@ -121,6 +130,7 @@ void Hero::setName()
 	std::string tmpName;
 	std::cin >> tmpName;
 	name = tmpName;
+	setSkill(skill1);
 	eraseScreen();
 }
 void Hero::showHero()
@@ -171,6 +181,33 @@ void Hero::addExp(int num)
 		addMp(20*level);
 		adjustAttack(5*level);
 		adjustDefend(5*level);
+		switch(level)
+		{
+			case 3:
+			{
+				std::cout << "你领悟到了新技能：" << skill2.getName() << std::endl;
+				setSkill(skill2);
+				break;
+			}
+			case 5:
+			{
+				std::cout << "你领悟到了新技能：" << skill3.getName() << std::endl;
+				setSkill(skill3);
+				break;
+			}
+			case 8:
+			{
+				std::cout << "你领悟到了新技能：" << skill4.getName() << std::endl;
+				setSkill(skill4);
+				break;
+			}
+			case 10:
+			{
+				std::cout << "你领悟到了新技能：" << skill5.getName() << std::endl;
+				setSkill(skill5);
+				break;
+			}
+		}
 	}
 }
 void Hero::adjustGold(int num)
@@ -333,6 +370,7 @@ Battle::Battle(Hero* hero, Enemy enemy) :player(hero), enemy(enemy)//构造
 {
 	round = 1;
 	fight1(*player,enemy);
+	//fight();
 }
 Battle::~Battle() {}
 void Battle::showRound()//回合演示

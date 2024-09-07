@@ -552,7 +552,7 @@ private:
 	int attack;
 	int defend;
 	int exp;
-	const int expMax[10] = { 10, 50, 150, 500, 1000, 2000, 4000, 8000, 15000, 30000 };
+	const int expMax[10] = { 10, 30, 60, 160, 460, 860, 1460, 2000, 5000, 10000 };
 	int level;
 	int gold;
 	std::vector<Skill> skills;

@@ -28,6 +28,8 @@ public:
     void parse(B& buf) {
         buf >> position >> dx >> dy;
     }
+    void createEnemy(int position, int dx, int dy);
+    void updateAffair(int position);
 private:
     int position;
     int dx, dy;

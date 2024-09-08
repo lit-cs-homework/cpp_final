@@ -1023,13 +1023,15 @@ void fight1(Hero& hero,Enemy& enemy)
             closeFunc();
             if (hero.getHp() <= 0)
             {
-                std::cout << std::endl <<"战斗失败";
-				closeFunc();
+				closeFunc();                
+				std::cout << std::endl <<"战斗失败";
+				ms_sleep(1000);
             }
             else if(enemy.getHp() <= 0 )
             {
-                std::cout <<std::endl<< "战斗成功";
-				closeFunc();
+				closeFunc();                
+				std::cout << std::endl<< "战斗成功";
+				ms_sleep(1000);
             }
             
         }
@@ -1154,5 +1156,4 @@ void fight1(Hero& hero,Enemy& enemy)
 
 
   screen.Loop(component);
-  screen.Clear();
 }

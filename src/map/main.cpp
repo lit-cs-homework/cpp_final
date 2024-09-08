@@ -1,6 +1,7 @@
 #include "../../include/map.h"
 #include "../../include/combat.h"
 #include "../../include/equip.h"
+#include <terminal.h>
 #include <cstdlib>
 #include <string>
 #include <array>

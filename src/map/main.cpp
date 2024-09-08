@@ -160,107 +160,8 @@ Room::Room(Hero &hm,Store& storem, Scenario& scm, int p):h(hm),store(storem),sc(
     }
     posR[1][1] = '*';
     posR[2][2] = '&';
-    switch(position)
-    {
-        case 1:
-        case 3:
-        case 4:
-        case 6:
-        case 9:
-        {
-            int num1=rand()%3;
-            int num2=rand()%3;
-            while((num1 == 1 && num2 == 2)||(num1 == 2 && num2 == 2)||(num1 == 1 && num2 == 1))
-            {
-                num1=rand()%3;
-                num2=rand()%3;
-            }
-            posR[num1][num2]='!';
-        }
-    }
-    switch(position)
-    {
-         case 0:
-        {
-            if(sc.getScenario() == 12)
-            {
-                posR[0][0] = '#';
-            }
-             break;
-        }
-        case 1:
-        {
-            if(sc.getScenario() == 3)
-            {
-                posR[0][0] = '#';
-            }
-             break;
-        }
-        case 3:
-        {
-            if(sc.getScenario() >=2 && sc.getScenario() <= 4)
-            {
-                posR[0][0] = '#';
-            }
-             break;
-        }
-        case 4:
-        {
-            if(sc.getScenario() == 1)
-            {
-                posR[0][0] = '#';
-            }
-             break;
-        }
-        case 6:
-        {
-            if(sc.getScenario() >=5 && sc.getScenario() <= 9)
-            {
-                posR[0][0] = '#';
-            }
-             break;
-        }
-        case 9:
-        {
-            if(sc.getScenario() >=7 && sc.getScenario() <= 8)
-            {
-                posR[0][0] = '#';
-            }
-             break;
-        }
-        case 7:
-        {
-            if(sc.getScenario() <= 6)
-            {
-                posR[0][0] = '#';
-            }
-             break;
-        }
-        case 2:
-        {
-            if(sc.getScenario() <= 8)
-            {
-                posR[0][0] = '#';
-            }
-             break;
-        }
-        case 5:
-        {
-            if(sc.getScenario() == 12)
-            {
-                posR[0][0] = '#';
-            }
-             break;
-        }
-        case 10:
-        {
-            if(sc.getScenario() <= 10)
-            {
-                posR[0][0] = '#';
-            }
-            break;
-        }
-    }
+    createEnemy(position,1,1);
+    updateAffair(position);
 }
 
 void Room::roomBattle(int pos)
@@ -416,6 +317,7 @@ void Room::actionRoom()
                 if(position != 8)
                 {
                     communciateNpc(position);
+                    updateAffair(position);
                 }
             }
             else if ((position == 1 || position == 3 || position == 4 || position == 6 ||position == 9) && posR[temp][dy] == '!')
@@ -424,6 +326,7 @@ void Room::actionRoom()
                 roomBattle(position);
                 positionR -= 3;
                 dx--;
+                createEnemy(position,dx,dy);
             }
             else
             {
@@ -445,6 +348,7 @@ void Room::actionRoom()
                 if(position != 8)
                 {
                     communciateNpc(position);
+                    updateAffair(position);
                 }
             }
             else if ((position == 1 || position == 3 || position == 4 || position == 6 ||position == 9) && posR[dx][temp] == '!')
@@ -453,6 +357,7 @@ void Room::actionRoom()
                 roomBattle(position);
                 positionR--;
                 dy--;
+                createEnemy(position,dx,dy);
             }
             else
             {
@@ -475,6 +380,7 @@ void Room::actionRoom()
                 roomBattle(position);
                 positionR++;
                 dy++;
+                createEnemy(position,dx,dy);
             }
             else
             {
@@ -497,6 +403,7 @@ void Room::actionRoom()
                 roomBattle(position);
                 dx++;
                 positionR += 3;
+                createEnemy(position,dx,dy);
             }
             else
             {
@@ -533,6 +440,153 @@ void Room::actionRoom()
     }
 }
 
+void Room::createEnemy(int position, int dx, int dy)
+{
+    switch(position)
+    {
+        case 1:
+        case 3:
+        case 4:
+        case 6:
+        case 9:
+        {
+            int num1=rand()%3;
+            int num2=rand()%3;
+            while((num1 == 0 && num2 == 0)||(num1 == 2 && num2 == 2)||(num1 == dx && num2 == dy))
+            {
+                num1=rand()%3;
+                num2=rand()%3;
+            }
+            posR[num1][num2]='!';
+        }
+    }
+}
+void Room::updateAffair(int position)
+{
+    switch(position)
+    {
+         case 0:
+        {
+            if(sc.getScenario() == 12)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+             break;
+        }
+        case 1:
+        {
+            if(sc.getScenario() == 3)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+             break;
+        }
+        case 3:
+        {
+            if(sc.getScenario() >=2 && sc.getScenario() <= 4)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+             break;
+        }
+        case 4:
+        {
+            if(sc.getScenario() == 1)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+             break;
+        }
+        case 6:
+        {
+            if(sc.getScenario() >=5 && sc.getScenario() <= 9)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+             break;
+        }
+        case 9:
+        {
+            if(sc.getScenario() >=7 && sc.getScenario() <= 8)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+             break;
+        }
+        case 7:
+        {
+            if(sc.getScenario() <= 6)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+             break;
+        }
+        case 2:
+        {
+            if(sc.getScenario() <= 8)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+             break;
+        }
+        case 5:
+        {
+            if(sc.getScenario() == 12)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+             break;
+        }
+        case 10:
+        {
+            if(sc.getScenario() <= 10)
+            {
+                posR[0][0] = '#';
+            }
+            else
+            {
+                posR[0][0] = ' ';
+            }
+            break;
+        }
+    }
+}
 Map::Map(int p /*=7*/): sc(h,store), backup(Backup::Cwd())
 {
     if(backup.hasData()) {
@@ -576,6 +630,10 @@ Map::Map(int p /*=7*/): sc(h,store), backup(Backup::Cwd())
     }
     pos[dx][dy] = '*';
     sc.Cave();
+    Room myRoom(h,store, sc, position);
+    myRoom.showRoom();
+    myRoom.actionRoom();
+    
 }
 
 void Map::showMap()

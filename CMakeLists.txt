@@ -8,6 +8,7 @@ set(mainTargetName "demonslayer")  #
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 
+# XXX: we currently use other own impl over Nim's
 # 1. call nim to build static lib
 
 set(NLIB_PATH ${CMAKE_BINARY_DIR}/lib/libnterm.a)
@@ -30,12 +31,12 @@ add_custom_command(
     OUTPUT  ${NLIB_PATH}
     DEPENDS ${CMAKE_SOURCE_DIR}/lib/src/*
 )
-add_custom_target(ntermLibBuild ALL DEPENDS ${NLIB_PATH})
+# add_custom_target(ntermLibBuild ALL DEPENDS ${NLIB_PATH})
 
 # append built static lib to CMake system
-add_library(nterm STATIC IMPORTED)
-add_dependencies(nterm ntermLibBuild)
-set_property(TARGET nterm PROPERTY IMPORTED_LOCATION ${NLIB_PATH})
+# add_library(nterm STATIC IMPORTED)
+# add_dependencies(nterm ntermLibBuild)
+# set_property(TARGET nterm PROPERTY IMPORTED_LOCATION ${NLIB_PATH})
 
 
 # 2. add ftxui
@@ -67,6 +68,9 @@ foreach(DIR ${SUBDIRS})
     if( ${isMain} )
       add_executable(${CUR_DST} ${SRCS})
     else()
+      if (${DIR} STREQUAL terminal)
+        list(APPEND SRCS "lib/src/terminal.cpp")
+      endif()
       add_library(${DIR} STATIC ${SRCS})
       set(TEST_MAIN ${CMAKE_SOURCE_DIR}/src/${DIR}/test.cpp)
       # create target named test_${DIR}
@@ -81,7 +85,7 @@ foreach(DIR ${SUBDIRS})
         PUBLIC ftxui::dom
         PUBLIC ftxui::screen
         PUBLIC ftxui::component
-        PUBLIC nterm
+        #PUBLIC nterm
     )
 endforeach()
 

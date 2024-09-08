@@ -569,7 +569,7 @@ void Battle::enemyRound()//对手攻击或使用技能
 		}
 		else
 		{
-			std::cout << "你成功抵御了" << "enemy.getName()" << "攻击。" << std::endl << std::endl;
+			std::cout << "你成功抵御了" << enemy.getName() << "攻击。" << std::endl << std::endl;
 			ms_sleep(1000);
 		}
 		break;

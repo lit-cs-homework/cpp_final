@@ -55,7 +55,11 @@ _BV( isTrueColorSupported )
 
 void ntermInit(bool enableTrueColor=false);
 
+#ifdef _WIN32
+# include <conio.h>
+#else
 _PRE char getch(void);
+#endif
 
 #define _RI(sym) _PRE NI sym(void);
 

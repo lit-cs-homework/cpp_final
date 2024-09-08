@@ -18,8 +18,13 @@ void ntermInit(bool enableTrueColor/*=true*/){
 
 _PRE
 void eraseScreen(FILE* f)
-{
+{ 
+  #ifdef _WIN32
     system("cls");
+    setCursorXPos(f, 0);
+  #else
+    fputs("\033[2J", f);
+  #endif
 }
 
 
@@ -32,6 +37,7 @@ void eraseScreen(FILE* f)
 
 
 #include <conio.h>
+
 
 const NI FOREGROUND_RGB = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
 const NI BACKGROUND_RGB = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE;
@@ -80,6 +86,19 @@ void setCursorPos(FILE* f, NI x, NI y) {
     setCursorPos(conHandle(f), x, y);
 }
 
+// Sets the terminal's cursor to the x position.
+// The y position is not changed.
+_PRE
+void setCursorXPos(FILE* f, NI x){
+    auto h = conHandle(f);
+    CONSOLE_SCREEN_BUFFER_INFO scrbuf = {};
+    if (GetConsoleScreenBufferInfo(h, &scrbuf) == 0)
+      raiseOSError(osLastError());
+    auto origin = scrbuf.dwCursorPosition;
+    origin.x = NI16(x);
+    if (SetConsoleCursorPosition(h, origin) == 0)
+      raiseOSError(osLastError());
+}
 
 static
 void getCursorPos(FILE* f,NI& x,NI& y){
@@ -404,7 +423,7 @@ void getCursorPos(NI& x, NI& y) {
 
 _PRE
 void setCursorPos(FILE* f, NI x, NI y) {
-  fprintf(f, "%s%zu%zuf", stylePrefix, y+1, x+1);
+    fprintf(f, "%s%zd%zdf", stylePrefix, y+1, x+1);
 }
 
 #ifndef _WIN32
@@ -412,6 +431,11 @@ void setCursorPos(FILE* f, NI x, NI y) {
     thread_local int gBG;
 #endif
 
+
+_PRE
+void setCursorXPos(FILE* f, NI x){
+    fprintf(f, "%s%zdG", stylePrefix, x+1);
+}
 
 // std::string ansiStyleCode(NI style) {
 //   std::string res;

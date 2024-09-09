@@ -94,6 +94,17 @@ target_link_libraries(test_equip PRIVATE combat)
 target_link_libraries(test_combat PRIVATE equip)
 # almost a cycle !
 
+
+# foreach(i equip combat)
+  
+# endforeach()
+
+target_link_libraries(equip  PRIVATE terminal)
+target_link_libraries(combat PRIVATE terminal)
+target_link_libraries(map    PRIVATE terminal)
+#target_link_libraries(mapcanvas)
+
+
 target_link_libraries(combat PRIVATE utils)
 
 target_link_libraries(map PRIVATE combat equip backup scenario utils)

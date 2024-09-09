@@ -370,7 +370,7 @@ void Enemy::setSkill(Skill skill[], int num)//设置技能
 Battle::Battle(Hero* hero, Enemy enemy) :player(hero), enemy(enemy)//构造
 {
 	round = 1;
-	fight1(*player,enemy);
+	fight(*player,enemy);
 	//fight();
 }
 Battle::~Battle() {}
@@ -599,8 +599,8 @@ void Battle::battleEnd()
 }
 
 
-// see fight1 instead
-// void fight()
+// see fight instead
+// void fightCli()
 // {
 // 	ms_sleep(500);
 // 	std::cout << "战斗开始！" << std::endl;
@@ -993,7 +993,7 @@ void enemyAttack(Hero& hero,Enemy& enemy)
 
 
 
-void fight1(Hero& hero,Enemy& enemy)
+void fight(Hero& hero,Enemy& enemy)
 {
     auto screen = ScreenInteractive::FitComponent();
     auto closeFunc = screen.ExitLoopClosure();

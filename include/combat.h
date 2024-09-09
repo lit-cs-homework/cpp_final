@@ -74,7 +74,7 @@ public:
 	Battle(Hero* hero, Enemy enemy);//构造
 	~Battle();//析构
     //战斗开始
-	void fight();
+	//void fight();
 	//回合演示
 	void showRound();
 
@@ -103,4 +103,4 @@ void fightDungeon(Hero* hero);
 void fightGhostdom(Hero* hero);
 void fightSweatPore(Hero* hero);
 void fightDarkRom(Hero* hero);
-void fight1(Hero& hero,Enemy& enemy);
+void fight(Hero& hero,Enemy& enemy);

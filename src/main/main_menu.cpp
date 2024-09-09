@@ -47,86 +47,64 @@ const std::vector<int> g_prize = {
     2,   //
 };
 
-Component PlayTab(std::function<void(int)> play) {
-  struct Impl : public ComponentBase {
-   public:
-    Impl(std::function<void(int)> play) {
-      auto on_click = [&, play] { play(index_); };
-      menu_ = Menu(&g_levels_name, &index_);
-      play_button_ = Button("Play", on_click,
-                            ButtonOption::Animated(Color::Red, Color::White));
-
-      auto layout = Container::Horizontal({
-          menu_,
-          play_button_,
-      });
-
-      auto renderer = Renderer(layout, [&] {
-        return hbox({
-            menu_->Render() | borderEmpty,
-            vbox({
-                text("Title: " + g_levels_name.at(size_t(index_))),
-                text("Prize: " + std::to_string(g_prize.at(size_t(index_)))),
-            }) | size(WIDTH, GREATER_THAN, 25) |
-                border,
-            play_button_->Render() | size(WIDTH, GREATER_THAN, 7) | borderEmpty,
-        });
-      });
-
-      Add(renderer);
-    }
-
-   private:
-    Component menu_;
-    Component play_button_;
-    int index_ = 0;
-  };
-  return Make<Impl>(play);
-}
+//Component PlayTab(std::function<void(int)> play) {}
 
 int LifeCost(const GameConfig& config){
     return config.difficulty;
 }
-Component ShopTab(GameConfig& config) {
 
-  auto button = Button("[TODO] Buy 5 life values", [&] {
-    if (config.coins >= LifeCost(config)) {
-      config.coins -= LifeCost(config);
-      config.life += 5;
-    }
-  });
+Component RestoreTab(GameConfig& config, ftxui::Closure quitThisPage) {
+    struct Impl : public ComponentBase {
+      Impl(GameConfig& config, ftxui::Closure quitThisPage): config(config), quitThisPage(quitThisPage) {
+          new_game = [this] {
+              this->config.map.delBackup();
+              this->config.map.load();
+              this->quitThisPage();
+          };
+          obtn = Button("从最近存档开始", [this] {
+            if(!this->config.map.load()){
+                // no old data
+                this->new_game();
+            }
+          });
+            nbtn = Button("开始新游戏", new_game);
 
-  return button | [&](Element button_element) {
-    auto description = vbox({
-        //text("balls: " + std::to_string(config.balls)),
-        text("coins: " + std::to_string(config.coins)),
-        text("cost 5 life value: " + std::to_string(LifeCost(config)) + " coins"),
-    });
+          auto buttons = Container::Vertical({
+                  obtn,
+                  nbtn
+          });
 
-    description |= border;
+          auto renderer = Renderer(buttons, [this] {
+                if (this->config.map.hasBackup()) {
+                    return vbox({
+                      this->obtn->Render(),
+                      this->nbtn->Render(),
+                    });
+                }
+                return vbox({
+                    text("尚无存档"),
+                    this->nbtn->Render()
+                });
+          });
+          Add(renderer);
+      }
 
-    if (config.coins < LifeCost(config)) {
-      return vbox({
-          description,
-          text("You don't have enough coins"),
-      });
-    }
-
-    return vbox({
-        description,
-        button_element,
-    });
-  };
-
+    private:
+      Component obtn;
+      Component nbtn;
+      GameConfig& config;
+      std::function<void()> new_game;
+      ftxui::Closure quitThisPage;
+    };
+    return Make<Impl>(config, std::move(quitThisPage));
 }
 
 
 Component MainMenu(GameConfig& config,
-                   std::function<void(int)> play,
+                   std::function<void()>  quitThisPage,
                    std::function<void()> quit) {
   static const std::vector<std::string> tab_entries_ = {
       "Play",
-      "Shop",
       "Quit",
   };
 
@@ -137,14 +115,14 @@ Component MainMenu(GameConfig& config,
 
    public:
     Impl(GameConfig& config,
-         std::function<void(int)> play,
-         std::function<void()> quit)
+         ftxui::Closure quitThisPage,
+         ftxui::Closure quit)
         : config_(config) {
       auto menu = Menu(&tab_entries_, &tab_index_, CustomMenuOption());
       auto tab_content = Container::Tab(
           {
-              PlayTab(play),
-              ShopTab(config_),
+              //PlayTab(play),
+              RestoreTab(config_, quitThisPage),
               QuitTab(quit),
           },
           &tab_index_);
@@ -157,5 +135,5 @@ Component MainMenu(GameConfig& config,
     }
   };
 
-  return Make<Impl>(config, std::move(play), std::move(quit));
+  return Make<Impl>(config, std::move(quitThisPage), std::move(quit));
 }

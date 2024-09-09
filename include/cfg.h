@@ -1,5 +1,7 @@
 
 #pragma once
+#include "./backup.h"
+#include "./map.h"
 
 class GameConfig{
 public:
@@ -9,4 +11,6 @@ public:
   int stage;
   int life;
 
+  Map& map;
+  GameConfig(Map&);
 };

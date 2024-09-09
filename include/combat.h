@@ -63,6 +63,11 @@ private:
 	int threaten;//威胁指数，影响逃跑概率
 };
 
+
+class FailCombat: public std::exception {
+};
+
+
 class Battle
 {
 public:

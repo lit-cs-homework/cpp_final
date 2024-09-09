@@ -11,6 +11,7 @@
 #include "cfg.h"
 #include "game.h"
 #include "map.h"
+#include "combat.h"
 
 
 using namespace ftxui;
@@ -29,45 +30,20 @@ void ExecuteBoard(GameConfig config,
                   std::function<void()> win,
                   std::function<void()> lose,
                   std::function<void()> quit) {
-  /*
-  auto screen = ScreenInteractive::Fullscreen();
-  auto exit = screen.ExitLoopClosure();
-  auto on_quit = [=] {
-    quit();
-    exit();
-  };
-  auto on_win = [=] {
-    win();
-    exit();
-  };
-  auto on_lose= [=] {
-    lose();
-    exit();
-  };*/
 
-  // Page page(config, on_win, on_lose);
-
-  // auto dialog = GameScreen(page, screen, on_lose, on_quit);
-  // auto component = dialog.asComponent(filler()) | center;
-
-  // screen.Loop(component);
-  // return;
     ntermInit();
-    Map myMap = Map(7);
-    do{
-        myMap.showMap();
-        myMap.showMenu();
 
-    } while (myMap.action());
-  // Loop loop(&screen, component);
+    config.map.load();
+    while (true) {
+        config.map.showMap();
+        config.map.showMenu();
+        try{
+          if(!config.map.action()) break;
+        }catch(FailCombat e) {
+          lose();
+        }
+    }
 
-  // while (!loop.HasQuitted()) {
-  //   loop.RunOnce();
-  //   using namespace std::chrono_literals;
-  //   const auto refresh_time = 1.0s / 60.0;
-  //   std::this_thread::sleep_for(refresh_time);
-  //   //screen.PostEvent(Event::Custom);
-  // }
 }
 
 void ExecuteWinScreen(int coins) {
@@ -87,15 +63,12 @@ void ExecuteMainMenu(GameConfig& config,
                      std::function<void()> quit) {
   auto screen = ScreenInteractive::Fullscreen();
   auto exit = screen.ExitLoopClosure();
-  auto play_and_exit = [play, exit](int level) {
-    play(level);
-    exit();
-  };
+
   auto quit_and_exit = [quit, exit]() {
     quit();
     exit();
   };
-  auto menu = MainMenu(config, play_and_exit, quit_and_exit);
+  auto menu = MainMenu(config, exit, quit_and_exit);
   screen.Loop(menu);
 }
 
@@ -103,6 +76,11 @@ void ExecuteIntro(bool* enable_audio) {
   auto screen = ScreenInteractive::Fullscreen();
   auto component = Intro(enable_audio, screen.ExitLoopClosure());
   screen.Loop(component);
+}
+
+
+void ExecuteMainMenu(GameConfig& config) {
+  ExecuteMainMenu(config, [](int x){}, []{});
 }
 
 
@@ -153,7 +131,8 @@ void StartGame() {
   ExecuteIntro(&enable_audio);
 
 
-  GameConfig config;
+  Map map;
+  GameConfig config{map};
 
   int level_to_play = -1;
 
@@ -172,13 +151,8 @@ void StartGame() {
 
     // Skip the first menu, because it is fun starting playing the game
     // directly.
-    if (iterations != 1) { // NOLINT
-      ExecuteMainMenu(config, select_level, on_quit);
-    }
-    else {
-      level_selected = true;
-      level_to_play = 0;
-    }
+
+    ExecuteMainMenu(config, select_level, on_quit);
 
     if (quit) {
       break;

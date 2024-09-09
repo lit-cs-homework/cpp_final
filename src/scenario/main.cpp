@@ -57,8 +57,10 @@ void heroTalk(const char* m)
 
 Scenario::Scenario(Hero& hero, Store& storem):h(hero),store(storem)
 {
+    store.refresh();
     scenario = 0;
 }
+
 void Scenario::adjustScenario(int n)
 {
     scenario = n;

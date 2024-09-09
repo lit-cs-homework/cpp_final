@@ -77,18 +77,64 @@ void Bag::display() const
     }
 }
 
-void Bag::displayEquipColumnCil()
+void Bag::displayEquipColumnCil(Hero& hero)
 {
-    std::cout << "装备栏:" << std::endl;
-    for(const auto& i: equipColumn){
-        if(i != nullptr){
-            std::cout << i->typ() << "." << i->name << std::endl;
-        } else {
-            std::cout << "(none)" << std::endl;
+    while(true)
+    {
+        std::cout << "装备栏:" << std::endl;
+        int p = 0;
+        for(const auto& i: equipColumn){
+            if(i != nullptr){
+                p++;
+                std::cout << i->typ() << "." << i->name << std::endl;
+            } else {
+                p++;
+                if(p != 1)
+                {
+                    std::cout << "(none)" << std::endl;
+                }
+            }
         }
-    }
-    std::cout << "是否要更换装备" << std::endl;
+        std::cout << "是否要更换装备,请输入y或者n,输入n退出" << std::endl;
+        char choice;
+        std::cin >> choice;
+        if(choice == 'y')
+        {
+            std::cout << "装备背包:" << std::endl;
+            int k = 0;
+            int j = 0;
+            for(const auto& i: equipBag){
+                if(i.second >= 0){
+                    std::cout << ++j << ". ";
+                    std::cout << i.first->name << " " << i.second << std::endl;
+                }
+            }
+            int key;
+            std::cout << "请输入序号" << std::endl;
+            std::cin >> key;
+            if(key > j)
+            {
+                std::cout << "请重新输入" << std::endl;
+            }
+            for(const auto& i: equipBag){
+                k++;
+                if(k==key)
+                {
+                    changeequip(i.first,hero);
+                }
+            }
+            
+        }
+        else if(choice == 'n')
+        {
+            break;
+        }
+        else
+        {
+            std::cout <<  "请重新输入" << std::endl;
+        }
 
+    }
 }
 
 // #define void Bag::get(std::shared_ptr<typ>,cls,int n)\
@@ -485,8 +531,8 @@ cls::cls(): base(__VA_ARGS__){\
 #define ImplSword(cls,...) ImplClsWithBase(cls, Sword, __VA_ARGS__)
 
 ImplSword(WoodenSword, 10, 10)
-ImplSword(IronSword  , 30, 30)
-ImplSword(GreenSword , 60, 60)
+ImplSword(IronSword  , 100, 100)
+ImplSword(GreenSword , 400, 400)
 ImplSword(HeavenlySword,6000,6000)
 
 
@@ -511,8 +557,8 @@ ArmOrShoe(Shoes  ,10, 10, 10, 10)
 #define ImplArm(cls,...) ImplClsWithBase(cls, Armhour, __VA_ARGS__)
 
 ImplArm(ClothArmhour,10, 30, 0, 10)
-ImplArm(CrystalIceArmhour,60,60,20,60)
-ImplArm(BlazeArmhour,100,100,40,100)
+ImplArm(CrystalIceArmhour,100,200,200,60)
+ImplArm(BlazeArmhour,400,600,400,100)
 ImplArm(HeavenlyDemonArmhour,6000,6000,3000,1500)
 
 #undef ImplArm
@@ -520,8 +566,8 @@ ImplArm(HeavenlyDemonArmhour,6000,6000,3000,1500)
 #define ImplShoe(cls,...) ImplClsWithBase(cls, Shoes, __VA_ARGS__)
 
 
-ImplShoe(SwiftShoes,30,30,5,30)
-ImplShoe(ThunderLightingShoes,60,60,20,60)
+ImplShoe(SwiftShoes,100,300,50,20)
+ImplShoe(ThunderLightingShoes,400,600,100,30)
 ImplShoe(ShadowShoes,2000,2000,1000,500)
 
 
@@ -631,7 +677,7 @@ LifeMedicine::LifeMedicine(){
     withName2(LifeMedicine);
     hp = 50;
     mp = 0;
-    value = 10;
+    value = 20;
 }
 
 std::string LifeMedicine::display() const{
@@ -642,7 +688,7 @@ LifeResortingMedicine::LifeResortingMedicine(){
     withName2(LifeResortingMedicine);
     hp = 200;
     mp = 0;
-    value = 10;
+    value = 50;
 }
 
 std::string LifeResortingMedicine::display() const{
@@ -651,9 +697,9 @@ std::string LifeResortingMedicine::display() const{
 
 SoulRevivingMedicine::SoulRevivingMedicine(){
     withName2(SoulRevivingMedicine);
-    hp = 10;
+    hp = 300;
     mp = 0;
-    value = 10;
+    value = 75;
 }
 
 std::string SoulRevivingMedicine::display() const{
@@ -675,7 +721,7 @@ SpiritConcentratingMedicine::SpiritConcentratingMedicine(){
     withName2(SpiritConcentratingMedicine);
     hp = 0;
     mp = 30;
-    value = 10;
+    value = 20;
 }
 
 std::string SpiritConcentratingMedicine::display() const{
@@ -686,7 +732,7 @@ HeavenlyOriginMedicine::HeavenlyOriginMedicine(){
     withName2(HeavenlyOriginMedicine);
     hp = 0;
     mp = 100;
-    value = 10;
+    value = 60;
 }
 
 std::string HeavenlyOriginMedicine::display() const{
@@ -697,7 +743,7 @@ HolyMedicine::HolyMedicine(){
     withName2(HolyMedicine);
     hp = 10000;
     mp = 5000;
-    value = 10;
+    value = 999;
 }
 
 std::string HolyMedicine::display() const{

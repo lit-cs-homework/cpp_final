@@ -3,6 +3,6 @@
 #include "cfg.h"
 
 
-class GameCfg{
-  
-};
+GameConfig::GameConfig(Map& m): map(m) {
+    
+}

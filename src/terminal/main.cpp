@@ -95,7 +95,7 @@ void setCursorXPos(FILE* f, NI x){
     if (GetConsoleScreenBufferInfo(h, &scrbuf) == 0)
       raiseOSError(osLastError());
     auto origin = scrbuf.dwCursorPosition;
-    origin.x = NI16(x);
+    origin.X = NI16(x);
     if (SetConsoleCursorPosition(h, origin) == 0)
       raiseOSError(osLastError());
 }

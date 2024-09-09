@@ -53,20 +53,20 @@ int LifeCost(const GameConfig& config){
     return config.difficulty;
 }
 
-Component RestoreTab(GameConfig& config, ftxui::Closure quitThisPage, bool&/*out*/ requireInit) {
+Component RestoreTab(GameConfig& config, ftxui::Closure quitThisPage, ftxui::Closure on_restart_game) {
     struct Impl : public ComponentBase {
-      Impl(GameConfig& config, ftxui::Closure quitThisPage, bool& requireInit): config(config), quitThisPage(quitThisPage) {
-          new_game = [this, &requireInit] {
+      Impl(GameConfig& config, ftxui::Closure quitThisPage, ftxui::Closure on_restart_game):
+            config(config) {
+          new_game = [this, on_restart_game, quitThisPage] {
               this->config.map.delBackup();
               this->config.map.load();
-              this->quitThisPage();
-              requireInit = true;
+              quitThisPage();
+              on_restart_game();
           };
-          obtn = Button("从最近存档开始", [this, &requireInit] {
+          obtn = Button("从最近存档开始", [this, &on_restart_game] {
             if(this->config.map.load()){
                 // no old data
                 this->new_game();
-                requireInit = false;
             }
           });
             nbtn = Button("开始新游戏", new_game);
@@ -96,15 +96,15 @@ Component RestoreTab(GameConfig& config, ftxui::Closure quitThisPage, bool&/*out
       Component nbtn;
       GameConfig& config;
       std::function<void()> new_game;
-      ftxui::Closure quitThisPage;
     };
-    return Make<Impl>(config, std::move(quitThisPage), requireInit);
+    return Make<Impl>(config, std::move(quitThisPage), on_restart_game);
 }
 
 
 Component MainMenu(GameConfig& config,
                    std::function<void()>  quitThisPage,
-                   std::function<void()> quit, bool& requireInit) {
+                   std::function<void()> quit,
+                   std::function<void()> on_restart_game) {
   static const std::vector<std::string> tab_entries_ = {
       "Play",
       "Quit",
@@ -119,13 +119,13 @@ Component MainMenu(GameConfig& config,
     Impl(GameConfig& config,
          ftxui::Closure quitThisPage,
          ftxui::Closure quit,
-         bool& requireInit)
+         ftxui::Closure on_restart_game)
         : config_(config) {
       auto menu = Menu(&tab_entries_, &tab_index_, CustomMenuOption());
       auto tab_content = Container::Tab(
           {
               //PlayTab(play),
-              RestoreTab(config_, quitThisPage, requireInit),
+              RestoreTab(config_, quitThisPage, on_restart_game),
               QuitTab(quit),
           },
           &tab_index_);
@@ -138,5 +138,5 @@ Component MainMenu(GameConfig& config,
     }
   };
 
-  return Make<Impl>(config, std::move(quitThisPage), std::move(quit), requireInit);
+  return Make<Impl>(config, std::move(quitThisPage), std::move(quit), std::move(on_restart_game));
 }

@@ -61,7 +61,8 @@ void ExecuteLoseScreen() {
 
 void ExecuteMainMenu(GameConfig& config,
                      std::function<void(int)> play,
-                     std::function<void()> quit, bool& requireInit) {
+                     std::function<void()> quit,
+                     std::function<void()> on_restart_game) {
   auto screen = ScreenInteractive::Fullscreen();
   auto exit = screen.ExitLoopClosure();
 
@@ -69,7 +70,7 @@ void ExecuteMainMenu(GameConfig& config,
     quit();
     exit();
   };
-  auto menu = MainMenu(config, exit, quit_and_exit, requireInit);
+  auto menu = MainMenu(config, exit, quit_and_exit, on_restart_game);
   screen.Loop(menu);
 }
 
@@ -137,31 +138,33 @@ void StartGame() {
 
   int iterations = 0;
 
-  bool requireInit; // out-var, init below
+  bool restart_game = false; // If start a new game.  out-var, init below
+  // we must init in loop body in case ExecuteMainMenu abort because user press ctrl-C
+
+  // NOTE: cannot make on_restart_game directly call config.map.enterFirstScenario(),
+  // whcich makes it called in too inner stacks
+  auto on_restart_game = [&] { restart_game = true; };
+
+  auto gameStatus = gsUndue;
+  auto on_win =  [&] { gameStatus = gsWin;  };
+  auto on_lose = [&] { gameStatus = gsLose; };
+
   while (!quit) {
     iterations++;
     auto select_level = [&](int level) {
       level_to_play = level;
     };
 
-    requireInit = false;  // we must init in loop body in case ExecuteMainMenu abort because user press ctrl-C
-
     // do not skip the first menu to choose backup
-    ExecuteMainMenu(config, select_level, on_quit, requireInit);
+    ExecuteMainMenu(config, select_level, on_quit, on_restart_game);
 
     if (quit) {
       break;
     }
-    if (requireInit) {
+    if (restart_game) {
         config.map.enterFirstScenario();
+        restart_game = false;  // prevent loop
     }
-    // NOTE: ExeuteMainMenu takes responibility to perform Scenerio::begin()
-
-    enum Status {
-      sNothing, sLose, sWin
-    } status = sNothing;
-    auto on_win = [&] { status = sWin; };
-    auto on_lose = [&] { status = sLose; };
 
     config.difficulty = level_to_play;
     ExecuteMap(config, on_win, on_lose, on_quit);
@@ -170,10 +173,10 @@ void StartGame() {
       break;
     }
 
-    if (status == sWin) {
+    if (gameStatus == gsWin) {
       ExecuteWinScreen(g_prize.at(size_t(level_to_play)));
       config.coins += g_prize.at(size_t(level_to_play));
-    } else if (status == sLose) {
+    } else if (gameStatus == gsLose) {
       ExecuteLoseScreen();
     }
   }

@@ -9,6 +9,14 @@
 #include "page.h"
 #include "dialog.h"
 
+
+enum GameStatus {
+  gsUndue = -1,
+  gsWin,
+  gsLose
+};
+
+
 void StartGame();
 
 // Exposed for testing.
@@ -22,9 +30,9 @@ ftxui::Component GameScreen(Page& page,
 ftxui::Component MainMenu(GameConfig& config,
                           std::function<void()> quitThisPage,
                           std::function<void()> quit,
-                          bool& requireInit);  // in main_menu.cpp
+                          std::function<void()>  on_restart_game);  // in main_menu.cpp
 void ExecuteMainMenu(GameConfig& config,
                      std::function<void()> play,
                      std::function<void()> quit,
-                     bool& requireInit);
+                     std::function<void()> on_restart_game);
 

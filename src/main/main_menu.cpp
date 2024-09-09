@@ -63,7 +63,7 @@ Component RestoreTab(GameConfig& config, ftxui::Closure quitThisPage, bool&/*out
               requireInit = true;
           };
           obtn = Button("从最近存档开始", [this, &requireInit] {
-            if(!this->config.map.load()){
+            if(this->config.map.load()){
                 // no old data
                 this->new_game();
                 requireInit = false;

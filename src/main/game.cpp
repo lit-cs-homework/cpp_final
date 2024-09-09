@@ -26,7 +26,7 @@ const std::vector<int> g_prize = {
     64000,  //
 };
 
-void ExecuteBoard(GameConfig config,
+void ExecuteMap(GameConfig config,
                   std::function<void()> win,
                   std::function<void()> lose,
                   std::function<void()> quit) {
@@ -137,16 +137,16 @@ void StartGame() {
 
   int iterations = 0;
 
-  bool requireInit = false; // out-var, init with false
-
+  bool requireInit; // out-var, init below
   while (!quit) {
     iterations++;
     auto select_level = [&](int level) {
       level_to_play = level;
     };
 
-    // do not skip the first menu to choose backup
+    requireInit = false;  // we must init in loop body in case ExecuteMainMenu abort because user press ctrl-C
 
+    // do not skip the first menu to choose backup
     ExecuteMainMenu(config, select_level, on_quit, requireInit);
 
     if (quit) {
@@ -164,7 +164,7 @@ void StartGame() {
     auto on_lose = [&] { status = sLose; };
 
     config.difficulty = level_to_play;
-    ExecuteBoard(config, on_win, on_lose, on_quit);
+    ExecuteMap(config, on_win, on_lose, on_quit);
 
     if (quit) {
       break;

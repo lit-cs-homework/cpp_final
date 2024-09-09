@@ -1011,57 +1011,58 @@ void fight1(Hero& hero,Enemy& enemy)
 			str1 = "你对" + enemy.getName() + "造成了" +std::to_string(hero.getAttack() - enemy.getDefend())+ "点伤害。";
 			// ms_sleep(1000);
 			enemy.adjustHp(enemy.getDefend() - hero.getAttack());
-            if (enemy.getHp() <= 0 || hero.getHp() <= 0)
-	        {
-		        end = true;
-	        }
-	        else
-            {
-                end = false;
-            };
+			if (enemy.getHp() <= 0 || hero.getHp() <= 0)
+			{
+				end = true;
+			}
+			else
+			{
+				end = false;
+			};
 		}
-        if(end == false)
-        {
-            enemyAttack(hero,enemy);
+		if (end == false)
+		{
+			enemyAttack(hero, enemy);
 			if (hero.getHp() <= 0)
-            {
+			{
 				str = defVal;
 				str1 = defVal;
 				str2 = defVal;
 				str3 = defVal;
-				closeFunc();                
-				std::cout << std::endl <<"战斗失败,游戏结束";
+				closeFunc();
+				std::cout << std::endl
+									<< "战斗失败,游戏结束";
 				ms_sleep(1000);
 				throw FailCombat();
-            }
-        }
-        else
-        {
-            closeFunc();
-            if (hero.getHp() <= 0)
-            {
+			}
+		}
+		else
+		{
+			closeFunc();
+			if (hero.getHp() <= 0)
+			{
 				str = defVal;
 				str1 = defVal;
 				str2 = defVal;
 				str3 = defVal;
-				closeFunc();                
-				std::cout << std::endl <<"战斗失败,游戏结束";
+				closeFunc();
+				std::cout << std::endl
+									<< "战斗失败,游戏结束";
 				ms_sleep(1000);
 				throw FailCombat();
-				
-            }
-            else if(enemy.getHp() <= 0 )
-            {
+			}
+			else if (enemy.getHp() <= 0)
+			{
 				str = defVal;
 				str1 = defVal;
 				str2 = defVal;
 				str3 = defVal;
-				closeFunc();                
-				std::cout << std::endl<< "战斗成功";
+				closeFunc();
+				std::cout << std::endl
+									<< "战斗成功";
 				ms_sleep(1000);
-            }
-            
-        }
+			}
+		}
         
     },Style());
 

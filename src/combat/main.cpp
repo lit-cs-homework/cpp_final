@@ -1113,7 +1113,15 @@ void fight1(Hero& hero,Enemy& enemy)
             else
             {
                 fun(hero,enemy,sk);
-            }
+								if (enemy.getHp() <= 0 || hero.getHp() <= 0)
+								{
+									end = true;
+								}
+								else
+								{
+									end = false;
+								};
+						}
         },Style()));
     }
 

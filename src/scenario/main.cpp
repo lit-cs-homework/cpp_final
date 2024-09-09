@@ -66,10 +66,15 @@ Scenario::begin()
     npcTalk("？？？：看来你醒了，别露出一副狼狈的模样，打起精神来！不然在这里会死的！");
     heroTalk("你：这是哪里？你是谁？");
     ms_sleep(1000);
-    npcTalk("？？？：别问这些浪费体力的问题，你现在最应该做的是想办法出去！外面有很多“家伙”在等着你呢！想要逃出这个鬼地方，就想办法让自己变得更强，拿到鬼玺之后来找我！当然，有金币的话也可以来岩穴和我这换一些东西，你会需要的。");
-    // 哦我忘了，瞧瞧你，连个武器都没有，还一副要死的样子，真是可怜。这样吧，这些东西送给你，别高兴得太早，
-    // "你获得了地图，铁剑 ×１，生命药水 ×１，"
-    narration("当前的位置是“岩穴”");
+    npcTalk("？？？：别问这些浪费体力的问题，你现在最应该做的是想办法出去！哦我忘了，瞧瞧你，连个武器都没有，还一副要死的样子，真是可怜。这样吧，这些东西送给你，别高兴得太早，外面有很多“家伙”在等着你呢！想要逃出这个鬼地方，就想办法让自己变得更强，拿到鬼玺之后来找我！当然，有金币的话也可以来岩穴和我这换一些东西，你会需要的。");
+    narration("你获得了地图，木剑 ×１，生命药水 ×１，当前的位置是“岩穴”");
+    std::shared_ptr<ClothArmhour> a = std::make_shared<ClothArmhour>();
+    std::shared_ptr<LifeMedicine> b = std::make_shared<LifeMedicine>();
+    std::shared_ptr<WoodenSword> c = std::make_shared<WoodenSword> ();
+    h.getBag().get(a,1);
+    h.getBag().get(b,1);
+    h.getBag().get(c,1);
+    h.getBag().displayEquipColumnAndChange(h);
     ms_sleep(3000);
     adjustScenario(1);
 }
@@ -287,6 +292,13 @@ void  Scenario::Grottoes()
         narration("你一脚踹在了石碑上，石碑在你这一脚之下直接爆裂。石碑之下，有着点点反光。你伸出了手...感受着异常的温暖...");
         ms_sleep(2000);
         narration("获得尘封的装备");
+        std::shared_ptr<HeavenlyDemonArmhour> a = std::make_shared<HeavenlyDemonArmhour>();
+        std::shared_ptr<HeavenlySword> b = std::make_shared<HeavenlySword>();
+        std::shared_ptr<ShadowShoes> c = std::make_shared<ShadowShoes> ();
+        h.getBag().get(a,1);
+        h.getBag().get(b,1);
+        h.getBag().get(c,1);
+        h.getBag().displayEquipColumnAndChange(h);
         adjustScenario(10);
     }
 }

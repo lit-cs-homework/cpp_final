@@ -1114,15 +1114,58 @@ void fight(Hero& hero,Enemy& enemy)
             else
             {
                 fun(hero,enemy,sk);
-								if (enemy.getHp() <= 0 || hero.getHp() <= 0)
-								{
-									end = true;
-								}
-								else
-								{
-									end = false;
-								};
-						}
+				if (enemy.getHp() <= 0 || hero.getHp() <= 0)
+				{
+					end = true;
+				}
+				else
+				{
+					end = false;
+				};
+			}
+			if(end == false)
+			{
+				enemyAttack(hero,enemy);
+				if (hero.getHp() <= 0)
+				{
+					str = defVal;
+					str1 = defVal;
+					str2 = defVal;
+					str3 = defVal;
+					closeFunc();                
+					std::cout << std::endl <<"战斗失败,游戏结束";
+					ms_sleep(1000);
+					throw FailCombat();
+				}
+			}
+			else
+			{
+				closeFunc();
+				if (hero.getHp() <= 0)
+				{
+					str = defVal;
+					str1 = defVal;
+					str2 = defVal;
+					str3 = defVal;
+					closeFunc();                
+					std::cout << std::endl <<"战斗失败,游戏结束";
+					ms_sleep(1000);
+					throw FailCombat();
+					
+				}
+				else if(enemy.getHp() <= 0 )
+				{
+					str = defVal;
+					str1 = defVal;
+					str2 = defVal;
+					str3 = defVal;
+					closeFunc();                
+					std::cout << std::endl<< "战斗成功";
+					ms_sleep(1000);
+				}
+            
+        }
+
         },Style()));
     }
 

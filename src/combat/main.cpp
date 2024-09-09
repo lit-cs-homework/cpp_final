@@ -3,6 +3,7 @@
 #include "../../lib/nterm.h"
 
 #include "../../include/utils.h"
+#include "game.h"
 
 #include "ftxui/component/captured_mouse.hpp"  // for ftxui
 #include "ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
@@ -180,7 +181,7 @@ void Hero::addExp(int num)
 		addHp(20*level);
 		addMp(20*level);
 		adjustAttack(5*level);
-		adjustDefend(5*level);
+		adjustDefend(5);
 		switch(level)
 		{
 			case 3:
@@ -596,42 +597,45 @@ void Battle::battleEnd()
 	ms_sleep(2000);
 	eraseScreen();
 }
-void Battle::fight()
-{
-	ms_sleep(500);
-	std::cout << "战斗开始！" << std::endl;
-	ms_sleep(1000);
-	while (!ifEnd())
-	{
-		showRound();
-		int cur = playerRound();//返回值判断是否逃跑，逃跑是否成功
-		if (cur == 0)//返回值为0代表逃跑成功
-		{
-			ms_sleep(1000);
-			std::cout << "你逃跑了";
-			return;
-		}
-		else if (cur == 1)//返回1代表逃跑失败 返回-1代表没有逃跑
-		{
-			ms_sleep(1000);
-			std::cout << "逃跑失败！" << std::endl;
-		}
 
-		if (ifEnd()) break;
-		enemyRound();
-		round++;
-	}
-	if (enemy.getHp() <= 0)
-	{
-		std::cout << "你成功打败了对手。" << std::endl;
-		ms_sleep(2000);
-	}
-	else if (((*player).getHp() <= 0))
-	{
-		std::cout << "很遗憾，你的旅程到此为止。" << std::endl;
-	}
-	battleEnd();//结算
-}
+
+// see fight1 instead
+// void fight()
+// {
+// 	ms_sleep(500);
+// 	std::cout << "战斗开始！" << std::endl;
+// 	ms_sleep(1000);
+// 	while (!ifEnd())
+// 	{
+// 		showRound();
+// 		int cur = playerRound();//返回值判断是否逃跑，逃跑是否成功
+// 		if (cur == 0)//返回值为0代表逃跑成功
+// 		{
+// 			ms_sleep(1000);
+// 			std::cout << "你逃跑了";
+// 			return;
+// 		}
+// 		else if (cur == 1)//返回1代表逃跑失败 返回-1代表没有逃跑
+// 		{
+// 			ms_sleep(1000);
+// 			std::cout << "逃跑失败！" << std::endl;
+// 		}
+
+// 		if (ifEnd()) break;
+// 		enemyRound();
+// 		round++;
+// 	}
+// 	if (enemy.getHp() <= 0)
+// 	{
+// 		std::cout << "你成功打败了对手。" << std::endl;
+// 		ms_sleep(2000);
+// 	}
+// 	else if (((*player).getHp() <= 0))
+// 	{
+// 		std::cout << "很遗憾，你的旅程到此为止。" << std::endl;
+// 	}
+// 	battleEnd();//结算
+// }
 
 void fightTunnel(Hero* hero)
 {
@@ -987,6 +991,8 @@ void enemyAttack(Hero& hero,Enemy& enemy)
 
 }
 
+
+
 void fight1(Hero& hero,Enemy& enemy)
 {
     auto screen = ScreenInteractive::FitComponent();
@@ -1017,18 +1023,39 @@ void fight1(Hero& hero,Enemy& enemy)
         if(end == false)
         {
             enemyAttack(hero,enemy);
+			if (hero.getHp() <= 0)
+            {
+				str = defVal;
+				str1 = defVal;
+				str2 = defVal;
+				str3 = defVal;
+				closeFunc();                
+				std::cout << std::endl <<"战斗失败,游戏结束";
+				ms_sleep(1000);
+				throw FailCombat();
+            }
         }
         else
         {
             closeFunc();
             if (hero.getHp() <= 0)
             {
+				str = defVal;
+				str1 = defVal;
+				str2 = defVal;
+				str3 = defVal;
 				closeFunc();                
-				std::cout << std::endl <<"战斗失败";
+				std::cout << std::endl <<"战斗失败,游戏结束";
 				ms_sleep(1000);
+				throw FailCombat();
+				
             }
             else if(enemy.getHp() <= 0 )
             {
+				str = defVal;
+				str1 = defVal;
+				str2 = defVal;
+				str3 = defVal;
 				closeFunc();                
 				std::cout << std::endl<< "战斗成功";
 				ms_sleep(1000);
@@ -1050,9 +1077,13 @@ void fight1(Hero& hero,Enemy& enemy)
 		{
 			if (rand() % 6 < enemy.getThreaten())
 			{
-				str = "逃跑成功" ;
+				str = defVal;
+				str1 = defVal;
+				str2 = defVal;
+				str3 = defVal;
                 closeFunc();
-                std::cout << str;
+                std::cout << "逃跑成功";
+				ms_sleep(1000);
 			}
             else
             {

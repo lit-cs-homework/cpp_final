@@ -14,6 +14,7 @@ public:
     static Backup Cwd();
     //Backup(std::string filepath);
     std::string getFilePath();
+    bool del();
     void setFileName(const std::string&);
 
     bool hasData();

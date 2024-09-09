@@ -3,6 +3,7 @@
 #include "../../lib/hps/hps.h"
 
 #include <fstream>
+#include <cstdio>
 
 std::string
 Backup::getFilePath() {return std::string(dir) + filename;}
@@ -25,4 +26,8 @@ Backup::Backup() {}
 Backup Backup::Cwd() {
     return Backup();
 }
-
+bool Backup::del() {
+    bool res = hasData();
+    remove(getFilePath().c_str());
+    return res;
+}

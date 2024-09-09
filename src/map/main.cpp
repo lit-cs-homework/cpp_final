@@ -167,6 +167,7 @@ Room::Room(Hero &hm,Store& storem, Scenario& scm, int p):h(hm),store(storem),sc(
 
 void Room::roomBattle(int pos)
 {
+
     switch(pos)
     {
         case 1:
@@ -588,27 +589,32 @@ void Room::updateAffair(int position)
         }
     }
 }
-Map::Map(int p /*=7*/): sc(h,store), backup(Backup::Cwd())
+
+bool Map::hasBackup() {
+    return backup.hasData();
+}
+
+bool Map::delBackup() {
+    return backup.del();
+}
+
+bool
+Map::load() {
+    return load(backup);
+}
+
+bool
+Map::load(Backup& backup)
 {
     if(backup.hasData()) {
-        backup.tryLoad(*this); // discard result
-    } else {
+        bool res = backup.tryLoad(*this);
+        if(res) {
+            return res;
+        }
+    }
 
-        Skill s2("凌天一斩", "奋力向对方发动一次斩击。 ", 40, 20);
-        std::shared_ptr<BlueMedicine> bluemedicine = std::make_shared<BlueMedicine>() ;
-        std::shared_ptr<RedMedicine> redMedicine = std::make_shared<RedMedicine>() ;
-        std::shared_ptr<StoneSword> a = std::make_shared<StoneSword>() ;
-        std::shared_ptr<IronSword> b = std::make_shared<IronSword>() ;
-        std::shared_ptr<BronzeSword> c = std::make_shared<BronzeSword>();
-        std::shared_ptr<Shoes> d = std::make_shared<Shoes>() ;
-        std::shared_ptr<Armhour> e = std::make_shared<Armhour>() ;
-        std::vector<std::shared_ptr<Equip>> equipstore = {a,b,c};
-        std::vector<std::shared_ptr<Medicine>> medicinestore = {redMedicine,bluemedicine};
-        Store store(equipstore,medicinestore);
-        h.setSkill(s2);
-        position = p;
 #define dealStart(N, x, y)      case N: { dx = x;dy = y;break;}
-        switch (p){
+        switch (position){
             dealStart(0,2,0)
             dealStart(1,2,1)
             dealStart(2,0,2)
@@ -621,7 +627,7 @@ Map::Map(int p /*=7*/): sc(h,store), backup(Backup::Cwd())
             dealStart(9,2,5)
         } 
 #undef dealStart
-     }
+
     for (int i = 0; i < 6; i++)
     {
         for (int j = 0; j < 6; j++)
@@ -630,11 +636,18 @@ Map::Map(int p /*=7*/): sc(h,store), backup(Backup::Cwd())
         }
     }
     pos[dx][dy] = '*';
+    eraseScreen();
     sc.Cave();
     Room myRoom(h,store, sc, position);
     myRoom.showRoom();
     myRoom.actionRoom();
+    return false;
     
+}
+
+
+Map::Map(int p /*=7*/): sc(h,store), position(p), backup(Backup::Cwd())
+{
 }
 
 void Map::showMap()
@@ -874,6 +887,12 @@ bool Map::action()
         
         break;
     }
+    case 'b':
+    {
+        h.getBag().displayEquipColumnAndChange(h);
+
+        break;
+    }
     case 3: // ctrl-c
     {
         return false;
@@ -899,7 +918,8 @@ void Map::showMenu()
     cout << "您目前的位置是：" << mapName[position] << endl;
     cout << "1.按回车进入区域。" << '\n';
     cout << "2.输入'v'保存游戏进度。" <<'\n';
-    cout << "3.输入'wasd'以移动。" << '\n';
-    cout << "4.ctrl-c 退出。" << '\n';
+    cout << "3.输入'b'更换装备。" << '\n'; 
+    cout << "4.输入'wasd'以移动。" << '\n';
+    cout << "5.ctrl-c 退出。" << '\n';
     cout << endl;
 }

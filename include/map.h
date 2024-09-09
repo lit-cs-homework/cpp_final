@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -46,6 +48,12 @@ public:
    void showMap() ;
    bool action();
    void showMenu();
+   bool hasBackup();
+   /// @returns if @param backup data is loaded
+   bool load(Backup& backup);
+   /// @returns if previous data is loaded
+   bool load();
+   bool delBackup();
     template <class B>
     void serialize(B& buf) const {
         buf << position << dx << dy << h << store << sc;

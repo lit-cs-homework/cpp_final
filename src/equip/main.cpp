@@ -531,8 +531,8 @@ cls::cls(): base(__VA_ARGS__){\
 #define ImplSword(cls,...) ImplClsWithBase(cls, Sword, __VA_ARGS__)
 
 ImplSword(WoodenSword, 10, 10)
-ImplSword(IronSword  , 300, 300)
-ImplSword(GreenSword , 600, 600)
+ImplSword(IronSword  , 100, 100)
+ImplSword(GreenSword , 400, 400)
 ImplSword(HeavenlySword,6000,6000)
 
 
@@ -557,8 +557,8 @@ ArmOrShoe(Shoes  ,10, 10, 10, 10)
 #define ImplArm(cls,...) ImplClsWithBase(cls, Armhour, __VA_ARGS__)
 
 ImplArm(ClothArmhour,10, 30, 0, 10)
-ImplArm(CrystalIceArmhour,600,600,200,600)
-ImplArm(BlazeArmhour,1000,1000,400,1000)
+ImplArm(CrystalIceArmhour,100,200,200,60)
+ImplArm(BlazeArmhour,400,600,400,100)
 ImplArm(HeavenlyDemonArmhour,6000,6000,3000,1500)
 
 #undef ImplArm
@@ -566,8 +566,8 @@ ImplArm(HeavenlyDemonArmhour,6000,6000,3000,1500)
 #define ImplShoe(cls,...) ImplClsWithBase(cls, Shoes, __VA_ARGS__)
 
 
-ImplShoe(SwiftShoes,300,300,50,300)
-ImplShoe(ThunderLightingShoes,600,600,200,600)
+ImplShoe(SwiftShoes,100,300,50,20)
+ImplShoe(ThunderLightingShoes,400,600,100,30)
 ImplShoe(ShadowShoes,2000,2000,1000,500)
 
 

@@ -34,7 +34,7 @@ void narrationImpl(const char* m, ForegroundColor color)
     {
         char print[]={m[i],m[i+1],m[i+2], '\0'};
         styledWrite(color, StyleSet{styleBright},print);
-        ms_sleep(100);
+        ms_sleep(30);
     }
     std::cout<<std::endl;
     showCursor();
@@ -220,7 +220,7 @@ void  Scenario::Grottoes()
         {
             char print[]={m[i],m[i+1],m[i+2], '\0'};
             styledWrite(fgBlue, StyleSet{styleBright},print);
-            ms_sleep(100);
+            ms_sleep(30);
         }
             std::cout<<std::endl;
             m="鬼王之玺 玄冥之石 无嗔之戒 ";
@@ -228,7 +228,7 @@ void  Scenario::Grottoes()
         {
            char print[]={m[i],m[i+1],m[i+2], '\0'};
            styledWrite(fgRed, StyleSet{styleBright},print);
-           ms_sleep(100);
+           ms_sleep(30);
         }
         std::cout<<std::endl;
         narration("有声音从石碑正面传来，是那张怪脸。");
@@ -272,7 +272,7 @@ void  Scenario::Grottoes()
         {
             char print[]={m[i],m[i+1],m[i+2], '\0'};
             styledWrite(fgBlue, StyleSet{styleBright},print);
-            ms_sleep(100);
+            ms_sleep(30);
         }
             std::cout<<std::endl;
             m="鬼王之玺 玄冥之石 无嗔之戒 ";
@@ -280,7 +280,7 @@ void  Scenario::Grottoes()
         {
            char print[]={m[i],m[i+1],m[i+2], '\0'};
            styledWrite(fgRed, StyleSet{styleBright},print);
-           ms_sleep(100);
+           ms_sleep(30);
         }
         std::cout<<std::endl;
     }
@@ -312,7 +312,7 @@ void  Scenario::Dungeon()
         {
             char print[]={m[i],m[i+1],m[i+2], '\0'};
             styledWrite(fgBlue, StyleSet{styleBright},print);
-            ms_sleep(100);
+            ms_sleep(30);
         }
             std::cout<<std::endl;
             heroTalk("你自言自语道：怎么这块没有鬼王之玺、玄冥之石、无嗔之戒？");

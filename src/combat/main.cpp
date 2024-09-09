@@ -123,6 +123,7 @@ Hero::Hero()
 	exp = 0;
 	gold = 0;
 	level = 1;
+	setSkill(skill1);
 }
 Hero::~Hero() {}
 void Hero::setName()
@@ -131,7 +132,6 @@ void Hero::setName()
 	std::string tmpName;
 	std::cin >> tmpName;
 	name = tmpName;
-	setSkill(skill1);
 	eraseScreen();
 }
 void Hero::showHero()

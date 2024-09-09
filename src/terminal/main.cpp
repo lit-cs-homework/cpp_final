@@ -498,9 +498,25 @@ struct IOctl_WinSize{
 
 
 static
-NI parseSaturatedNatural(CCStr s, NI& w) {
-    w = std::stoll(s);
-    // TODO
+NI parseSaturatedNatural(CCStr s, NI& b) {
+    NI i {};
+    const NI hi = std::numeric_limits<NI>::max();
+
+    if (s[i] == '+') i++;
+    if (isascii0_9(s[i])) {
+        b = 0;
+        while ( isascii0_9(s[i]) ) {
+            const auto c = int(s[i]) - '0';
+            if ( b<= (hi - c) / 10)
+                b = b * 10 + c;
+            else
+                b = hi;
+            i++;
+            while ( s[i] == '_' ) i++;
+        }
+        return i;
+    }
+    return 0;
 }
 
 // Returns terminal width from first fd that supports the ioctl.

@@ -21,8 +21,10 @@ ftxui::Component GameScreen(Page& page,
                             std::function<void()> quit);
 ftxui::Component MainMenu(GameConfig& config,
                           std::function<void()> quitThisPage,
-                          std::function<void()> quit);  // in main_menu.cpp
+                          std::function<void()> quit,
+                          bool& requireInit);  // in main_menu.cpp
 void ExecuteMainMenu(GameConfig& config,
                      std::function<void()> play,
-                     std::function<void()> quit);
-void ExecuteMainMenu(GameConfig& config);
+                     std::function<void()> quit,
+                     bool& requireInit);
+

@@ -31,9 +31,10 @@ void ExecuteBoard(GameConfig config,
                   std::function<void()> lose,
                   std::function<void()> quit) {
 
-    ntermInit();
 
-    config.map.load();
+
+    //config.map.load();  loaded before this function
+
     while (true) {
         config.map.showMap();
         config.map.showMenu();
@@ -60,7 +61,7 @@ void ExecuteLoseScreen() {
 
 void ExecuteMainMenu(GameConfig& config,
                      std::function<void(int)> play,
-                     std::function<void()> quit) {
+                     std::function<void()> quit, bool& requireInit) {
   auto screen = ScreenInteractive::Fullscreen();
   auto exit = screen.ExitLoopClosure();
 
@@ -68,7 +69,7 @@ void ExecuteMainMenu(GameConfig& config,
     quit();
     exit();
   };
-  auto menu = MainMenu(config, exit, quit_and_exit);
+  auto menu = MainMenu(config, exit, quit_and_exit, requireInit);
   screen.Loop(menu);
 }
 
@@ -76,11 +77,6 @@ void ExecuteIntro(bool* enable_audio) {
   auto screen = ScreenInteractive::Fullscreen();
   auto component = Intro(enable_audio, screen.ExitLoopClosure());
   screen.Loop(component);
-}
-
-
-void ExecuteMainMenu(GameConfig& config) {
-  ExecuteMainMenu(config, [](int x){}, []{});
 }
 
 
@@ -141,20 +137,25 @@ void StartGame() {
 
   int iterations = 0;
 
+  bool requireInit = false; // out-var, init with false
+
   while (!quit) {
     iterations++;
     auto select_level = [&](int level) {
       level_to_play = level;
     };
 
-    // Skip the first menu, because it is fun starting playing the game
-    // directly.
+    // do not skip the first menu to choose backup
 
-    ExecuteMainMenu(config, select_level, on_quit);
+    ExecuteMainMenu(config, select_level, on_quit, requireInit);
 
     if (quit) {
       break;
     }
+    if (requireInit) {
+        config.map.enterFirstScenario();
+    }
+    // NOTE: ExeuteMainMenu takes responibility to perform Scenerio::begin()
 
     enum Status {
       sNothing, sLose, sWin

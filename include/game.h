@@ -10,10 +10,10 @@
 #include "dialog.h"
 
 
-enum GameStatus {
-  gsUndue = -1,
-  gsWin,
-  gsLose
+enum BoolStatus {
+  bsUndue = -1,
+  bsTrue,
+  bsFalse
 };
 
 
@@ -28,11 +28,12 @@ ftxui::Component GameScreen(Page& page,
                             std::function<void()> lose,
                             std::function<void()> quit);
 ftxui::Component MainMenu(GameConfig& config,
+                          std::function<void(int)> play,
                           std::function<void()> quitThisPage,
                           std::function<void()> quit,
-                          std::function<void()>  on_restart_game);  // in main_menu.cpp
+                          std::function<void()>  on_start_new_game);  // in main_menu.cpp
 void ExecuteMainMenu(GameConfig& config,
                      std::function<void()> play,
                      std::function<void()> quit,
-                     std::function<void()> on_restart_game);
+                     std::function<void()> on_start_new_game);
 

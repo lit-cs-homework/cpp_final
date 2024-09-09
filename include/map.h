@@ -46,6 +46,8 @@ public:
    char pos[10][10];
    Map(int p = 7) ;
    void enterFirstScenario();
+   /// @brief will be auto called in `load`
+   void prepareShowMap();
    void showMap() ;
    bool action();
    void showMenu();

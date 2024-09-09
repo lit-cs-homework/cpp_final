@@ -62,7 +62,7 @@ void ExecuteLoseScreen() {
 void ExecuteMainMenu(GameConfig& config,
                      std::function<void(int)> play,
                      std::function<void()> quit,
-                     std::function<void()> on_restart_game) {
+                     std::function<void()> on_start_new_game) {
   auto screen = ScreenInteractive::Fullscreen();
   auto exit = screen.ExitLoopClosure();
 
@@ -70,7 +70,7 @@ void ExecuteMainMenu(GameConfig& config,
     quit();
     exit();
   };
-  auto menu = MainMenu(config, exit, quit_and_exit, on_restart_game);
+  auto menu = MainMenu(config, play, exit, quit_and_exit, on_start_new_game);
   screen.Loop(menu);
 }
 
@@ -138,16 +138,15 @@ void StartGame() {
 
   int iterations = 0;
 
-  bool restart_game = false; // If start a new game.  out-var, init below
-  // we must init in loop body in case ExecuteMainMenu abort because user press ctrl-C
+  auto new_game = false; // If start a new game.  out-var, init below
 
-  // NOTE: cannot make on_restart_game directly call config.map.enterFirstScenario(),
+  // NOTE: cannot make on_start_new_game directly call config.map.enterFirstScenario(),
   // whcich makes it called in too inner stacks
-  auto on_restart_game = [&] { restart_game = true; };
+  auto on_start_new_game = [&] { new_game = true; };
 
-  auto gameStatus = gsUndue;
-  auto on_win =  [&] { gameStatus = gsWin;  };
-  auto on_lose = [&] { gameStatus = gsLose; };
+  auto gameStatus = bsUndue;  // if win
+  auto on_win =  [&] { gameStatus = bsTrue;  };
+  auto on_lose = [&] { gameStatus = bsFalse; };
 
   while (!quit) {
     iterations++;
@@ -156,14 +155,20 @@ void StartGame() {
     };
 
     // do not skip the first menu to choose backup
-    ExecuteMainMenu(config, select_level, on_quit, on_restart_game);
+    ExecuteMainMenu(config, select_level, on_quit, on_start_new_game);
 
     if (quit) {
       break;
     }
-    if (restart_game) {
+    if (new_game) {
         config.map.enterFirstScenario();
-        restart_game = false;  // prevent loop
+        new_game = false;  // prevent loop
+    }
+    if (level_to_play == -1) { // ExecuteMainMenu abort because user press ctrl-C
+        // assuming map is loaded (within one started game)
+        config.map.prepareShowMap();
+    } else {
+        level_to_play = -1;
     }
 
     config.difficulty = level_to_play;
@@ -173,11 +178,13 @@ void StartGame() {
       break;
     }
 
-    if (gameStatus == gsWin) {
+    if (gameStatus == bsTrue) {
       ExecuteWinScreen(g_prize.at(size_t(level_to_play)));
       config.coins += g_prize.at(size_t(level_to_play));
-    } else if (gameStatus == gsLose) {
+      gameStatus = bsUndue;
+    } else if (gameStatus == bsFalse) {
       ExecuteLoseScreen();
+      gameStatus = bsUndue;
     }
   }
 }

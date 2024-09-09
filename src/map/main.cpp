@@ -607,12 +607,14 @@ Map::load() {
 bool
 Map::load(Backup& backup)
 {
+    bool res;
+
     if(backup.hasData()) {
-        bool res = backup.tryLoad(*this);
-        if(res) {
-            return res;
-        }
-    }
+        res = backup.tryLoad(*this);
+        assert(res);
+
+    } else {
+        res = false;
 
 #define dealStart(N, x, y)      case N: { dx = x;dy = y;break;}
         switch (position){
@@ -627,8 +629,18 @@ Map::load(Backup& backup)
             dealStart(8,2,4)
             dealStart(9,2,5)
         } 
+    }
 #undef dealStart
 
+    prepareShowMap();
+
+    return res;
+    
+}
+
+void
+Map::prepareShowMap()
+{
     for (int i = 0; i < 6; i++)
     {
         for (int j = 0; j < 6; j++)
@@ -637,9 +649,6 @@ Map::load(Backup& backup)
         }
     }
     pos[dx][dy] = '*';
-
-    return false;
-    
 }
 
 void

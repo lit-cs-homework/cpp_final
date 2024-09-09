@@ -17,7 +17,7 @@ public:
     char posR[10][10];
     Room(Hero& h, Store& store , Scenario& scm, int p = 7);
     void showRoom();
-    void actionRoom();
+    void mainloop();
     void communciateNpc(int position);
     void roomBattle(int pos);
     template <class B>
@@ -45,6 +45,7 @@ class Map{
 public:
    char pos[10][10];
    Map(int p = 7) ;
+   void enterFirstScenario();
    void showMap() ;
    bool action();
    void showMenu();

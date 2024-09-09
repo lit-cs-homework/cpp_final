@@ -298,11 +298,12 @@ void Room::communciateNpc(int position){
         }
     }
 }
-void Room::actionRoom()
+void Room::mainloop()
 {
     char order = ' ';
     while (order != 'n')
     {
+        showRoom();
         order = getch();
         switch (order)
         {
@@ -438,7 +439,7 @@ void Room::actionRoom()
 
         posR[dx][dy] = '*';
 
-        Room::showRoom();
+
     }
 }
 
@@ -636,18 +637,22 @@ Map::load(Backup& backup)
         }
     }
     pos[dx][dy] = '*';
-    eraseScreen();
-    sc.Cave();
-    Room myRoom(h,store, sc, position);
-    myRoom.showRoom();
-    myRoom.actionRoom();
+
     return false;
     
 }
 
+void
+Map::enterFirstScenario() {
+    eraseScreen();
+    sc.begin();
+    Room myRoom(h, store, sc, position);
+    myRoom.mainloop();
+}
 
 Map::Map(int p /*=7*/): sc(h,store), position(p), backup(Backup::Cwd())
 {
+    store.refresh();
 }
 
 void Map::showMap()
@@ -875,8 +880,7 @@ bool Map::action()
     case 13:  // Enter
     {
         Room myRoom(h,store, sc, position);
-        myRoom.showRoom();
-        myRoom.actionRoom();
+        myRoom.mainloop();
         break;
     }
     case 'v':

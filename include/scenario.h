@@ -38,6 +38,7 @@ public:
     //内部使用函数，仅供调试使用
     void adjustScenario(int n);
 
+    void begin();
     void end();
     int getScenario();
     template <class B>

@@ -156,23 +156,25 @@ void StartGame() {
       break;
     }
 
-      bool win = false;
-      auto on_win = [&] { win = true; };
-      auto on_lose = [&] { win = false; };
+    enum Status {
+      sNothing, sLose, sWin
+    } status = sNothing;
+    auto on_win = [&] { status = sWin; };
+    auto on_lose = [&] { status = sLose; };
 
-      config.difficulty = level_to_play;
-      ExecuteBoard(config, on_win, on_lose, on_quit);
+    config.difficulty = level_to_play;
+    ExecuteBoard(config, on_win, on_lose, on_quit);
 
-      if (quit) {
-        break;
-      }
-
-      if (win) {
-        ExecuteWinScreen(g_prize.at(size_t(level_to_play)));
-        config.coins += g_prize.at(size_t(level_to_play));
-      } else {
-        ExecuteLoseScreen();
-      }
+    if (quit) {
+      break;
     }
+
+    if (status == sWin) {
+      ExecuteWinScreen(g_prize.at(size_t(level_to_play)));
+      config.coins += g_prize.at(size_t(level_to_play));
+    } else if (status == sLose) {
+      ExecuteLoseScreen();
+    }
+  }
 }
 

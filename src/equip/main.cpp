@@ -151,7 +151,7 @@ void Bag::get(std::shared_ptr<Medicine> medicine, int n){
 }
 
 bool Bag::use(std::shared_ptr<Medicine> medicine, int n, Hero& hero){
-    if(hero.hp < hero.hpMax){
+    if(hero.hp < hero.hpMax && medicineBag[medicine] >= n){
         medicineBag[medicine] = medicineBag[medicine] - n;
         medicine->used(hero, n);
         return true;
@@ -1067,7 +1067,7 @@ void Bag::displayEquipColumnAndChange(Hero& hero)
     auto closeFunc = screen.ExitLoopClosure();
     Component component;
 
-    std::string selectedBtn;
+    std::string selectedBtn = "WoodenSword";
     std::string str = "请选择要更换的装备";
     std::string str1;
 

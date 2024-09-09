@@ -143,9 +143,7 @@ void StartGame() {
 
   while (!quit) {
     iterations++;
-    bool level_selected = false;
     auto select_level = [&](int level) {
-      level_selected = true;
       level_to_play = level;
     };
 
@@ -158,7 +156,6 @@ void StartGame() {
       break;
     }
 
-    if (level_selected) {
       bool win = false;
       auto on_win = [&] { win = true; };
       auto on_lose = [&] { win = false; };
@@ -177,7 +174,5 @@ void StartGame() {
         ExecuteLoseScreen();
       }
     }
-  }
-
 }
 

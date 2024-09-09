@@ -1,10 +1,11 @@
 
 #include "../../include/terminal.h"
-#include <cstdint>
 #include <stdexcept>
-#include <cstring>
 #include <string>
+#include <limits>
 
+#include <cstdint>
+#include <cstring>
 #include <cstdio>
 #include <cassert>
 
@@ -141,17 +142,11 @@ void initTerminal(PTerminal term){
 }
 
 
-// typedef Terminal;
-
-#ifdef _WIN32
-    PTerminal newTerminal() {
-        auto result = std::make_shared<Terminal>();
-        initTerminal(result);
-        return result;
-    }
-#else
-  proc newTerminal(): owned(PTerminal) {.gcsafe, raises: [].}
-#endif
+PTerminal newTerminal() {
+    auto result = std::make_shared<Terminal>();
+    initTerminal(result);
+    return result;
+}
 
 static
 thread_local PTerminal gTerm;
@@ -172,129 +167,94 @@ HANDLE conHandle(FILE* f) {
     else return term->hStdout;
 }
 
-#ifdef _WIN32
-  NI16 defaultForegroundColor = 0xFFFF;
-  NI16 defaultBackgroundColor = 0xFFFF;
-#endif
+NI16 defaultForegroundColor = 0xFFFF;
+NI16 defaultBackgroundColor = 0xFFFF;
 
 
-#define setColor(cls, defval) \
+#define genSetColor(cls, defval, BF) \
 _PRE \
 void set##cls##Color(FILE* f, cls##Color bg ,bool bright)\
 {\
     auto h = conHandle(f);\
-    auto old = getAttributes(h) & ~ BACKGROUND_RGB;\
+    auto old = getAttributes(h) & ~ BF##_RGB;\
     if (default##cls##Color == 0xFFFF){\
         default##cls##Color = old;\
         if (bright)\
-        {\
-            old = old | BACKGROUND_INTENSITY;\
-        } \
+            old |= BF##_INTENSITY;\
         else\
-        {\
-            old = old & ~(BACKGROUND_INTENSITY);\
-        } \
+            old &= ~(BF##_INTENSITY);\
     }\
     const NI lookup[10] = {\
     0, \
-    (BACKGROUND_RED),\
-    (BACKGROUND_GREEN),\
-    (BACKGROUND_RED | BACKGROUND_GREEN),\
-    (BACKGROUND_BLUE),\
-    (BACKGROUND_RED | BACKGROUND_BLUE),\
-    (BACKGROUND_BLUE | BACKGROUND_GREEN),\
-    (BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED),0,0};\
+    (BF##_RED),\
+    (BF##_GREEN),\
+    (BF##_RED | BF##_GREEN),\
+    (BF##_BLUE),\
+    (BF##_RED | BF##_BLUE),\
+    (BF##_BLUE | BF##_GREEN),\
+    (BF##_BLUE | BF##_GREEN | BF##_RED),0,0};\
     if (bg == defval)\
-    {\
         SetConsoleTextAttribute(h, NI16(NU16(old) | NU16(default##cls##Color))); \
-    }\
     else\
-    {\
         SetConsoleTextAttribute(h, NI16(NU16(old) | NU16(lookup[bg])));\
-    }\
 }
 
-setColor(Background, bgDefault)
-setColor(Foreground, fgDefault)
+genSetColor(Background, bgDefault, BACKGROUND)
+genSetColor(Foreground, fgDefault, FOREGROUND)
+
+#undef genSetColor
 
 
 
 #define contains(style, e)  (std::find(style.begin(), style.end(), e) != style.end())
 
-
-
 _PRE
 void setStyle(FILE* f, StyleSet style ){
-    #ifdef _WIN32
-        auto h = conHandle(f);
-        auto old = getAttributes(h) & (FOREGROUND_RGB | BACKGROUND_RGB);
-        auto a = 0;
-        if (contains(style,styleBright)) a = a | NI16(FOREGROUND_INTENSITY);
-        if (contains(style,styleBlink)) a = a | NI16(BACKGROUND_INTENSITY);
-        if (contains(style,styleReverse)) a = a | 0x4000;
-        if (contains(style,styleUnderscore)) a = a | 0x8000;
-        SetConsoleTextAttribute(h, old | a);
-    #else
-        for s in items(style):
-        f.write(ansiStyleCode(s))
-    #endif
+    auto h = conHandle(f);
+    auto old = getAttributes(h) & (FOREGROUND_RGB | BACKGROUND_RGB);
+    auto a = 0;
+    if (contains(style,styleBright)) a = a | NI16(FOREGROUND_INTENSITY);
+    if (contains(style,styleBlink)) a = a | NI16(BACKGROUND_INTENSITY);
+    if (contains(style,styleReverse)) a = a | 0x4000;
+    if (contains(style,styleUnderscore)) a = a | 0x8000;
+    SetConsoleTextAttribute(h, old | a);
+
 }
 
+#undef contains
 
 _PRE
 void resetAttributes(FILE* f){
-    #ifdef _WIN32
-        auto term = getTerminal();
-        if(f == stderr)
-            SetConsoleTextAttribute(term->hStderr, term->oldStderrAttr);
-        else
-            SetConsoleTextAttribute(term->hStdout, term->oldStdoutAttr);
-    #else
-        f.write(ansiResetCode)
-        gFG = 0
-        gBG = 0
-    #endif
+    auto term = getTerminal();
+    if(f == stderr)
+        SetConsoleTextAttribute(term->hStderr, term->oldStderrAttr);
+    else
+        SetConsoleTextAttribute(term->hStdout, term->oldStdoutAttr);
 }
 
 
-
-#ifdef _WIN32
-_PRE
+static
 void setCursorVisibility(FILE* f,bool visible)
 {
     CONSOLE_CURSOR_INFO ccsi = {};
     auto h = conHandle(f);
     if (GetConsoleCursorInfo(h, &ccsi) == 0)
       raiseOSError(osLastError());
-    if (visible){
-        ccsi.bVisible = 1;
-    }
-    else{
-        ccsi.bVisible = 0 ;
-    } 
+    ccsi.bVisible = int(visible);
     if (SetConsoleCursorInfo(h, &ccsi) == 0)
       raiseOSError(osLastError());
 }
-#endif
 
 _PRE
 void showCursor(FILE* f)
 {
-    #ifdef _WIN32
-        setCursorVisibility(f, true);
-    #else
-        f.write("\e[?25h") 
-    #endif
+    setCursorVisibility(f, true);
 }
 
 _PRE
 void hideCursor(FILE* f)
 {
-    #ifdef _WIN32
-        setCursorVisibility(f, false);
-    #else
-        f.write("\e[?25h") 
-    #endif
+    setCursorVisibility(f, false);
 }
 
 
@@ -316,13 +276,11 @@ void
 setRaw(int fd_p0, int time_p1 = TCSAFLUSH) {
 	struct termios mode = {};
 	auto T1_ = tcgetattr(fd_p0, &mode);
-	mode.c_iflag = (NU32)(mode.c_iflag & (NU32)((NU32) ~((NU32)((NU32)((NU32)((NU32)(BRKINT | ICRNL) | INPCK) | ISTRIP) | IXON))));
-	mode.c_oflag = (NU32)(mode.c_oflag & (NU32)((NU32) ~(OPOST)));
-	mode.c_cflag = (NU32)((NU32)(mode.c_cflag & (NU32)((NU32) ~((NU32)(CSIZE | PARENB)))) | CS8);
-	mode.c_lflag = (NU32)(mode.c_lflag & (NU32)((NU32) ~((NU32)((NU32)((NU32)(ECHO | ICANON) | IEXTEN) | ISIG))));
-	if ((NU)(VMIN) > (NU)(31)){ raiseIndexError2(VMIN, 31); 	}
+	mode.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+	mode.c_oflag &= ~OPOST;
+	mode.c_cflag  = (mode.c_cflag & ~(CSIZE | PARENB)) | CS8;
+	mode.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
 	mode.c_cc[VMIN] = 1;
-	if ((NU)(VTIME) > (NU)(31)){ raiseIndexError2(VTIME, 31); 	}
 	mode.c_cc[VTIME] = 0;
 	auto T2_ = tcsetattr(fd_p0, time_p1, &mode);
 
@@ -346,8 +304,8 @@ char getch() {
 
 typedef const char* const  CCStr;
 static CCStr stylePrefix = "\033[";
-static CCStr getPos = "\e[6n";
-static CCStr ansiResetCode = "\e[0m";
+static CCStr getPos = "\033[6n";
+static CCStr ansiResetCode = "\033[0m";
 
 
 // Returns cursor position (x, y)
@@ -362,6 +320,12 @@ public:
 template <typename T>
 static void raiseValueError(T s) {
   throw ValueError(s);
+}
+
+static
+inline
+bool isascii0_9(char ch) {
+    return '0' <= ch && ch <= '9';
 }
 
 static
@@ -398,7 +362,7 @@ void getCursorPos(FILE* f, NI& x, NI& y) {
           err = "Got unterminated character position message from terminal";
         if (ch == ';')
           readX = true;
-        else if ('0' <= ch && ch <= '9'){
+        else if ( isascii0_9(ch) ){
           if (readX)
             xStr += ch;
           else

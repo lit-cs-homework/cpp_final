@@ -41,9 +41,12 @@ void ExecuteMap(GameConfig config,
         try{
           if(!config.map.action()) break;
         }catch(FailCombat e) {
-          lose();
+          goto loseGame; // break loop
         }
     }
+    return;
+loseGame:
+    lose();
 
 }
 

@@ -452,7 +452,7 @@ void showCursor(FILE* f) {
 
 _PRE
 void hideCursor(FILE* f) {
-    fputs("\033[?251h", f);
+    fputs("\033[?25l", f);
 }
 
 

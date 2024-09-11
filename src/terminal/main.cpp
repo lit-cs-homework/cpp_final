@@ -411,7 +411,7 @@ void setCursorXPos(FILE* f, NI x){
 _PRE
 CCStr ansiStyleCode(NI style) {
   static char res[10]; // style shall not be more than 6 length
-  sprintf(res, "%s%dm", stylePrefix, style);
+  sprintf(res, "%s%zdm", stylePrefix, style);
   return res; // f"{stylePrefix}{style}m";
 }
 

@@ -22,6 +22,7 @@ void narrationImpl(const char* m, ForegroundColor color)
     {
         char print[]={m[i],m[i+1],m[i+2], '\0'};
         styledWrite(color, StyleSet{styleBright},print);
+        fflush(stdout);
         ms_sleep(30);
     }
     std::cout<<std::endl;

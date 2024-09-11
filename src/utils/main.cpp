@@ -13,8 +13,8 @@ void ms_sleep(int ms)
 	Sleep(ms);
 #else
 	struct timespec tp = {
-		ms / 1000,    // second
-		ms % 1000000  // ns
+		.tv_sec =   ms / 1000,    // second
+		.tv_nsec = (ms % 1000) * 1000000  // ns
 	};
 	nanosleep(&tp, NULL);
 #endif

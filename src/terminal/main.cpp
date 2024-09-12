@@ -167,11 +167,10 @@ HANDLE conHandle(FILE* f) {
     else return term->hStdout;
 }
 
-NI16 defaultForegroundColor = 0xFFFF;
-NI16 defaultBackgroundColor = 0xFFFF;
+static NI16 defaultForegroundColor = 0xFFFF;
+static NI16 defaultBackgroundColor = 0xFFFF;
 
-
-#define genSetColor(cls, defval, BF) \
+#define genSetColor(cls, defval, BF, Begin) \
 _PRE \
 void set##cls##Color(FILE* f, cls##Color bg ,bool bright)\
 {\
@@ -196,11 +195,11 @@ void set##cls##Color(FILE* f, cls##Color bg ,bool bright)\
     if (bg == defval)\
         SetConsoleTextAttribute(h, NI16(NU16(old) | NU16(default##cls##Color))); \
     else\
-        SetConsoleTextAttribute(h, NI16(NU16(old) | NU16(lookup[bg])));\
+        SetConsoleTextAttribute(h, NI16(NU16(old) | NU16(lookup[bg-Begin])));\
 }
 
-genSetColor(Background, bgDefault, BACKGROUND)
-genSetColor(Foreground, fgDefault, FOREGROUND)
+genSetColor(Background, bgDefault, BACKGROUND, bgBlack)
+genSetColor(Foreground, fgDefault, FOREGROUND, fgBlack)
 
 #undef genSetColor
 

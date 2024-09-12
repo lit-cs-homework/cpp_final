@@ -30,6 +30,7 @@ std::unordered_map<
     std::function<void(std::shared_ptr<Equip>&)>
 > equipcolumnmap;
 
+static std::string format2Digit(double x);
 
 
 
@@ -250,7 +251,7 @@ DeclWithName2(Medicine)
 
 std::string Medicine::display()
 {
-    return "回复hp "+std::to_string(hp) + " 回复mp"+std::to_string(mp);
+    return "回复hp "+format2Digit(hp) + " 回复mp"+format2Digit(mp);
 }
 
 
@@ -488,7 +489,7 @@ void Sword::takeoff(Hero& hero){
 
 std::string Sword::display1() const
 {
-    return "攻击力 "+std::to_string(atk);
+    return "攻击力 "+format2Digit(atk);
 }
 
 // std::string WoodenSword::display() const
@@ -591,7 +592,7 @@ void Armhour::takeoff(Hero& hero){
 
 std::string Armhour::display1() const
 {
-    return "hp "+std::to_string(hp)+" mp "+std::to_string(mp)+" 防御 "+std::to_string(def);
+    return "hp "+format2Digit(hp)+" mp "+format2Digit(mp)+" 防御 "+format2Digit(def);
 }
 
 // std::string ClothArmhour::display() const
@@ -631,7 +632,7 @@ void Shoes::takeoff(Hero& hero){
 
 std::string Shoes::display1() const
 {
-    return "hp "+std::to_string(hp)+" mp "+std::to_string(mp)+" 防御 "+std::to_string(def);
+    return "hp "+format2Digit(hp)+" mp "+format2Digit(mp)+" 防御 "+format2Digit(def);
 }
 
 // std::string SwiftShoes::display() const
@@ -670,7 +671,7 @@ RedMedicine::RedMedicine(){
 }
 
 std::string RedMedicine::display() const{
-    return "回复hp"+std::to_string(hp);
+    return "回复hp"+format2Digit(hp);
 }
 
 LifeMedicine::LifeMedicine(){
@@ -681,7 +682,7 @@ LifeMedicine::LifeMedicine(){
 }
 
 std::string LifeMedicine::display() const{
-    return "回复hp"+std::to_string(hp);
+    return "回复hp"+format2Digit(hp);
 }
 
 LifeResortingMedicine::LifeResortingMedicine(){
@@ -692,7 +693,7 @@ LifeResortingMedicine::LifeResortingMedicine(){
 }
 
 std::string LifeResortingMedicine::display() const{
-    return "回复hp"+std::to_string(hp);
+    return "回复hp"+format2Digit(hp);
 }
 
 SoulRevivingMedicine::SoulRevivingMedicine(){
@@ -703,7 +704,7 @@ SoulRevivingMedicine::SoulRevivingMedicine(){
 }
 
 std::string SoulRevivingMedicine::display() const{
-    return "回复hp"+std::to_string(hp);
+    return "回复hp"+format2Digit(hp);
 }
 
 BlueMedicine::BlueMedicine(){
@@ -714,7 +715,7 @@ BlueMedicine::BlueMedicine(){
 }
 
 std::string BlueMedicine::display() const{
-    return "回复mp"+std::to_string(mp);
+    return "回复mp"+format2Digit(mp);
 }
 
 SpiritConcentratingMedicine::SpiritConcentratingMedicine(){
@@ -725,7 +726,7 @@ SpiritConcentratingMedicine::SpiritConcentratingMedicine(){
 }
 
 std::string SpiritConcentratingMedicine::display() const{
-    return "回复mp"+std::to_string(mp);
+    return "回复mp"+format2Digit(mp);
 }
 
 HeavenlyOriginMedicine::HeavenlyOriginMedicine(){
@@ -736,7 +737,7 @@ HeavenlyOriginMedicine::HeavenlyOriginMedicine(){
 }
 
 std::string HeavenlyOriginMedicine::display() const{
-    return "回复mp"+std::to_string(mp);
+    return "回复mp"+format2Digit(mp);
 }
 
 HolyMedicine::HolyMedicine(){
@@ -747,7 +748,7 @@ HolyMedicine::HolyMedicine(){
 }
 
 std::string HolyMedicine::display() const{
-    return "回复hp "+std::to_string(hp) + " 回复mp"+std::to_string(mp);
+    return "回复hp "+format2Digit(hp) + " 回复mp"+format2Digit(mp);
 }
 
 static
@@ -821,7 +822,7 @@ ftxui::Table createEquipColumnTable(Hero& hero,const Bag& bag)
 // And x won't be negative, so no sign char will be preappended.
 static char buffer[17];
 
-static std::string formatCurrency(double x) {
+static std::string format2Digit(double x) {
     sprintf(buffer, "%.2f", x);
     return std::string(buffer);
 }
@@ -839,7 +840,7 @@ ftxui::Table createPriceTable(const Store& store)
     auto i = 1;
     #define add1(p) do{\
         if(p.second!=0) vec.push_back({\
-        std::to_string(i), p.first->name, formatCurrency(p.first->value),std::to_string(p.second)\
+        std::to_string(i), p.first->name, format2Digit(p.first->value),std::to_string(p.second)\
         }); i++;}while(0)
     for(const auto& p: store.equipCommodities) add1(p);
     for(const auto& p: store.medicineCommodities) add1(p);
@@ -971,7 +972,7 @@ void Store::trade(Bag& bag, Hero& hero)
         func(EP);\
         if(EP->name == selectedBtn)\
         {\
-            str1 = "hp "+formatCurrency(EP->hp)+" mp " +formatCurrency(EP->mp) +" 防御力 "+ formatCurrency(EP->def);\
+            str1 = "hp "+format2Digit(EP->hp)+" mp " +format2Digit(EP->mp) +" 防御力 "+ format2Digit(EP->def);\
         }\
     }\
     else if(hasEnding(selectedBtn,"Shoes"))\
@@ -981,7 +982,7 @@ void Store::trade(Bag& bag, Hero& hero)
         func(EP);\
         if(EP->name == selectedBtn)\
         {\
-            str1 = "hp "+formatCurrency(EP->hp)+" mp " +formatCurrency(EP->mp) +" 防御力 "+ formatCurrency(EP->def);\
+            str1 = "hp "+format2Digit(EP->hp)+" mp " +format2Digit(EP->mp) +" 防御力 "+ format2Digit(EP->def);\
         }\
     }\
     else\

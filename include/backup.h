@@ -5,19 +5,24 @@
 #include <ios>
 #include <string>
 #include <fstream>
+#include "./pathutils.h"
+
 #include "../lib/hps/hps.h"
 
 class Backup {
 public:
     /// @brief using AppData path
     //static Backup AppData();
-    static Backup Cwd();
+    Backup(const char* const d);
+    Backup(const std::string& d);
     //Backup(std::string filepath);
-    std::string getFilePath();
+    std::string getFilePath() const;
     bool del();
     void setFileName(const std::string&);
+public:
+    virtual std::string getAdditionalInfo() const;
 
-    bool hasData();
+    bool hasData() const;
 
     /// @returns if there are backup data to load
     template <typename T>
@@ -62,8 +67,35 @@ public:
           std::string("failed to save to file: ")+getFilePath());
     }
 
+    virtual ~Backup();
+protected:
+    Backup();
+    std::string dir = "./";  // endswith os.sep
+    std::string stem = "cpp_final";
+    std::string suffix = ".data"; // startswith '.'
+};
+
+class TimeTFormatter{
+    std::string timefBuf;
+    const char* format_str;
+public:
+    /// @throw std::invalid_argument format_str is "" or NULL
+    TimeTFormatter(const char* const format_str);
+    std::string& format(std::string& res, time_t);
+};
+
+class BackupWithTime: public Backup {
+public:
+    BackupWithTime(const std::string& d);
+    ~BackupWithTime();
+    // backup data's time
+    std::string lastWriteTimeStr() const;
+    const char* cannotGetWriteTimeFallBackMsg = "";
+    std::string getAdditionalInfo() const override;
 private:
-    Backup(); 
-    const char* dir = "./";
-    const char* filename = "cpp_final.data";
+    // init ttfmt
+    void setTimeFormat(const char* const format = "%m-%d %H:%M");
+    //time_t lastWriteTimeT() const;
+
+    TimeTFormatter* ttfmt = nullptr; // to skip const
 };

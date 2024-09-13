@@ -5,6 +5,7 @@
 #include "ftxui/component/screen_interactive.hpp" // for ScreenInterative
 #include "ftxui/dom/elements.hpp"
 #include <functional>
+#include <string>
 #include "cfg.h"
 #include "page.h"
 #include "dialog.h"
@@ -17,7 +18,7 @@ enum BoolStatus {
 };
 
 
-void StartGame();
+void StartGame(const std::string& backupDir);
 
 // Exposed for testing.
 ftxui::Component Intro(bool* enable_audio, std::function<void()> quit);  // in intro.cpp

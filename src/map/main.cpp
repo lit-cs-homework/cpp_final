@@ -570,21 +570,8 @@ void Room::updateAffair(int position)
     }
 }
 
-bool Map::hasBackup() {
-    return backup.hasData();
-}
-
-bool Map::delBackup() {
-    return backup.del();
-}
-
 bool
-Map::load() {
-    return load(backup);
-}
-
-bool
-Map::load(Backup& backup)
+Map::tryLoadBackup(Backup& backup)
 {
     bool res;
 
@@ -617,6 +604,7 @@ Map::load(Backup& backup)
     
 }
 
+
 void
 Map::prepareShowMap()
 {
@@ -638,7 +626,7 @@ Map::enterFirstScenario() {
     myRoom.mainloop();
 }
 
-Map::Map(int p /*=7*/): sc(h,store), position(p), backup(Backup::Cwd())
+Map::Map(int p /*=7*/): sc(h,store), position(p)
 {
     store.refresh();
 }
@@ -683,7 +671,7 @@ void displayBelowMap(const char* const stringm){
     ms_sleep(700);
 }
 
-bool Map::action()
+bool Map::action(Backup& backup)
 {
     pos[dx][dy] = ' ';
     char command = ' ';
@@ -873,10 +861,10 @@ bool Map::action()
     }
     case 'v':
     {
-        backup.save(*this);
-        displayBelowMap("游戏进度已保存。");
-        
-        
+        if (backup.trySave(*this))
+            displayBelowMap("游戏进度已保存。");
+        else 
+            displayBelowMap("游戏进度保存失败"); // TODO: better err msg
         break;
     }
     case 'b':

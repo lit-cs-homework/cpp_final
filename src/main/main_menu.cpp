@@ -61,14 +61,14 @@ Component RestoreTab(GameConfig& config,
         ftxui::Closure quitThisPage, ftxui::Closure on_start_new_game):
             config(config) {
           new_game = [this, on_start_new_game, quitThisPage, play] {
-              this->config.map.delBackup();
-              this->config.map.load();
+              this->config.backup->del();
+              this->config.tryLoadBackup();
               quitThisPage();
               play(1);
               on_start_new_game();
           };
           obtn = Button("从最近存档开始", [this, quitThisPage, play] {
-            if(!this->config.map.load()){
+            if(!this->config.tryLoadBackup()){
                 // no old data
                 assert(false); // this shall not appear (see below)
             }
@@ -83,7 +83,7 @@ Component RestoreTab(GameConfig& config,
           });
 
           auto renderer = Renderer(buttons, [this] {
-                if (this->config.map.hasBackup()) {
+                if (this->config.backup->hasData()) {
                     return vbox({
                       this->obtn->Render(),
                       this->nbtn->Render(),

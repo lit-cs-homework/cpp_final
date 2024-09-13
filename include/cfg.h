@@ -11,6 +11,8 @@ public:
   int stage;
   int life;
 
+  std::shared_ptr<Backup> backup;
   Map& map;
-  GameConfig(Map&);
+  GameConfig(Map&, const std::string& backupDir);
+  bool tryLoadBackup();
 };

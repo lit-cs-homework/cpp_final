@@ -26,7 +26,7 @@ const std::vector<int> g_prize = {
     64000,  //
 };
 
-void ExecuteMap(GameConfig config,
+void ExecuteMap(const GameConfig& config,
                   std::function<void()> win,
                   std::function<void()> lose,
                   std::function<void()> quit) {
@@ -39,7 +39,7 @@ void ExecuteMap(GameConfig config,
         config.map.showMap();
         config.map.showMenu();
         try{
-          if(!config.map.action()) break;
+          if(!config.map.action(*config.backup)) break;
         }catch(FailCombat e) {
           goto loseGame; // break loop
         }
@@ -125,14 +125,14 @@ void ExecuteIntro(bool* enable_audio) {
 
 // The main logic, moving the players in between the various screens.
 
-void StartGame() {
+void StartGame(const std::string& backupDir) {
 
   bool enable_audio = false;
   ExecuteIntro(&enable_audio);
 
 
   Map map;
-  GameConfig config{map};
+  GameConfig config{map, backupDir};
 
   int level_to_play = -1;
 

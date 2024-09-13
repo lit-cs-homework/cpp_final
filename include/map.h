@@ -44,19 +44,20 @@ private:
 class Map{
 public:
    char pos[10][10];
+
    Map(int p = 7) ;
    void enterFirstScenario();
    /// @brief will be auto called in `load`
    void prepareShowMap();
    void showMap() ;
-   bool action();
+   /// @brief often called `runOnce`, handle action from player
+   /// @param backup used to save backup
+   /// @return if to continue the loop
+   bool action(Backup& backup);
    void showMenu();
-   bool hasBackup();
    /// @returns if @param backup data is loaded
-   bool load(Backup& backup);
+   bool tryLoadBackup(Backup& backup);
    /// @returns if previous data is loaded
-   bool load();
-   bool delBackup();
     template <class B>
     void serialize(B& buf) const {
         buf << position << dx << dy << h << store << sc;
@@ -71,6 +72,5 @@ private:
     int dx, dy;
     Store store;
     Hero h;
-    Backup backup;
     Scenario sc;
 };

@@ -112,8 +112,8 @@ Component RestoreTab(GameConfig& config,
                     });
                 }
                 return vbox({
-                    text("尚无存档"),
-                    this->nbtn->Render()
+                    this->nbtn->Render(),
+                    text("尚无存档") | border
                 });
           });
           Add(renderer);

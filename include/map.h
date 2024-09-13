@@ -1,12 +1,12 @@
 #pragma once
 
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <ios>
 #include <cstdlib>
-#include "../lib/nterm.h"
 #include "../lib/hps/hps.h"
+#include "../include/terminal.h"
+#include "../include/utils.h"
 #include "../include/combat.h"
 #include "../include/equip.h"
 #include "../include/backup.h"

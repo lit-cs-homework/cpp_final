@@ -1,32 +1,11 @@
+
 #include "../../include/map.h"
-#include "../../include/combat.h"
-#include "../../include/equip.h"
-#include <terminal.h>
-#include <cstdlib>
 #include <string>
 #include <array>
+#include <iostream>
+
+#include <cstdlib>
 #include <cassert>
-#include "../../include/scenario.h"
-
-#ifdef _WIN32
-# include<windows.h>
-#else
-//#include <unistd.h>
-#endif
-
-static
-void ms_sleep(int ms)
-{
-#ifdef _WIN32
-	Sleep(ms);
-#else
-	struct timespec tp = {
-		ms / 1000,    // second
-		ms % 1000000  // ns
-	};
-	nanosleep(&tp, NULL);
-#endif
-}
 
 using std::cin;
 using std::cout;

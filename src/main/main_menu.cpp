@@ -53,6 +53,26 @@ int LifeCost(const GameConfig& config){
     return config.difficulty;
 }
 
+namespace addInfo
+{
+static const char sep = '\x01';
+static const char* const space = "  ";
+
+static
+void withAdditionalInfo(std::string& msg, const std::string& additional)
+{
+    if (additional.empty())
+        return;
+    const size_t pos = msg.rfind(sep);
+    if (pos != std::string::npos)
+      msg.resize(pos);
+    msg += sep;
+    msg += space;
+    msg += additional;
+}
+  
+} // namespace addInfo
+
 Component RestoreTab(GameConfig& config,
         std::function<void(int)> play,
         ftxui::Closure quitThisPage, ftxui::Closure on_start_new_game) {
@@ -67,7 +87,8 @@ Component RestoreTab(GameConfig& config,
               play(1);
               on_start_new_game();
           };
-          obtn = Button("从最近存档开始", [this, quitThisPage, play] {
+          oAddStr = "从最近存档开始";
+          obtn = Button(&oAddStr, [this, quitThisPage, play] {
             if(!this->config.tryLoadBackup()){
                 // no old data
                 assert(false); // this shall not appear (see below)
@@ -81,9 +102,10 @@ Component RestoreTab(GameConfig& config,
                   obtn,
                   nbtn
           });
-
           auto renderer = Renderer(buttons, [this] {
                 if (this->config.backup->hasData()) {
+                    auto addInfo = this->config.backup->getAdditionalInfo();
+                    addInfo::withAdditionalInfo(this->oAddStr, addInfo);
                     return vbox({
                       this->obtn->Render(),
                       this->nbtn->Render(),
@@ -98,6 +120,8 @@ Component RestoreTab(GameConfig& config,
       }
 
     private:
+      // addidional str for obtn
+      std::string oAddStr;
       Component obtn;
       Component nbtn;
       GameConfig& config;

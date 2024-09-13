@@ -4,17 +4,12 @@
 #include "../../include/equip.h"
 #include "../../include/scenario.h"
 
-#ifdef _WIN32
-# include<windows.h>
-#else
-//#include <unistd.h>
-#endif
-
 #include "utils.h"
 
+#include <initializer_list>
 #include <cstring>
 static
-void narrationImpl(const char* m, ForegroundColor color)
+void narrationImpl(const char* m, ForegroundColor color, int sleep_ms_each_char)
 {
     hideCursor();
     //std::cout<<m;
@@ -23,25 +18,53 @@ void narrationImpl(const char* m, ForegroundColor color)
         char print[]={m[i],m[i+1],m[i+2], '\0'};
         styledWrite(color, StyleSet{styleBright},print);
         fflush(stdout);
-        ms_sleep(30);
+        ms_sleep(sleep_ms_each_char);
     }
-    std::cout<<std::endl;
     showCursor();
 }
 
-void narration(const char* m)
+static
+void narrationImpl(const char* m, ForegroundColor color)
+{
+    narrationImpl(m, color, 45);
+}
+
+#define NL() putchar('\n')
+
+void narrationNoL(const char* m)
 {
     narrationImpl(m, fgYellow);
 }
+void narration(const char* m)
+{
+    narrationNoL(m);
+    NL();
+}
 
-void npcTalk(const char* m)
+
+// long narration
+void narrationLong(const char* m)
+{
+    narrationImpl(m, fgYellow, 60);
+    NL();
+}
+
+void npcTalkNoL(const char* m)
 {
     narrationImpl(m, fgGreen);
 }
 
+void npcTalk(const char* m)
+{
+    npcTalkNoL(m);
+    NL();
+
+}
+
 void heroTalk(const char* m)
 {
-    narrationImpl(m, fgWhite);
+    narrationImpl(m, fgWhite, 55);
+    NL();
 }
 
 Scenario::Scenario(Hero& hero, Store& storem):h(hero),store(storem)
@@ -58,17 +81,51 @@ int Scenario::getScenario()
     return scenario;
 }
 
+static
+void doEach(std::function<void(const char*)> F, int sleep_ms_each_line, std::initializer_list<const char* const> ls)
+{
+    for (auto i: ls) {
+        F(i);
+        ms_sleep(sleep_ms_each_line);
+        putchar('\n');
+    }
+}
+
+
+
 void
 Scenario::begin()
 {
-    narration("你缓缓地从一片黑暗中苏醒过来，周身弥漫着一股霉味和潮湿的气息。脑袋里一片空白，没有过去的记忆来填补这突如其来的存在感。你的视线逐渐聚焦，发现自己身上仅穿着几件破旧不堪的衣物，似乎已经经历了无数次的磨损和风化。环顾四周，发现自己身处一个昏暗的地穴之中，头顶上是粗糙的岩石，周围零星散落着一些破碎的石头和尘土。当你试图站起来时，一阵眩晕袭来，但你还是坚持着摇晃着站稳了脚跟。这时，你的眼睛被前方的一丝微弱光线所吸引——那是地穴的一个出口。尽管光亮并不强烈，但在这样的环境中，它就像是希望的灯塔一样引人注目。你朝着光源走去，每一步都小心翼翼，生怕惊扰了这份难得的宁静。随着距离的缩短，你发现那光线的背后竟然走进来一个人影。");
-    ms_sleep(1000);
+    setCursorPos(0, 0);
+    doEach(narrationNoL, 400, {
+                "你缓缓地从一片黑暗中苏醒过来，周身弥漫着一股霉味和潮湿的气息。"
+               ,"脑袋里一片空白，没有过去的记忆来填补这突如其来的存在感。"
+               ,"你的视线逐渐聚焦，发现自己身上仅穿着几件破旧不堪的衣物，似乎已经经历了无数次的磨损和风化。"
+               ,"环顾四周，发现自己身处一个昏暗的地穴之中，头顶上是粗糙的岩石，周围零星散落着一些破碎的石头和尘土。"
+               ,"当你试图站起来时，一阵眩晕袭来，但你还是坚持着摇晃着站稳了脚跟。"
+               ,"这时，你的眼睛被前方的一丝微弱光线所吸引——那是地穴的一个出口。"
+               ,"尽管光亮并不强烈，但在这样的环境中，它就像是希望的灯塔一样引人注目。"
+               ,"你朝着光源走去，每一步都小心翼翼，生怕惊扰了这份难得的宁静。"
+    });
+    doEach(
+        [](const char* m){narrationImpl(m, fgYellow, 250);},
+        1000, {"· · · "}); // hint： strlen("·") == 2
+    narration("随着距离的缩短，你发现那光线的背后竟然走进来一个人影。");
+    ms_sleep(500);
     eraseScreen();
     npcTalk("？？？：看来你醒了，别露出一副狼狈的模样，打起精神来！不然在这里会死的！");
     heroTalk("你：这是哪里？你是谁？");
     ms_sleep(1000);
-    npcTalk("？？？：别问这些浪费体力的问题，你现在最应该做的是想办法出去！哦我忘了，瞧瞧你，连个武器都没有，还一副要死的样子，真是可怜。这样吧，这些东西送给你，别高兴得太早，外面有很多“家伙”在等着你呢！想要逃出这个鬼地方，就想办法让自己变得更强，拿到鬼玺之后来找我！当然，有金币的话也可以来岩穴和我这换一些东西，你会需要的。");
+    doEach(npcTalkNoL, 400, {
+        "？？？：别问这些浪费体力的问题，你现在最应该做的是想办法出去！"
+       ,"哦我忘了，瞧瞧你，连个武器都没有，还一副要死的样子，真是可怜。"
+       ,"这样吧，这些东西送给你，别高兴得太早，外面有很多“家伙”在等着你呢！"
+       ,"想要逃出这个鬼地方，就想办法让自己变得更强，拿到鬼玺之后来找我！"
+       ,"当然，有金币的话也可以来岩穴和我这换一些东西，你会需要的。"
+    });
+    ms_sleep(600);
     narration("你获得了地图，木剑 ×１，生命药水 ×１，当前的位置是“岩穴”");
+    ms_sleep(600);
     std::shared_ptr<ClothArmhour> a = std::make_shared<ClothArmhour>();
     std::shared_ptr<LifeMedicine> b = std::make_shared<LifeMedicine>();
     std::shared_ptr<WoodenSword> c = std::make_shared<WoodenSword> ();
@@ -76,7 +133,10 @@ Scenario::begin()
     h.getBag().get(b,1);
     h.getBag().get(c,1);
     h.getBag().displayEquipColumnAndChange(h);
-    ms_sleep(3000);
+    eraseScreen();
+    hideCursor();
+    ms_sleep(400);
+    showCursor();
     adjustScenario(1);
 }
 

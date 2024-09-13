@@ -98,6 +98,10 @@ target_link_libraries(test_combat PRIVATE equip)
 # foreach(i equip combat)
   
 # endforeach()
+target_link_libraries(pathutils PRIVATE oserrors)
+
+target_link_libraries(backup  PRIVATE pathutils)
+
 
 target_link_libraries(equip  PRIVATE terminal)
 target_link_libraries(combat PRIVATE terminal)

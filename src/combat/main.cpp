@@ -522,7 +522,7 @@ int Battle::playerRound()
         }
         player->use(i->first,1);
         std::cout << "使用" << i->first->name << "成功！" << std::endl;
-		player->showHero();
+				player->showHero();
         playerRound();
 		return -1;
 	}
@@ -590,6 +590,7 @@ bool Battle::ifEnd()//战斗是否结束
 }
 void Battle::battleEnd()
 {
+	eraseScreen();
 	std::cout << enemy.getName() << "掉落了" << enemy.getGold() << "枚金币。" << std::endl;
 	std::cout << "你获得了" << enemy.getExp() << "点经验值。" << std::endl;
 	player->addExp(enemy.getExp());
@@ -1030,6 +1031,7 @@ void fight(Hero& hero,Enemy& enemy)
 				str2 = defVal;
 				str3 = defVal;
 				closeFunc();
+				eraseScreen();
 				std::cout << std::endl
 									<< "战斗失败,游戏结束";
 				ms_sleep(1000);
@@ -1046,6 +1048,7 @@ void fight(Hero& hero,Enemy& enemy)
 				str2 = defVal;
 				str3 = defVal;
 				closeFunc();
+				eraseScreen();
 				std::cout << std::endl
 									<< "战斗失败,游戏结束";
 				ms_sleep(1000);
@@ -1082,17 +1085,17 @@ void fight(Hero& hero,Enemy& enemy)
 				str1 = defVal;
 				str2 = defVal;
 				str3 = defVal;
-                closeFunc();
-                std::cout << "逃跑成功";
+				closeFunc();
+				std::cout << "逃跑成功";
 				ms_sleep(1000);
 			}
-            else
-            {
-                str = "逃跑失败" ;
-                str1 = defVal;
-                str2 = defVal;
-                str3 = defVal;
-            }
+			else
+			{
+				str = "逃跑失败" ;
+				str1 = defVal;
+				str2 = defVal;
+				str3 = defVal;
+			}
 		}
     },Style());
 
@@ -1106,65 +1109,68 @@ void fight(Hero& hero,Enemy& enemy)
             auto& sk = hero.getskills()[i];
             if(sk.getMagicLose() > hero.getMp())
             {
-                str = "当前魔法不足，请重新选择";
-                str1 = defVal;
-                str2 = defVal;
-                str3 = defVal;
+							str = "当前魔法不足，请重新选择";
+							str1 = defVal;
+							str2 = defVal;
+							str3 = defVal;
             }
             else
             {
-                fun(hero,enemy,sk);
-				if (enemy.getHp() <= 0 || hero.getHp() <= 0)
-				{
-					end = true;
-				}
-				else
-				{
-					end = false;
-				};
-			}
-			if(end == false)
-			{
-				enemyAttack(hero,enemy);
-				if (hero.getHp() <= 0)
-				{
-					str = defVal;
-					str1 = defVal;
-					str2 = defVal;
-					str3 = defVal;
-					closeFunc();                
-					std::cout << std::endl <<"战斗失败,游戏结束";
-					ms_sleep(1000);
-					throw FailCombat();
-				}
-			}
-			else
-			{
-				closeFunc();
-				if (hero.getHp() <= 0)
-				{
-					str = defVal;
-					str1 = defVal;
-					str2 = defVal;
-					str3 = defVal;
-					closeFunc();                
-					std::cout << std::endl <<"战斗失败,游戏结束";
-					ms_sleep(1000);
-					throw FailCombat();
-					
-				}
-				else if(enemy.getHp() <= 0 )
-				{
-					str = defVal;
-					str1 = defVal;
-					str2 = defVal;
-					str3 = defVal;
-					closeFunc();                
-					std::cout << std::endl<< "战斗成功";
-					ms_sleep(1000);
-				}
-            
-        }
+							fun(hero,enemy,sk);
+							if (enemy.getHp() <= 0 || hero.getHp() <= 0)
+							{
+								end = true;
+							}
+							else
+							{
+								end = false;
+							};
+						}
+						if (end == false)
+						{
+							enemyAttack(hero, enemy);
+							if (hero.getHp() <= 0)
+							{
+								str = defVal;
+								str1 = defVal;
+								str2 = defVal;
+								str3 = defVal;
+								closeFunc();
+								eraseScreen();
+								std::cout << std::endl
+													<< "战斗失败,游戏结束";
+								ms_sleep(1000);
+								throw FailCombat();
+							}
+						}
+						else
+						{
+							closeFunc();
+							if (hero.getHp() <= 0)
+							{
+								str = defVal;
+								str1 = defVal;
+								str2 = defVal;
+								str3 = defVal;
+								closeFunc();
+								eraseScreen();
+								std::cout << std::endl
+													<< "战斗失败,游戏结束";
+								ms_sleep(1000);
+								throw FailCombat();
+							}
+							else if (enemy.getHp() <= 0)
+							{
+								str = defVal;
+								str1 = defVal;
+								str2 = defVal;
+								str3 = defVal;
+								closeFunc();
+								std::cout << std::endl
+													<< "战斗成功";
+								ms_sleep(1000);
+							}
+						}
 
         },Style()));
     }
